@@ -1,0 +1,843 @@
+<div class="bg-white font-sans text-gray-800">
+
+  <!-- HERO SECTION -->
+  <section class="relative pt-20 pb-16 overflow-hidden flex flex-col items-center text-center px-4">
+    <!-- Background blob -->
+    <div
+      class="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-[#f0f7ff] to-transparent -z-10 rounded-b-[100px]">
+    </div>
+
+    <h1 appScrollReveal="words" [revealDelay]="20"
+      class="text-4xl md:text-5xl lg:text-6xl font-normal text-[#0a1b3f] max-w-4xl tracking-tight leading-[1.15]">
+      Transform Your Clothing Store <br class="hidden md:block" />
+      With <span
+        class="text-primary-600 underline decoration-primary-300 decoration-4 underline-offset-4">Clothify</span> - The
+      Ultimate <br class="hidden md:block" />
+      Store Management Software
+    </h1>
+    <p appScrollReveal="element" [revealDelay]="200"
+      class="text-sm md:text-base font-normal text-gray-500 mt-2 max-w-xl w-full mt-5">Simplify salon management with
+      Barbera’s easy-to-use salon management software , designed for better customer engagement and retention.</p>
+
+    <div class="mt-6 flex flex-col items-center">
+      <div class="flex items-center gap-1 text-yellow-400 text-lg">
+        <!-- <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i> -->
+      </div>
+      <!-- <p class="text-sm md:text-base font-normal text-[#0a1b3f] mt-2">Trusted by 5,000+ fashion businesses globally</p> -->
+    </div>
+
+    <a routerLink="/contact-us" [queryParams]="{demo: 'true'}"
+      class="mt-8 bg-primary-600 text-white px-8 py-3.5 rounded-full text-base normal hover:bg-primary-700 transition-all ">
+      Book Free Demo
+    </a>
+
+    <!-- Dashboard & Phone Mockups Overlapping -->
+    <div appScrollReveal="element" [revealFromY]="60" class="mt-16 md:mt-24 max-w-7xl w-full mx-auto px-4 sm:px-6">
+      <div class="relative flex items-center justify-end">
+        <!-- Dashboard Mockup (Main, slightly right) -->
+        <div class="w-full bg-white rounded-2xl md:rounded-[32px] p-2 md:p-4">
+          <div class="relative overflow-hidden border border-gray-50 bg-gray-50 flex flex-col">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white "></div>
+            <img src="/dashboard.png" alt="Dashboard Preview" class="w-full h-auto object-cover" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline below the mockups -->
+    <div appScrollReveal="children" [revealDelay]="100" class="mt-24 md:mt-32 text-center max-w-3xl mx-auto space-y-4">
+      <h2 class="text-3xl md:text-5xl normal text-[#0a1b3f]">
+        Made for <span class="text-primary-600">Simplicity</span> – The <br />
+        Easiest Retail Management Software <br />
+        for Your Business
+      </h2>
+      <p class="text-gray-500 text-sm md:text-base leading-relaxed px-4">
+        A software with powerful features tailored perfectly to suit the dynamic needs of your clothing boutique or
+        apparel chain.
+      </p>
+    </div>
+
+     <div class="mt-12 w-full max-w-5xl mx-auto bg-white rounded-2xl  border border-gray-50 py-6 px-8 flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70">
+           <span class="text-xl normal text-gray-400">StyleHub</span>
+           <span class="text-xl font-serif italic text-gray-400">FabNest</span>
+           <span class="text-xl font-black uppercase text-gray-400">Modeva</span>
+           <span class="text-xl font-mono text-gray-400" >NextWear</span>
+      </div>
+
+    <div appScrollReveal="element" [revealFromY]="60" class="max-w-8xl w-full mx-auto px-4 sm:px-6 ">
+      <div class="relative flex items-center justify-end">
+        <!-- Dashboard Mockup (Main, slightly right) -->
+        <div class="w-full bg-white rounded-2xl md:rounded-[32px] p-2 md:p-4">
+          <div class="relative overflow-hidden border border-gray-50 bg-gray-50 flex flex-col">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white "></div>
+            <!-- <img src="/dashboard.png" alt="Dashboard Preview" class="w-full h-auto object-cover" /> -->
+            <img src="/phone.png" alt="Staff App Phone Mockup"
+              class="w-full h-auto object-cover rounded-xl md:rounded-3xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline below the mockups -->
+    <div appScrollReveal="children" [revealDelay]="100" class="mt-24 md:mt-32 text-center max-w-3xl mx-auto space-y-6">
+      <h2 class="text-3xl md:text-5xl font-normal leading-tight text-[#0a1b3f]">
+        Powerful Retail Management Software
+        <span class="text-primary-600">Built for Fashion Businesses</span>
+      </h2>
+
+      <p class="text-gray-500 text-base md:text-lg leading-relaxed px-4">
+        Manage inventory, billing, customers, purchases, expenses, and multiple
+        stores from one platform. Empower your staff with the built-in
+        <strong>Staff App</strong> for sales, stock updates, and daily operations—
+        everything you need to run your clothing business efficiently.
+      </p>
+    </div>
+
+    <!-- Trusted By Logos (Mock) -->
+    <div
+      class="mt-12 w-full max-w-5xl mx-auto bg-white rounded-2xl  border border-gray-50 py-6 px-8 flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70">
+      <span class="text-xl normal text-gray-400">TRENDZ</span>
+      <span class="text-xl font-serif italic text-gray-400">Boutique</span>
+      <span class="text-xl font-black uppercase text-gray-400">Urban Wear</span>
+      <span class="text-xl font-mono text-gray-400">THREADS</span>
+    </div>
+  </section>
+
+  <!-- WHAT YOU CAN DO TABS SECTION -->
+  <section class="py-16 px-4">
+    <div appScrollReveal="children" [revealDelay]="150" class="max-w-5xl mx-auto text-center space-y-8">
+      <h4 class="text-primary-600 normal uppercase tracking-wider text-sm">Key Functionalities of Clothify</h4>
+      <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f]">What you can do with Clothify</h2>
+
+      <!-- Tabs Navigation -->
+      <div class="flex flex-wrap justify-center gap-2 md:gap-4 mt-8">
+        <button (click)="activeTab.set('pos')" [class.bg-primary-600]="activeTab() === 'pos'"
+          [class.text-white]="activeTab() === 'pos'" [class.bg-white]="activeTab() !== 'pos'"
+          [class.text-gray-600]="activeTab() !== 'pos'"
+          class="px-6 py-2.5 rounded-full normal text-sm shadow-sm border border-gray-200 transition-colors">Point of
+          Sale (POS)</button>
+        <button (click)="activeTab.set('inventory')" [class.bg-primary-600]="activeTab() === 'inventory'"
+          [class.text-white]="activeTab() === 'inventory'" [class.bg-white]="activeTab() !== 'inventory'"
+          [class.text-gray-600]="activeTab() !== 'inventory'"
+          class="px-6 py-2.5 rounded-full normal text-sm shadow-sm border border-gray-200 transition-colors">Inventory</button>
+        <button (click)="activeTab.set('marketing')" [class.bg-primary-600]="activeTab() === 'marketing'"
+          [class.text-white]="activeTab() === 'marketing'" [class.bg-white]="activeTab() !== 'marketing'"
+          [class.text-gray-600]="activeTab() !== 'marketing'"
+          class="px-6 py-2.5 rounded-full normal text-sm shadow-sm border border-gray-200 transition-colors">Marketing</button>
+        <button (click)="activeTab.set('reports')" [class.bg-primary-600]="activeTab() === 'reports'"
+          [class.text-white]="activeTab() === 'reports'" [class.bg-white]="activeTab() !== 'reports'"
+          [class.text-gray-600]="activeTab() !== 'reports'"
+          class="px-6 py-2.5 rounded-full normal text-sm shadow-sm border border-gray-200 transition-colors">Reports</button>
+        <button (click)="activeTab.set('website')" [class.bg-primary-600]="activeTab() === 'website'"
+          [class.text-white]="activeTab() === 'website'" [class.bg-white]="activeTab() !== 'website'"
+          [class.text-gray-600]="activeTab() !== 'website'"
+          class="px-6 py-2.5 rounded-full normal text-sm shadow-sm border border-gray-200 transition-colors">Online
+          Store</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div
+        class="mt-12 bg-white rounded-3xl border border-gray-200  p-6 md:p-12 text-left flex flex-col md:flex-row items-center gap-12">
+        <!-- Content Left -->
+        <div class="flex-1 space-y-6">
+          <h3 class="text-2xl md:text-3xl normal text-[#0a1b3f]">
+            <ng-container *ngIf="activeTab() === 'pos'">Lightning-fast billing counter</ng-container>
+            <ng-container *ngIf="activeTab() === 'inventory'">Never run out of stock</ng-container>
+            <ng-container *ngIf="activeTab() === 'marketing'">Keep customers coming back</ng-container>
+            <ng-container *ngIf="activeTab() === 'reports'">Data-driven decisions</ng-container>
+            <ng-container *ngIf="activeTab() === 'website'">Launch your online store instantly</ng-container>
+          </h3>
+          <p class="text-gray-500 leading-relaxed text-lg">
+            <ng-container *ngIf="activeTab() === 'pos'">Scan barcodes, apply bulk discounts, and print or WhatsApp
+              digital invoices in seconds. Our highly optimized POS interface ensures your checkout queues move faster
+              than ever.</ng-container>
+            <ng-container *ngIf="activeTab() === 'inventory'">Manage hundreds of SKUs, sizes, and colors effortlessly.
+              Get low-stock alerts, print barcodes, and handle vendor returns all from a single
+              dashboard.</ng-container>
+            <ng-container *ngIf="activeTab() === 'marketing'">Send personalized WhatsApp promotions, track customer
+              loyalty points, and send automatic birthday discounts to build a loyal customer base.</ng-container>
+            <ng-container *ngIf="activeTab() === 'reports'">Monitor daily revenue, top-selling items, and staff
+              performance with real-time analytics. Export beautifully formatted reports for your
+              accountant.</ng-container>
+            <ng-container *ngIf="activeTab() === 'website'">Create your own beautifully designed eCommerce website in
+              just a few clicks. Seamlessly receive orders online, track deliveries, and expand your reach without any
+              coding knowledge.</ng-container>
+          </p>
+          <button (click)="openModal()"
+            class="text-primary-600 normal hover:text-primary-700 flex items-center gap-2 transition-colors cursor-pointer">
+            Know More <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+        <!-- Mock Graphic Right -->
+        <div class="flex-1 w-full max-w-sm mx-auto">
+          <div
+            class="bg-gray-50 rounded-2xl border border-gray-200 p-4 shadow-inner relative h-[300px] flex flex-col items-center justify-center overflow-hidden">
+            <!-- Abstract visual based on tab -->
+            <i [class]="activeTab() === 'pos' ? 'bi-calculator' : activeTab() === 'inventory' ? 'bi-boxes' : activeTab() === 'marketing' ? 'bi-megaphone' : activeTab() === 'website' ? 'bi-globe' : 'bi-graph-up'"
+              class="bi text-7xl text-primary-200 mb-4 drop-shadow-md"></i>
+            <div class="w-3/4 h-3 bg-gray-200 rounded-full mb-2"></div>
+            <div class="w-1/2 h-3 bg-gray-200 rounded-full"></div>
+
+            <!-- Floating mock element -->
+            <div
+              class="absolute bottom-4 right-4 bg-white p-3 rounded-xl shadow-lg border border-gray-200 flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center"><i
+                  class="bi bi-check-lg"></i></div>
+              <div class="flex flex-col">
+                <span class="text-xs normal text-gray-800">Done!</span>
+                <span class="text-[10px] text-gray-400">Processed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALL FEATURES GRID -->
+  <section class="py-16 px-4">
+    <div appScrollReveal="children" [revealDelay]="100"
+      class="max-w-6xl mx-auto bg-[#f6f9ff] rounded-[40px] p-8 md:p-16 text-center">
+      <h4 class="text-primary-600 normal mb-4 uppercase tracking-wider text-sm">Features</h4>
+      <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f] mb-12">Everything you need to manage your store</h2>
+
+      <div appScrollReveal="children" [revealDelay]="50"
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-left">
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-upc-scan text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Barcode Billing</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-person-badge text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Staff Management</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-file-earmark-bar-graph text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">GST Reports</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-tags text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Discount Management</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-wallet2 text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Expense Tracker</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-diagram-3 text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Multi-store Sync</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-award text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Customer Loyalty</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-truck text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Vendor Management</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-arrow-return-left text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Return & Refund</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-receipt text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Digital Invoices</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-box-seam text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Size & Color Matrix</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-bar-chart-line text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Real-time Analytics</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-journal-check text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Customer Udhar (Credit)</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-shield-lock text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Role-Based Access</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-globe2 text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">eCommerce Website</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-phone text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Mobile App Support</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-cash-stack text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Credit Notes</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-percent text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Offers & Promotions</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer">
+          <i class="bi bi-bell text-primary-500 text-xl"></i>
+          <span class="normal text-gray-700 text-sm">Push Notifications</span>
+        </div>
+        <div
+          class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center gap-3 hover:shadow-md transition-shadow cursor-pointer text-primary-600 justify-center">
+          <span class="normal text-sm">+ View All Features</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZIG ZAG SECTIONS -->
+  <!-- Staff App Section -->
+  <section class="py-16 px-4">
+    <div appScrollReveal="children" [revealDelay]="150"
+      class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+      <div class="flex-1 space-y-6">
+        <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f]">Built-in Staff App</h2>
+        <p class="text-lg text-gray-500 leading-relaxed">
+          Empower your employees with a dedicated mobile application. Staff can easily process bills, manage daily
+          inventory, and track their performance right from their smartphones, without needing full access to the main
+          admin dashboard.
+        </p>
+      </div>
+      <div class="flex-1 relative">
+        <div class="absolute inset-0 bg-primary-100 rounded-full blur-3xl opacity-50"></div>
+        <!-- Mock Mobile Phone showing Staff App -->
+        <div
+          class="relative w-72 mx-auto bg-gray-50 border-[10px] border-white rounded-[40px] h-[550px] overflow-hidden flex flex-col shadow-2xl">
+          <div class="bg-primary-600 text-white p-6 pb-8 rounded-b-3xl flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white normal">
+                  <i class="bi bi-person"></i>
+                </div>
+                <div>
+                  <h5 class="normal text-sm">Hello, Amit</h5>
+                  <p class="text-[10px] opacity-80">Store Manager</p>
+                </div>
+              </div>
+              <i class="bi bi-bell"></i>
+            </div>
+            <div class="bg-white/10 rounded-xl p-3">
+              <p class="text-[10px] opacity-80 mb-1">Today's Sales</p>
+              <h4 class="text-2xl normal">₹12,450</h4>
+            </div>
+          </div>
+          <div class="flex-1 bg-gray-50 p-4 space-y-4 -mt-4 relative z-10">
+            <div class="grid grid-cols-2 gap-3">
+              <div
+                class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i
+                    class="bi bi-upc-scan"></i></div>
+                <span class="text-xs normal text-gray-700">Quick Bill</span>
+              </div>
+              <div
+                class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i
+                    class="bi bi-box"></i></div>
+                <span class="text-xs normal text-gray-700">Stock Check</span>
+              </div>
+              <div
+                class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center"><i
+                    class="bi bi-arrow-return-left"></i></div>
+                <span class="text-xs normal text-gray-700">Returns</span>
+              </div>
+              <div
+                class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center"><i
+                    class="bi bi-person-lines-fill"></i></div>
+                <span class="text-xs normal text-gray-700">Customers</span>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 mt-4">
+              <h6 class="text-xs normal text-gray-500 mb-2">Recent Transactions</h6>
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-500"><i
+                      class="bi bi-receipt"></i></div>
+                  <div class="flex flex-col">
+                    <span class="text-xs normal text-gray-800">#INV-4920</span>
+                    <span class="text-[9px] text-gray-400">2 mins ago</span>
+                  </div>
+                </div>
+                <span class="text-xs normal text-green-600">+₹2,450</span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-500"><i
+                      class="bi bi-receipt"></i></div>
+                  <div class="flex flex-col">
+                    <span class="text-xs normal text-gray-800">#INV-4919</span>
+                    <span class="text-[9px] text-gray-400">15 mins ago</span>
+                  </div>
+                </div>
+                <span class="text-xs normal text-green-600">+₹890</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inventory Section -->
+  <section class="py-16 px-4 bg-gray-50/50">
+    <div appScrollReveal="children" [revealDelay]="150"
+      class="max-w-6xl mx-auto flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-24">
+      <div class="flex-1 space-y-6">
+        <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f]">Smart Inventory & Alerts</h2>
+        <p class="text-lg text-gray-500 leading-relaxed">
+          Define minimum stock levels and let Clothify notify you when it's time to reorder. Avoid dead stock by
+          tracking slow-moving items in real-time.
+        </p>
+      </div>
+      <div class="flex-1 relative">
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-200 p-6 w-full max-w-md mx-auto">
+          <h4 class="normal text-[#0a1b3f] border-b border-gray-200 pb-4 mb-4">Low Stock Alerts</h4>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i
+                    class="bi bi-exclamation-triangle"></i></div>
+                <div>
+                  <p class="normal text-sm text-gray-800">Men's Denim Jacket</p>
+                  <p class="text-xs text-gray-400">Size: M | Color: Blue</p>
+                </div>
+              </div>
+              <span class="text-red-500 normal text-sm">2 Left</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500"><i
+                    class="bi bi-bell"></i></div>
+                <div>
+                  <p class="normal text-sm text-gray-800">Cotton T-Shirt</p>
+                  <p class="text-xs text-gray-400">Size: L | Color: White</p>
+                </div>
+              </div>
+              <span class="text-orange-500 normal text-sm">5 Left</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-500"><i
+                    class="bi bi-box"></i></div>
+                <div>
+                  <p class="normal text-sm text-gray-800">Summer Dress Floral</p>
+                  <p class="text-xs text-gray-400">Size: S</p>
+                </div>
+              </div>
+              <span class="text-gray-500 normal text-sm">12 Left</span>
+            </div>
+          </div>
+          <button
+            class="w-full mt-6 py-2.5 rounded-lg border border-gray-200 text-sm normal text-gray-600 hover:bg-gray-50">Generate
+            PO</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Web Builder Section -->
+  <section class="py-16 px-4">
+    <div appScrollReveal="children" [revealDelay]="150"
+      class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+      <div class="flex-1 space-y-6">
+        <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f]">Built-in Website Builder</h2>
+        <p class="text-lg text-gray-500 leading-relaxed">
+          Launch your online store instantly without any coding knowledge. Choose from beautiful templates, customize
+          your layout, and start receiving orders directly from your customers. Everything syncs perfectly with your
+          physical store's inventory.
+        </p>
+      </div>
+      <div class="flex-1 relative">
+        <div class="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+        <!-- Mock Browser UI showing Web Builder -->
+        <div
+          class="relative w-full max-w-[400px] mx-auto bg-gray-50 border border-gray-200 rounded-2xl h-[350px] overflow-hidden flex flex-col shadow-xl z-10">
+          <!-- Browser Header -->
+          <div class="bg-gray-200 px-4 py-2 flex items-center gap-2">
+            <div class="flex gap-1.5">
+              <div class="w-3 h-3 rounded-full bg-red-400"></div>
+              <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+              <div class="w-3 h-3 rounded-full bg-green-400"></div>
+            </div>
+            <div class="bg-white/60 mx-4 flex-1 h-6 rounded text-[10px] text-gray-500 flex items-center px-2">
+              mystore.clothify.com</div>
+          </div>
+          <!-- Browser Content -->
+          <div class="flex-1 bg-white relative">
+            <!-- Sidebar -->
+            <div
+              class="absolute left-0 top-0 bottom-0 w-16 bg-gray-50 border-r border-gray-100 flex flex-col items-center py-4 gap-4">
+              <div
+                class="w-8 h-8 rounded bg-primary-100 text-primary-600 flex items-center justify-center cursor-pointer shadow-sm">
+                <i class="bi bi-layout-text-window-reverse"></i></div>
+              <div
+                class="w-8 h-8 rounded text-gray-400 flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                <i class="bi bi-image"></i></div>
+              <div
+                class="w-8 h-8 rounded text-gray-400 flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                <i class="bi bi-palette"></i></div>
+              <div
+                class="w-8 h-8 rounded text-gray-400 flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                <i class="bi bi-gear"></i></div>
+            </div>
+            <!-- Main Canvas -->
+            <div class="ml-16 p-4 h-full flex flex-col">
+              <!-- Header mock -->
+              <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100 border-dashed">
+                <div class="w-20 h-4 bg-gray-200 rounded"></div>
+                <div class="flex gap-2">
+                  <div class="w-8 h-2 bg-gray-200 rounded"></div>
+                  <div class="w-8 h-2 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+              <!-- Hero mock -->
+              <div
+                class="bg-gray-50 rounded-xl h-24 mb-4 flex items-center justify-center border-2 border-primary-400 border-dashed relative group cursor-pointer hover:bg-primary-50 transition-colors">
+                <span class="text-xs font-semibold text-primary-600">Edit Hero Section</span>
+                <!-- Active marker -->
+                <div class="absolute -right-1 -top-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white"></div>
+              </div>
+              <!-- Grid mock -->
+              <div class="grid grid-cols-3 gap-2 flex-1 pb-2">
+                <div class="bg-gray-100 rounded-lg h-full border border-gray-200 border-dashed"></div>
+                <div class="bg-gray-100 rounded-lg h-full border border-gray-200 border-dashed"></div>
+                <div class="bg-gray-100 rounded-lg h-full border border-gray-200 border-dashed"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enterprise Capabilities Section -->
+  <section class="py-16 px-4 bg-gray-50/50 border-t border-b border-gray-100">
+    <div appScrollReveal="children" [revealDelay]="100" class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f] mb-4">Enterprise-Grade Capabilities</h2>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">Everything you need to scale your retail operations, built
+          right in.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+        <!-- Custom API -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl mb-4">
+            <i class="bi bi-code-slash"></i></div>
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-2">Custom API Integration</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Connect Clothify with your existing tools, ERPs, or custom
+            software seamlessly using our robust developer APIs.</p>
+        </div>
+
+        <!-- Shipment & Payment -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div
+            class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4"><i
+              class="bi bi-truck"></i></div>
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-2">Shipment & Payment</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Integrated payment gateways and automated shipping partner
+            integrations for smooth online and offline checkouts.</p>
+        </div>
+
+        <!-- Advance Report & GST -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4"><i
+              class="bi bi-file-earmark-bar-graph"></i></div>
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-2">Advance & GST Reports</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Generate one-click GST reports for accounting, alongside
+            advanced predictive analytics for inventory and sales forecasting.</p>
+        </div>
+
+        <!-- Multiple Branch -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl mb-4">
+            <i class="bi bi-diagram-3"></i></div>
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-2">Multiple Branch Support</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Manage inventory, staff, and sales across multiple locations
+            or franchises from a single centralized dashboard.</p>
+        </div>
+
+        <!-- Supplier Management -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-xl mb-4">
+            <i class="bi bi-people"></i></div>
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-2">Supplier Management</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Track vendor details, manage purchase orders, handle returns,
+            and monitor supplier payments in one place.</p>
+        </div>
+
+        <!-- Expense Tracker -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl mb-4"><i
+              class="bi bi-wallet2"></i></div>
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-2">Expense Tracker</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Log daily shop expenses, staff salaries, and overheads to
+            calculate your exact net profit margins accurately.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO CAN USE SECTION -->
+  <section appScrollReveal="children" [revealDelay]="150" class="py-24 px-4 text-center border-t border-gray-200">
+    <h2 class="text-3xl md:text-4xl normal text-[#0a1b3f] mb-4">Who can use Clothify?</h2>
+    <p class="text-gray-500 max-w-xl mx-auto mb-12 text-lg">Designed specifically for apparel and fashion retailers of
+      all sizes.</p>
+
+    <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+      <div class="px-6 py-3 rounded-full bg-[#f0f7ff] text-primary-700 normal border border-primary-100">Men's Wear
+        Shops</div>
+      <div class="px-6 py-3 rounded-full bg-[#f0f7ff] text-primary-700 normal border border-primary-100">Women's
+        Boutiques</div>
+      <div class="px-6 py-3 rounded-full bg-[#f0f7ff] text-primary-700 normal border border-primary-100">Kids Wear</div>
+      <div class="px-6 py-3 rounded-full bg-[#f0f7ff] text-primary-700 normal border border-primary-100">Footwear Stores
+      </div>
+      <div class="px-6 py-3 rounded-full bg-[#f0f7ff] text-primary-700 normal border border-primary-100">Sports Apparel
+      </div>
+      <div class="px-6 py-3 rounded-full bg-[#f0f7ff] text-primary-700 normal border border-primary-100">Multi-Brand
+        Retail Chains</div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="py-16 px-4 pb-32">
+    <div
+      class="max-w-5xl mx-auto bg-gradient-to-br from-[#0a1b3f] to-[#1a3673] rounded-[40px] p-10 md:p-16 text-center text-white relative overflow-hidden">
+      <!-- Abstract Background Elements -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500 rounded-full blur-[80px] opacity-40 mix-blend-screen">
+      </div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-400 rounded-full blur-[80px] opacity-30 mix-blend-screen">
+      </div>
+
+      <div class="relative z-10 max-w-2xl mx-auto space-y-8">
+        <h2 class="text-3xl md:text-5xl normal leading-tight">
+          A Complete Retail Technology Software To Scale & Speed Up Your Stores
+        </h2>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a routerLink="/contact-us" [queryParams]="{demo: 'true'}"
+            class="bg-white text-[#0a1b3f] px-10 py-4 rounded-full text-base normal shadow-xl hover:bg-gray-50 transition-all ">
+            Book Free Demo
+          </a>
+          <a href="http://localhost:4200/login"
+            class="bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-full text-base normal hover:bg-white/10 transition-all">
+            Login
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DETAILS -->
+  <div *ngIf="isModalOpen()"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm transition-opacity">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+      <!-- Close Button -->
+      <button (click)="closeModal()"
+        class="absolute top-4 right-4 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors z-10">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <div class="p-8 md:p-12">
+
+        <!-- POS Details -->
+        <div *ngIf="activeTab() === 'pos'">
+          <div
+            class="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+            <i class="bi bi-calculator"></i>
+          </div>
+          <h2 class="text-3xl font-normal text-[#0a1b3f] mb-4">Point of Sale (POS)</h2>
+          <p class="text-gray-600 text-lg mb-8 leading-relaxed">Experience a lightning-fast billing counter designed for
+            retail apparel. Our POS system helps you manage checkout queues efficiently, scan items instantly, and keep
+            your customers happy.</p>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">How it works</h3>
+          <ul class="space-y-4 text-gray-600 mb-8">
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Instant Barcode Scanning:</strong> Simply scan the tag, and the item is added to the cart in
+                milliseconds.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Apply Discounts:</strong> Easily apply percentage or flat discounts on single items or the
+                entire bill.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Digital Invoices:</strong> Go paperless. Send professional PDF invoices directly to the
+                customer's WhatsApp.</div>
+            </li>
+          </ul>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">Key Features</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Multiple payment modes (Cash, UPI, Card)</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Hold & Resume bills for waiting customers
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Staff-specific billing access</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Offline mode support</div>
+          </div>
+        </div>
+
+        <!-- Inventory Details -->
+        <div *ngIf="activeTab() === 'inventory'">
+          <div
+            class="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+            <i class="bi bi-boxes"></i>
+          </div>
+          <h2 class="text-3xl font-normal text-[#0a1b3f] mb-4">Smart Inventory Management</h2>
+          <p class="text-gray-600 text-lg mb-8 leading-relaxed">Never run out of your best-selling stock. Keep track of
+            every SKU, size, and color across multiple stores with our smart inventory system.</p>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">How it works</h3>
+          <ul class="space-y-4 text-gray-600 mb-8">
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Bulk Import:</strong> Upload your entire inventory via Excel/CSV instantly.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Size & Color Matrix:</strong> Group products by style and track individual variants
+                effortlessly.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Low Stock Alerts:</strong> Set minimum thresholds and get notified before you run out of
+                stock.</div>
+            </li>
+          </ul>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">Key Features</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Vendor Management</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Purchase Orders</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Custom Barcode Printing</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Vendor Return tracking</div>
+          </div>
+        </div>
+
+        <!-- Marketing Details -->
+        <div *ngIf="activeTab() === 'marketing'">
+          <div
+            class="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+            <i class="bi bi-megaphone"></i>
+          </div>
+          <h2 class="text-3xl font-normal text-[#0a1b3f] mb-4">Customer Marketing & Loyalty</h2>
+          <p class="text-gray-600 text-lg mb-8 leading-relaxed">Keep your customers coming back. Turn first-time buyers
+            into loyal brand advocates with automated marketing and loyalty programs.</p>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">How it works</h3>
+          <ul class="space-y-4 text-gray-600 mb-8">
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>WhatsApp Automation:</strong> Send festive greetings, new arrival alerts, and offers on
+                autopilot.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Loyalty Points:</strong> Automatically award points on every purchase that customers can
+                redeem later.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Birthday/Anniversary Campaigns:</strong> Delight customers with personalized wishes and
+                special discounts on their big days.</div>
+            </li>
+          </ul>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">Key Features</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">SMS/WhatsApp Campaigns</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Targeted Customer Segments</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Referral Tracking</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Custom Promotional Codes</div>
+          </div>
+        </div>
+
+        <!-- Reports Details -->
+        <div *ngIf="activeTab() === 'reports'">
+          <div
+            class="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+            <i class="bi bi-graph-up"></i>
+          </div>
+          <h2 class="text-3xl font-normal text-[#0a1b3f] mb-4">Advanced Reports & Analytics</h2>
+          <p class="text-gray-600 text-lg mb-8 leading-relaxed">Make data-driven decisions. Understand your business
+            performance at a glance with comprehensive dashboards and exportable reports.</p>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">How it works</h3>
+          <ul class="space-y-4 text-gray-600 mb-8">
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Real-time Dashboard:</strong> View today's sales, footfall, and top items live on your phone
+                or PC.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Staff Performance:</strong> Track which salesperson is driving the most revenue.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>GST & Tax Reports:</strong> Instantly generate GST-ready reports to hand over to your
+                accountant.</div>
+            </li>
+          </ul>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">Key Features</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Daily/Weekly Sales Reports</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Profit Margin Analysis</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Slow-moving Stock Report</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Expense Tracking</div>
+          </div>
+        </div>
+
+        <!-- Website Details -->
+        <div *ngIf="activeTab() === 'website'">
+          <div
+            class="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+            <i class="bi bi-globe"></i>
+          </div>
+          <h2 class="text-3xl font-normal text-[#0a1b3f] mb-4">Instant Online Store</h2>
+          <p class="text-gray-600 text-lg mb-8 leading-relaxed">Launch your own beautifully designed eCommerce website
+            in just a few clicks. Expand your reach beyond your physical store without any coding knowledge.</p>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">How it works</h3>
+          <ul class="space-y-4 text-gray-600 mb-8">
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>One-Click Publish:</strong> Sync your physical inventory directly to your online store
+                instantly.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Accept Online Orders:</strong> Customers can browse your catalog, add to cart, and place
+                orders directly from their phones.</div>
+            </li>
+            <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-green-500 mt-1"></i>
+              <div><strong>Payment & Delivery:</strong> Integrate online payments and manage order dispatch seamlessly.
+              </div>
+            </li>
+          </ul>
+
+          <h3 class="text-xl font-medium text-[#0a1b3f] mb-4 border-b border-gray-100 pb-2">Key Features</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Custom Domain Name Integration</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Mobile-Friendly Storefront UI</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">SEO Optimized for Google</div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">Direct WhatsApp Orders</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<section class="relative overflow-hidden bg-transparent px-4 py-12 text-gray-800">
+  <!-- Header -->
+  <div class="relative z-10 flex flex-col items-center justify-center text-center">
+    <span class="mb-3 bg-gradient-to-r from-primary-600 to-primary-600 bg-clip-text font-normal text-transparent uppercase tracking-wider text-xs">
+      {{ subtitle }}
+    </span>
+    <h2 class="mb-8 text-3xl sm:text-5xl font-normal text-[#0a1b3f] tracking-tight">{{ title }}</h2>
+    <span class="absolute -top-[350px] left-[50%] z-0 h-[500px] w-[600px] -translate-x-[50%] rounded-full bg-gradient-to-r from-primary-500/10 to-primary-500/5 blur-3xl"></span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="relative z-10 flex flex-wrap items-center justify-center gap-3">
+    @for (key of categoryKeys; track key) {
+      <button
+        (click)="selectCategory(key)"
+        class="relative overflow-hidden whitespace-nowrap rounded-full border px-5 py-2.5 text-sm font-normal transition-all duration-300"
+        [class.bg-primary-600]="selectedCategory() === key"
+        [class.text-white]="selectedCategory() === key"
+        [class.border-primary-600]="selectedCategory() === key"
+        [class.bg-white]="selectedCategory() !== key"
+        [class.text-gray-600]="selectedCategory() !== key"
+        [class.border-gray-200]="selectedCategory() !== key"
+        [class.hover:bg-gray-50]="selectedCategory() !== key"
+      >
+        <span class="relative z-10">{{ categories[key] }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- FAQ List -->
+  <div class="mx-auto mt-10 max-w-3xl space-y-4 relative z-10">
+    @for (faq of faqData[selectedCategory()]; track $index) {
+      <div
+        class="rounded-[1.5rem] border transition-all duration-300"
+        [class.bg-primary-50/10]="openFaqIndex() === $index"
+        [class.border-primary-100]="openFaqIndex() === $index"
+        [class.bg-white]="openFaqIndex() !== $index"
+        [class.border-gray-200]="openFaqIndex() !== $index"
+      >
+        <button
+          (click)="toggleFaq($index)"
+          class="flex w-full items-center justify-between gap-4 p-5 sm:p-6 text-left focus:outline-none"
+        >
+          <span
+            class="text-base sm:text-lg font-normal transition-colors duration-300"
+            [class.text-primary-600]="openFaqIndex() === $index"
+            [class.text-[#0a1b3f]]="openFaqIndex() !== $index"
+          >
+            {{ faq.question }}
+          </span>
+          <span
+            class="transition-transform duration-300 shrink-0 text-xl flex items-center justify-center w-6 h-6"
+            [class.rotate-45]="openFaqIndex() === $index"
+            [class.text-primary-600]="openFaqIndex() === $index"
+            [class.text-gray-400]="openFaqIndex() !== $index"
+          >
+            <i class="bi bi-plus-lg"></i>
+          </span>
+        </button>
+        
+        <!-- Answer section (animated using CSS Grid row transition) -->
+        <div
+          class="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          [class.grid-rows-[1fr]]="openFaqIndex() === $index"
+          [class.grid-rows-[0fr]]="openFaqIndex() !== $index"
+        >
+          <div class="overflow-hidden">
+            <p class="px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-gray-500 leading-relaxed font-normal">
+              {{ faq.answer }}
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-white pb-24 font-sans text-gray-800 relative">
+  <!-- Background gradient blob -->
+  <div class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-[#f0f7ff] to-transparent -z-10 rounded-b-[80px]"></div>
+
+  <!-- Hero Header -->
+  <section class="relative pt-20 pb-12 flex flex-col items-center text-center px-4">
+    <h1 appScrollReveal="words" [revealDelay]="20" class="text-4xl md:text-5xl lg:text-6xl font-normal text-[#0a1b3f] max-w-4xl tracking-tight leading-[1.15] mb-6">
+      How to <span class="text-gradient">Set up</span>
+    </h1>
+    <p appScrollReveal="element" [revealDelay]="200" class="text-sm md:text-base font-normal text-gray-500 max-w-xl leading-relaxed">
+      Follow our step-by-step guides to set up Clothify on your preferred platform.
+    </p>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 relative z-20 space-y-12">
+    <!-- Category Tabs (Glassmorphism) -->
+    <div appScrollReveal="element" [revealFromY]="20" class="bg-white rounded-3xl p-6 border border-gray-200 flex flex-col md:flex-row md:items-center justify-center gap-6">
+      <div class="flex flex-wrap gap-2">
+        @for (tab of tabs; track tab) {
+          <button
+            (click)="activeTab = tab"
+            class="px-5 py-2.5 rounded-full text-sm font-normal transition-all duration-300"
+            [class.bg-primary-600]="activeTab === tab"
+            [class.text-white]="activeTab === tab"
+            [class.bg-white]="activeTab !== tab"
+            [class.text-gray-600]="activeTab !== tab"
+            [class.border]="activeTab !== tab"
+            [class.border-gray-200]="activeTab !== tab"
+            [class.hover:bg-gray-50]="activeTab !== tab"
+          >
+            {{ tab }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 border border-gray-200 shadow-sm relative overflow-hidden min-h-[400px]">
+      <!-- Decorative background blob -->
+      <div class="absolute inset-0 bg-gradient-to-tr from-[#f8faff] to-white -z-10"></div>
+      
+      @if (activeTab === 'PC') {
+        <div class="space-y-12">
+          <h2 class="text-2xl sm:text-3xl font-normal text-[#0a1b3f] mb-8 text-center md:text-left">Setting up Clothify on PC</h2>
+          
+          <div appScrollReveal="children" [revealDelay]="80" class="space-y-6 mx-auto max-w-5xl">
+            @for (step of pcSteps; track $index) {
+              <div
+                class="rounded-[1.5rem] border transition-all duration-300 overflow-hidden shadow-sm"
+                [class.bg-primary-50/10]="openStepIndex === $index"
+                [class.border-primary-100]="openStepIndex === $index"
+                [class.bg-white]="openStepIndex !== $index"
+                [class.border-gray-200]="openStepIndex !== $index"
+              >
+                <!-- Accordion Header -->
+                <button
+                  (click)="toggleStep($index)"
+                  class="flex w-full items-center justify-between gap-4 p-5 sm:p-6 text-left focus:outline-none"
+                >
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-normal transition-colors shrink-0"
+                      [class.bg-primary-600]="openStepIndex === $index"
+                      [class.text-white]="openStepIndex === $index"
+                      [class.bg-[#f0f7ff]]="openStepIndex !== $index"
+                      [class.text-primary-600]="openStepIndex !== $index"
+                      [class.border]="openStepIndex !== $index"
+                      [class.border-primary-100]="openStepIndex !== $index"
+                    >
+                      {{ $index + 1 }}
+                    </div>
+                    <span
+                      class="text-lg sm:text-xl font-normal transition-colors duration-300"
+                      [class.text-primary-600]="openStepIndex === $index"
+                      [class.text-[#0a1b3f]]="openStepIndex !== $index"
+                    >
+                      {{ step.title }}
+                    </span>
+                  </div>
+                  
+                  <span
+                    class="transition-transform duration-300 shrink-0 text-xl flex items-center justify-center w-6 h-6"
+                    [class.rotate-45]="openStepIndex === $index"
+                    [class.text-primary-600]="openStepIndex === $index"
+                    [class.text-gray-400]="openStepIndex !== $index"
+                  >
+                    <i class="bi bi-plus-lg"></i>
+                  </span>
+                </button>
+                
+                <!-- Accordion Content -->
+                <div
+                  class="grid transition-[grid-template-rows] duration-300 ease-in-out"
+                  [class.grid-rows-[1fr]]="openStepIndex === $index"
+                  [class.grid-rows-[0fr]]="openStepIndex !== $index"
+                >
+                  <div class="overflow-hidden">
+                    <div class="px-5 sm:px-6 pb-5 sm:pb-6 pt-2 ml-[3.25rem]">
+                      <div class="flex flex-col lg:flex-row gap-8 items-start">
+                        <!-- Text -->
+                        <div class="lg:w-1/2">
+                          <p class="text-gray-500 leading-relaxed text-sm sm:text-base">
+                            {{ step.description }}
+                          </p>
+                        </div>
+                        
+                        <!-- Image Placeholder -->
+                        <div class="lg:w-1/2 h-56 bg-gray-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-200 w-full">
+                          <span class="text-gray-400 font-normal text-sm text-center px-4">{{ step.placeholder }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      } @else if (activeTab === 'Android') {
+        <div class="flex flex-col items-center justify-center h-full py-20 text-center">
+          <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
+            <i class="bi bi-android2 text-4xl text-green-500"></i>
+          </div>
+          <h2 class="text-2xl font-normal text-[#0a1b3f] mb-4">Coming Soon to Android</h2>
+          <p class="text-gray-500 max-w-md">
+            Our Android application is currently under development. Stay tuned for updates on our release schedule!
+          </p>
+        </div>
+      } @else if (activeTab === 'iOS') {
+        <div class="flex flex-col items-center justify-center h-full py-20 text-center">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <i class="bi bi-apple text-4xl text-gray-800"></i>
+          </div>
+          <h2 class="text-2xl font-normal text-[#0a1b3f] mb-4">Coming Soon to iOS</h2>
+          <p class="text-gray-500 max-w-md">
+            Our iOS application is currently under development. Stay tuned for updates on our release schedule!
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

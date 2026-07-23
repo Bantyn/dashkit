@@ -1,0 +1,209 @@
+<div class="min-h-screen bg-white pt-24 pb-32 selection:bg-primary-500 selection:text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error()" class="max-w-2xl mx-auto bg-red-50 p-8 rounded-3xl text-center border border-red-100">
+      <i class="bi bi-exclamation-triangle text-red-500 text-4xl mb-4 inline-block"></i>
+      <p class="text-red-700 text-lg">{{ error() }}</p>
+      <button routerLink="/pricing" class="mt-6 px-6 py-3 bg-red-100 text-red-700 font-semibold rounded-xl hover:bg-red-200 transition-colors">Go Back to Pricing</button>
+    </div>
+
+    <div *ngIf="!isLoading() && !error() && plan()" class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      
+      <!-- Left Cart Side -->
+      <div class="lg:col-span-2 space-y-8">
+        <h1 class="text-4xl md:text-5xl font-normal text-[#0a1b3f] tracking-tight mb-2">Your cart</h1>
+        
+        <!-- Main Plan Card -->
+        <div class="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-5 mb-8 pb-8 border-b border-gray-100">
+            <div class="h-14 w-14 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-3xl">
+              <i class="bi" [class]="plan()?.icon || 'bi-store'"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-semibold text-gray-900">{{ plan()?.name }} Plan</h2>
+              <p class="text-gray-500 mt-1">Subscription for Clothify POS</p>
+            </div>
+          </div>
+          
+          <div class="space-y-5">
+            <h3 class="text-lg font-semibold text-[#0a1b3f]">Billing Period</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-lg">
+              <div *ngFor="let p of periods" 
+                   class="relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-200"
+                   [class.border-primary-600]="selectedPeriod() === p.months"
+                   [class.bg-primary-50]="selectedPeriod() === p.months"
+                   [class.border-gray-200]="selectedPeriod() !== p.months"
+                   [class.hover:border-primary-300]="selectedPeriod() !== p.months"
+                   (click)="selectPeriod(p.months)">
+                   
+                <div *ngIf="p.discountPercent > 0" class="absolute -top-3.5 right-4 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-200">
+                  Save {{ p.discountPercent }}%
+                </div>
+                
+                <div class="text-center">
+                  <div class="text-xl font-semibold text-gray-900">{{ p.months }} {{ p.months === 1 ? 'month' : 'months' }}</div>
+                  
+                  <div class="mt-3 flex items-baseline justify-center text-gray-900">
+                    <span class="text-2xl font-bold">₹{{ getPeriodDetails(p.months).discountedPrice | number:'1.0-0' }}</span>
+                    <span class="text-sm text-gray-500 ml-1 font-medium">/mo</span>
+                  </div>
+                  <div class="text-sm text-gray-400 line-through mt-1 font-medium" *ngIf="p.discountPercent > 0">
+                    ₹{{ getPeriodDetails(p.months).originalPrice | number:'1.0-0' }}/mo
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-ons Card (Branches) -->
+        <div *ngIf="hasBranchFeature()" class="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-4">
+              <div class="h-12 w-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-600 text-xl">
+                <i class="bi bi-building"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-[#0a1b3f]">Extra Branches</h3>
+                <p class="text-sm text-gray-500 mt-1">Scale easily as your business grows</p>
+              </div>
+            </div>
+            
+            <div class="text-right">
+              <div class="text-lg font-bold text-gray-900">₹{{ branchPricePerMonth }}/mo</div>
+              <div class="text-xs text-gray-500 mt-0.5 font-medium uppercase tracking-wide">per additional branch</div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex items-center justify-between bg-gray-50 rounded-2xl p-5 border border-gray-100">
+            <div>
+              <span class="font-medium text-gray-700">Included Branches: </span>
+              <span class="text-gray-900 font-bold ml-2 text-lg">{{ includedBranches() }}</span>
+              <div class="text-xs text-gray-500 mt-1" *ngIf="maxBranches() !== -1">Max Allowed: {{ maxBranches() }}</div>
+              <div class="text-xs text-gray-500 mt-1" *ngIf="maxBranches() === -1">Max Allowed: Unlimited</div>
+            </div>
+            <div class="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <button class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 font-bold disabled:opacity-50 transition-colors" (click)="decrementBranch()" [disabled]="branchCount() <= includedBranches()">-</button>
+              <div class="px-5 py-2.5 font-semibold border-l border-r border-gray-200 bg-gray-50">{{ branchCount() }}</div>
+              <button class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 font-bold disabled:opacity-50 transition-colors" (click)="incrementBranch()" [disabled]="branchCount() >= maxBranches() && maxBranches() !== -1">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-ons Card (Custom Domain) -->
+        <div *ngIf="hasWebsiteFeature()" class="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-4">
+              <div class="h-12 w-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-600 text-xl">
+                <i class="bi bi-globe"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-[#0a1b3f]">Custom Domain</h3>
+                <p class="text-sm text-gray-500 mt-1">Connect your own custom domain name (e.g. yourbrand.com)</p>
+              </div>
+            </div>
+            
+            <div class="text-right">
+              <div class="text-lg font-bold text-gray-900">₹{{ domainCostPerMonth }}/mo</div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex items-center justify-between bg-gray-50 rounded-2xl p-5 border border-gray-100">
+            <div>
+              <span class="font-medium text-gray-700">Add custom domain</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" class="sr-only peer" [checked]="includeDomain()" (change)="toggleDomain()">
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Plan Features -->
+        <div class="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-6 border-b border-gray-100 gap-3">
+            <div>
+              <h3 class="text-xl font-semibold text-[#0a1b3f]">What's included in {{ plan()?.name }}</h3>
+              <p class="text-sm text-gray-500 mt-1"><span class="font-bold text-primary-600">{{ plan()?.features?.length || 0 }}</span> total features to run your business</p>
+            </div>
+            <a routerLink="/pricing" class="px-4 py-2 bg-primary-50 text-primary-700 text-sm font-semibold rounded-xl hover:bg-primary-100 transition-colors whitespace-nowrap">Compare Plans</a>
+          </div>
+          <div class="space-y-8">
+            <div *ngFor="let group of groupedFeatures()" class="space-y-4">
+              <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider">{{ group.module }}</h4>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8">
+                <li *ngFor="let feature of group.features" class="flex items-start">
+                  <i class="bi bi-check-circle-fill text-primary-500 mt-1 mr-3 flex-shrink-0"></i>
+                  <span class="text-sm text-gray-600 leading-relaxed">{{ feature }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Order Summary Side -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-28 bg-white rounded-3xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-shadow">
+          <h2 class="text-2xl font-semibold text-[#0a1b3f] mb-8">Order summary</h2>
+          
+          <div class="space-y-6">
+            <!-- Plan Info -->
+            <div class="pb-6 border-b border-gray-100">
+              <h3 class="text-xl font-bold text-gray-900">{{ plan()?.name }} Plan</h3>
+              <p class="text-gray-500 mt-1">
+                ₹{{ currentPeriodDetails().discountedPrice | number:'1.0-0' }}/{{ selectedPeriod() === 12 ? 'year' : 'month' }}
+              </p>
+            </div>
+
+            <!-- Free Trial Badge/Highlight -->
+            <div class="bg-primary-50 border border-primary-100 rounded-2xl p-4 flex items-center justify-between">
+              <span class="text-primary-800 font-semibold">5-Day Free Trial</span>
+              <span class="bg-primary-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">Active</span>
+            </div>
+
+            <!-- Charge breakdown -->
+            <div class="space-y-4 text-sm font-medium text-gray-600 pb-6 border-b border-gray-100">
+              <div class="flex justify-between">
+                <span>Today's Charge</span>
+                <span class="text-green-600 font-bold text-base">₹0</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Billing Starts</span>
+                <span class="text-gray-900 font-semibold">After Trial Ends</span>
+              </div>
+            </div>
+
+            <!-- Next Charge Info -->
+            <div class="space-y-2">
+              <div class="text-xs text-gray-400 font-bold uppercase tracking-wider">Next Charge</div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-2xl font-extrabold text-gray-950">₹{{ total() | number:'1.2-2' }}</span>
+                <span class="text-sm text-gray-500">on {{ trialEndDate() | date:'MMM dd, yyyy' }}</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-2 leading-relaxed">
+                Includes chosen period billing cycle, taxes (18% GST), and any selected branch/domain add-ons.
+              </p>
+            </div>
+          </div>
+
+          <button (click)="continueToPayment()" class="w-full mt-8 bg-primary-600 text-white font-semibold text-lg py-4 px-6 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 hover:shadow-primary-600/40 transform hover:-translate-y-0.5">
+            Start 5-Day Free Trial
+          </button>
+          
+          <div class="mt-6 flex items-center justify-center gap-2 text-green-600 text-sm font-semibold bg-green-50 py-2.5 rounded-lg">
+            <i class="bi bi-shield-check"></i>
+            <span>Secure SSL Checkout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

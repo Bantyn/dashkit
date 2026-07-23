@@ -1,0 +1,106 @@
+<div class="min-h-screen bg-white pb-24 font-sans text-gray-800 relative">
+  <!-- Background gradient blob -->
+  <div class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-[#f0f7ff] to-transparent -z-10 rounded-b-[80px]"></div>
+
+  <!-- Hero Section -->
+  <section class="relative pt-24 pb-16 overflow-hidden flex flex-col items-center text-center px-4">
+    <div appScrollReveal="children" [revealDelay]="100" class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+     
+      <h2 class="text-4xl md:text-6xl lg:text-7xl font-normal tracking-tight leading-tight max-w-4xl mx-auto text-[#0a1b3f]">
+        Empowering local fashion retailers with <span class="text-gradient">world-class technology</span>
+      </h2>
+      <p class="text-sm sm:text-base font-normal text-gray-500 max-w-2xl mx-auto leading-relaxed">
+        At Clothify, we believe boutique store owners and apparel retailers shouldn't be held back by complicated or overpriced software. Our mission is to simplify retail operations, making POS billing, stock management, and customer marketing accessible to everyone.
+      </p>
+    </div>
+  </section>
+
+  <!-- Vision / Focus -->
+  <section class="relative py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <!-- Text -->
+      <div appScrollReveal="children" [revealDelay]="120" class="space-y-8">
+        <h3 class="text-3xl sm:text-5xl font-normal text-[#0a1b3f] leading-tight">
+          Why we built <span class="text-gradient">Clothify</span>
+        </h3>
+        <p class="text-base sm:text-lg text-gray-500 leading-relaxed font-normal">
+          Fashion retail operates differently than standard grocery or electronics retail. Apparel features complex grids of sizes, styles, fabric types, and colors. Standard checkout machines and inventory software often fail to capture these details properly, leading to confusion and lost profits.
+        </p>
+        <p class="text-base sm:text-lg text-gray-500 leading-relaxed font-normal">
+          We built Clothify specifically to resolve these boutique challenges. By developing a clean, premium user interface, automated integrations, and size matrix controls, we provide store owners with the tools to grow their businesses efficiently.
+        </p>
+      </div>
+
+      <!-- Cards Grid -->
+      <div appScrollReveal="children" [revealDelay]="80" class="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
+        <!-- Floating Blob behind cards -->
+        <!-- <div class="absolute inset-0 bg-gradient-to-r from-primary-100 to-purple-100 rounded-[1.5rem] blur-3xl opacity-50 -z-10 transform rotate-3"></div> -->
+        
+        <div class="bg-white rounded-[1.5rem] p-8 border border-gray-200 hover:-translate-y-1.5 transition-all duration-300 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-[#f0f7ff] border border-primary-100 flex items-center justify-center text-2xl text-primary-600 mb-6 shadow-sm">
+            <i class="bi bi-heart"></i>
+          </div>
+          <h4 class="text-lg font-normal text-[#0a1b3f]">User-Centric UI</h4>
+          <p class="text-sm text-gray-500 leading-relaxed font-normal">
+            Designed to be intuitive. Cashiers and staff can learn and operate the billing screen in under 15 minutes.
+          </p>
+        </div>
+        
+        <div class="bg-white rounded-[1.5rem] p-8 border border-gray-200 hover:-translate-y-1.5 transition-all duration-300 space-y-4 sm:translate-y-8">
+          <div class="w-14 h-14 rounded-2xl bg-[#f0f7ff] border border-primary-100 flex items-center justify-center text-2xl text-primary-600 mb-6 shadow-sm">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h4 class="text-lg font-normal text-[#0a1b3f]">Absolute Trust</h4>
+          <p class="text-sm text-gray-500 leading-relaxed font-normal">
+            Your business transactions and client profiles are protected with enterprise-grade cloud servers.
+          </p>
+        </div>
+        
+        <div class="bg-white rounded-[1.5rem] p-8 border border-gray-200 hover:-translate-y-1.5 transition-all duration-300 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-[#f0f7ff] border border-primary-100 flex items-center justify-center text-2xl text-primary-600 mb-6 shadow-sm">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h4 class="text-lg font-normal text-[#0a1b3f]">Scalable Growth</h4>
+          <p class="text-sm text-gray-500 leading-relaxed font-normal">
+            Built to support you as you expand from a single boutique to a multi-branch apparel chain.
+          </p>
+        </div>
+        
+        <div class="bg-white rounded-[1.5rem] p-8 border border-gray-200 hover:-translate-y-1.5 transition-all duration-300 space-y-4 sm:translate-y-8">
+          <div class="w-14 h-14 rounded-2xl bg-[#f0f7ff] border border-primary-100 flex items-center justify-center text-2xl text-primary-600 mb-6 shadow-sm">
+            <i class="bi bi-people"></i>
+          </div>
+          <h4 class="text-lg font-normal text-[#0a1b3f]">Support First</h4>
+          <p class="text-sm text-gray-500 leading-relaxed font-normal">
+            Our support team is always available via phone, chat, or email to assist your staff during store hours.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="py-16 px-4">
+    <div appScrollReveal="element" [revealFromY]="40" class="max-w-5xl mx-auto bg-[#f0f7ff] border border-primary-100 rounded-[1.5rem] p-8 sm:p-12 text-center text-[#0a1b3f] shadow-xl shadow-primary-500/5 relative overflow-hidden">
+      <!-- Decorative vector glow -->
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-100 rounded-full filter blur-[80px] -z-10 opacity-70"></div>
+      
+      <div class="relative z-10 space-y-8 max-w-3xl mx-auto">
+        <h3 class="text-2xl sm:text-4xl font-normal text-[#0a1b3f] leading-snug">
+          Experience the difference today
+        </h3>
+        <p class="text-sm sm:text-base font-normal text-gray-500 max-w-xl mx-auto leading-relaxed">
+          See how our boutique management tools can help you save hours of manual stock count and increase customer checkout speed.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+          <a routerLink="/contact-us" [queryParams]="{demo: 'true'}" class="bg-[#0a1b3f] hover:bg-primary-600 text-white font-normal px-8 py-3.5 rounded-full shadow-md transition-all hover:scale-102">
+            Book a Free Demo
+          </a>
+          <a routerLink="/contact-us" class="bg-white border border-gray-200 text-[#0a1b3f] hover:bg-gray-50 font-normal px-8 py-3.5 rounded-full shadow-sm transition-all hover:scale-102">
+            Write to Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

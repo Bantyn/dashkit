@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow checkout and login flows to avoid indexing incomplete pages or private pages
+Disallow: /checkout/
+Disallow: /login
+
+# Specify XML sitemap location
+Sitemap: https://clothify.co/sitemap.xml

@@ -1,0 +1,220 @@
+<div class="min-h-screen bg-white font-sans text-gray-800 relative py-20 px-4 sm:px-6 lg:px-8">
+  <!-- Background gradient blob -->
+  <div class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-[#f0f7ff] to-transparent -z-10 rounded-b-[80px]"></div>
+
+  <div class="relative z-10 w-full max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      
+      <!-- Sidebar Info -->
+      <div appScrollReveal="children" [revealDelay]="100" class="lg:col-span-5 space-y-10 text-[#0a1b3f]">
+        <div class="space-y-4">
+         
+          <h2 class="text-4xl lg:text-6xl font-normal tracking-tight leading-tight">
+            Get in <span class="text-gradient">touch</span>
+          </h2>
+          <p class="text-gray-500 text-lg leading-relaxed max-w-md font-normal">
+            Have questions about pricing, setup, or branch synchronizations? Fill out the form, and our retail integration team will reach out within 24 hours.
+          </p>
+        </div>
+
+        <div class="space-y-8">
+          <div class="flex gap-5 items-start">
+            <div class="w-12 h-12 rounded-2xl bg-[#f0f7ff] border border-primary-100 text-primary-600 flex items-center justify-center shrink-0 text-xl shadow-sm">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div>
+              <h4 class="text-base font-normal text-[#0a1b3f]">Office</h4>
+              <p class="text-sm text-gray-500 mt-1 leading-relaxed font-normal">2/4863, Navsari Bazar, Surat, Gujarat, India, 395002</p>
+            </div>
+          </div>
+
+          <div class="flex gap-5 items-start">
+            <div class="w-12 h-12 rounded-2xl bg-[#f0f7ff] border border-primary-100 text-primary-600 flex items-center justify-center shrink-0 text-xl shadow-sm">
+              <i class="bi bi-telephone"></i>
+            </div>
+            <div>
+              <h4 class="text-base font-normal text-[#0a1b3f]">Phone & Support</h4>
+              <p class="text-sm text-gray-500 mt-1 font-normal">+91 90165 76612</p>
+            </div>
+          </div>
+
+          <div class="flex gap-5 items-start">
+            <div class="w-12 h-12 rounded-2xl bg-[#f0f7ff] border border-primary-100 text-primary-600 flex items-center justify-center shrink-0 text-xl shadow-sm">
+              <i class="bi bi-envelope"></i>
+            </div>
+            <div>
+              <h4 class="text-base font-normal text-[#0a1b3f]">Support Email</h4>
+              <p class="text-sm text-gray-500 mt-1 font-normal">patelbanty&#64;gmail.com</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust Badge -->
+        <div class="p-6 bg-[#f0f7ff]/50 border border-primary-100 rounded-[1.5rem] flex items-center gap-5 mt-12 shadow-sm">
+          <div class="text-4xl text-primary-500 shrink-0"><i class="bi bi-shield-fill-check"></i></div>
+          <div class="text-sm text-gray-500 leading-relaxed font-normal">
+            We respect your privacy. Your contact details will only be used to answer your query and will never be shared.
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Card -->
+      <div appScrollReveal="element" [revealFromY]="50" class="lg:col-span-7">
+        <div class="bg-white rounded-[1.5rem] p-8 sm:p-12  border border-gray-200 relative overflow-hidden">
+          <!-- Decorative subtle blob inside form -->
+          <div class="absolute top-0 right-0 w-64 h-64 bg-primary-50 rounded-full filter blur-[80px] -z-10 opacity-60"></div>
+          
+          <div class="space-y-8 relative z-10">
+            <!-- Tabs -->
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl w-fit shadow-inner">
+              <button
+                (click)="setLeadType('contact')"
+                class="px-6 py-2.5 text-sm font-normal rounded-xl transition-all duration-300"
+                [class.bg-white]="leadType === 'contact'"
+                [class.text-[#0a1b3f]]="leadType === 'contact'"
+                [class.shadow-sm]="leadType === 'contact'"
+                [class.text-gray-500]="leadType !== 'contact'"
+              >
+                Send Message
+              </button>
+              <button
+                (click)="setLeadType('demo')"
+                class="px-6 py-2.5 text-sm font-normal rounded-xl transition-all duration-300"
+                [class.bg-white]="leadType === 'demo'"
+                [class.text-[#0a1b3f]]="leadType === 'demo'"
+                [class.shadow-sm]="leadType === 'demo'"
+                [class.text-gray-500]="leadType !== 'demo'"
+              >
+                Book Free Demo
+              </button>
+            </div>
+
+            <!-- Success Alert -->
+            @if (submittedSuccess) {
+              <div class="p-8 rounded-[1.5rem] bg-green-50 text-green-800 border border-green-200 space-y-4 animate-scale-in flex flex-col items-center justify-center text-center min-h-[400px]">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl text-green-600 mb-2 shadow-sm">
+                  <i class="bi bi-check-lg"></i>
+                </div>
+                <h4 class="text-2xl font-normal">Submission Successful!</h4>
+                <p class="text-base leading-relaxed text-green-700 max-w-sm font-normal">
+                  Thank you for reaching out. We have successfully registered your {{ leadType === 'demo' ? 'demo request' : 'message' }}. An expert from our team will contact you shortly.
+                </p>
+                <button (click)="submittedSuccess = false" class="px-6 py-3 bg-green-600 text-white rounded-full font-normal shadow-md hover:bg-green-700 transition-colors mt-4">
+                  Submit another request
+                </button>
+              </div>
+            } @else {
+              <!-- Form -->
+              <form #leadForm="ngForm" (ngSubmit)="submitForm(leadForm)" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <!-- Name -->
+                  <label class="block space-y-2">
+                    <span class="text-sm font-normal text-[#0a1b3f]">Your Name *</span>
+                    <input
+                      required
+                      name="name"
+                      [(ngModel)]="form.name"
+                      #nameCtrl="ngModel"
+                      placeholder="John Doe"
+                      class="w-full text-base px-5 py-3.5 bg-gray-50/50 border rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all shadow-sm"
+                      [class.border-red-400]="nameCtrl.invalid && nameCtrl.touched"
+                      [class.border-gray-200]="!(nameCtrl.invalid && nameCtrl.touched)"
+                    />
+                  </label>
+
+                  <!-- Email -->
+                  <label class="block space-y-2">
+                    <span class="text-sm font-normal text-[#0a1b3f]">Email Address *</span>
+                    <input
+                      required
+                      email
+                      name="email"
+                      [(ngModel)]="form.email"
+                      #emailCtrl="ngModel"
+                      placeholder="john&#64;store.com"
+                      class="w-full text-base px-5 py-3.5 bg-gray-50/50 border rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all shadow-sm"
+                      [class.border-red-400]="emailCtrl.invalid && emailCtrl.touched"
+                      [class.border-gray-200]="!(emailCtrl.invalid && emailCtrl.touched)"
+                    />
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <!-- Phone -->
+                  <label class="block space-y-2">
+                    <span class="text-sm font-normal text-[#0a1b3f]">Phone Number *</span>
+                    <input
+                      required
+                      name="phone"
+                      [(ngModel)]="form.phone"
+                      #phoneCtrl="ngModel"
+                      placeholder="+91 9876543210"
+                      class="w-full text-base px-5 py-3.5 bg-gray-50/50 border rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all shadow-sm"
+                      [class.border-red-400]="phoneCtrl.invalid && phoneCtrl.touched"
+                      [class.border-gray-200]="!(phoneCtrl.invalid && phoneCtrl.touched)"
+                    />
+                  </label>
+
+                  <!-- Shop Name -->
+                  <label class="block space-y-2">
+                    <span class="text-sm font-normal text-[#0a1b3f]">Shop / Boutique Name *</span>
+                    <input
+                      required
+                      name="shopName"
+                      [(ngModel)]="form.shopName"
+                      #shopCtrl="ngModel"
+                      placeholder="Vastram Boutique"
+                      class="w-full text-base px-5 py-3.5 bg-gray-50/50 border rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all shadow-sm"
+                      [class.border-red-400]="shopCtrl.invalid && shopCtrl.touched"
+                      [class.border-gray-200]="!(shopCtrl.invalid && shopCtrl.touched)"
+                    />
+                  </label>
+                </div>
+
+                <!-- Message -->
+                <label class="block space-y-2">
+                  <span class="text-sm font-normal text-[#0a1b3f]">{{ leadType === 'demo' ? 'Specific requirements or sizes/quantities you manage? (Optional)' : 'Your Message *' }}</span>
+                  <textarea
+                    [required]="leadType === 'contact'"
+                    name="message"
+                    [(ngModel)]="form.message"
+                    #msgCtrl="ngModel"
+                    rows="4"
+                    placeholder="Tell us more..."
+                    class="w-full text-base px-5 py-4 bg-gray-50/50 border rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all shadow-sm resize-none"
+                    [class.border-red-400]="msgCtrl.invalid && msgCtrl.touched"
+                    [class.border-gray-200]="!(msgCtrl.invalid && msgCtrl.touched)"
+                  ></textarea>
+                </label>
+
+                <!-- Error message -->
+                @if (submittedError) {
+                  <div class="text-sm font-normal text-red-600 bg-red-50 p-4 rounded-[1.5rem] border border-red-100 flex items-center gap-3">
+                    <i class="bi bi-exclamation-triangle-fill text-lg"></i>
+                    {{ submittedError }}
+                  </div>
+                }
+
+                <!-- Submit Button -->
+                <button
+                  type="submit"
+                  [disabled]="leadForm.invalid || loading"
+                  class="w-full bg-[#0a1b3f] text-white font-normal py-4 px-8 rounded-2xl hover:bg-primary-600 transition-all hover:scale-[1.02] shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 text-lg mt-4"
+                >
+                  @if (loading) {
+                    <div class="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
+                    Submitting...
+                  } @else {
+                    {{ leadType === 'demo' ? 'Request Free Demo' : 'Send Message' }}
+                    <i class="bi bi-arrow-right"></i>
+                  }
+                </button>
+              </form>
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

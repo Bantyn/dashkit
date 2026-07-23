@@ -1,0 +1,64 @@
+<div class="min-h-[calc(100vh-5rem)] flex items-center justify-center px-4 py-12 relative overflow-hidden bg-[#0a1b3f]">
+  <!-- Abstract Blobs -->
+  <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary-500 rounded-full mix-blend-multiply filter blur-[150px] opacity-40 animate-blob"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#4c1d95] rounded-full mix-blend-multiply filter blur-[150px] opacity-40 animate-blob animation-delay-2000"></div>
+
+  <!-- Card -->
+  <div appScrollReveal="children" [revealDelay]="100" class="relative w-full max-w-md bg-white/10 backdrop-blur-2xl rounded-[2.5rem] p-8 sm:p-12 border border-white/20 shadow-2xl space-y-8 z-10">
+    <!-- Logo Header -->
+    <div class="text-center space-y-4">
+      <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-[#0a1b3f] text-2xl font-extrabold shadow-lg mx-auto">
+        C
+      </div>
+      <div>
+        <h2 class="text-3xl font-extrabold text-white">Sign In</h2>
+        <p class="text-sm text-gray-300 font-medium mt-2 leading-relaxed">Enter your registered shop name to access your dashboard.</p>
+      </div>
+    </div>
+
+    @if (redirecting()) {
+      <div class="p-8 text-center space-y-6 animate-scale-in">
+        <div class="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin mx-auto"></div>
+        <div>
+          <p class="text-base font-bold text-white">Redirecting...</p>
+          <p class="text-sm text-primary-200 mt-1">{{ targetUrl }}</p>
+        </div>
+        <p class="text-xs text-gray-400 mt-4">If you are not redirected, <a [href]="targetUrl" class="text-white font-bold underline hover:text-primary-300 transition-colors">click here</a>.</p>
+      </div>
+    } @else {
+      <!-- Input Form -->
+      <form #loginForm="ngForm" (ngSubmit)="handleRedirect()" class="space-y-6">
+        <label class="block space-y-2 relative">
+          <span class="text-sm font-bold text-gray-200 pl-2">Shop Domain</span>
+          <div class="relative flex items-center">
+            <input
+              name="subdomain"
+              [(ngModel)]="subdomain"
+              placeholder="my-shop"
+              class="w-full text-base pl-6 pr-28 py-4 bg-white/10 border border-white/20 rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 transition-all font-semibold text-white placeholder-gray-400 shadow-inner"
+            />
+            <span class="absolute right-6 text-sm font-bold text-gray-400 pointer-events-none">
+              .clothify.io
+            </span>
+          </div>
+          <p class="text-[11px] text-gray-400 font-medium pl-2 pt-1 leading-relaxed">Leave empty to access local default at localhost:4200</p>
+        </label>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="w-full bg-white text-[#0a1b3f] font-extrabold text-lg py-4 px-6 rounded-2xl hover:bg-gray-100 transition-all hover:scale-[1.02] shadow-xl flex items-center justify-center gap-3 mt-4"
+        >
+          Continue
+          <i class="bi bi-arrow-right font-extrabold"></i>
+        </button>
+      </form>
+    }
+
+    <!-- Footer -->
+    <div class="text-center pt-6 text-sm text-gray-400 font-medium border-t border-white/10">
+      Don't have an account?
+      <a routerLink="/contact-us" [queryParams]="{demo: 'true'}" class="text-white font-bold hover:text-primary-300 hover:underline transition-colors ml-1">Book Demo</a>
+    </div>
+  </div>
+</div>
