@@ -1,25 +1,33 @@
 // Dynamic API URL: automatically uses LAN IP when accessed from a non-localhost device.
 // This means you NEVER need to manually change this file when switching between devices.
 function getApiUrl(): string {
-  const customApi = (window as any)?.__env?.API_URL;
-  if (customApi) return `${customApi}/admin`;
+  try {
+    const customApi = (window as any)?.process?.env?.API_URL || (globalThis as any)?.process?.env?.API_URL || (window as any)?.__env?.API_URL;
+    if (customApi) return `${customApi}/admin`;
+  } catch {}
 
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:3003/api/v1/admin';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return 'https://dashkit-server.onrender.com/api/v1/admin';
+    }
   }
-  return `http://${hostname}:3003/api/v1/admin`;
+  return 'http://localhost:3003/api/v1/admin';
 }
 
 function getPublicApiUrl(): string {
-  const customApi = (window as any)?.__env?.API_URL;
-  if (customApi) return customApi;
+  try {
+    const customApi = (window as any)?.process?.env?.API_URL || (globalThis as any)?.process?.env?.API_URL || (window as any)?.__env?.API_URL;
+    if (customApi) return customApi;
+  } catch {}
 
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:3003/api/v1';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return 'https://dashkit-server.onrender.com/api/v1';
+    }
   }
-  return `http://${hostname}:3003/api/v1`;
+  return 'http://localhost:3003/api/v1';
 }
 
 export const environment = {
