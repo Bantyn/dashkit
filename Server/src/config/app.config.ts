@@ -34,6 +34,9 @@ export const APP_CONFIG = {
     /^https:\/\/.*\.trycloudflare\.com$/,
     /^https:\/\/.*\.loca\.lt$/,
     /^http:\/\/.*\.nip\.io(:\d+)?$/,
+    // Vercel & Cloud Hosting domains
+    /^https:\/\/.*\.vercel\.app$/,
+    /^https:\/\/.*\.onrender\.com$/,
   ]),
 
   // Rate Limiting
