@@ -8,7 +8,7 @@ dotenv.config({ quiet: true } as any);
 try {
   let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
 
-  // 1. If base64 encoded, decode it
+  // 1. Decode Base64 if passed as base64
   if (!privateKey.includes("-----BEGIN PRIVATE KEY-----") && privateKey.length > 100) {
     try {
       const decoded = Buffer.from(privateKey, "base64").toString("utf-8");
@@ -18,13 +18,18 @@ try {
     } catch (_) {}
   }
 
-  // 2. Clean outer quotes if any
-  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
-    privateKey = privateKey.slice(1, -1);
-  }
+  // 2. Remove surrounding quotes
+  privateKey = privateKey.replace(/^["']|["']$/g, "").trim();
 
-  // 3. Convert escaped newlines \n to actual newlines
+  // 3. Unescape literal \n strings to real newlines
   privateKey = privateKey.replace(/\\n/g, "\n");
+
+  // 4. Ensure correct PEM line formatting if newlines got stripped
+  if (!privateKey.includes("\n") && privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
+    privateKey = privateKey
+      .replace("-----BEGIN PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----\n")
+      .replace("-----END PRIVATE KEY-----", "\n-----END PRIVATE KEY-----");
+  }
 
   if (!admin.apps.length) {
     admin.initializeApp({
