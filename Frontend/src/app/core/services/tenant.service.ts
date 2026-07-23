@@ -11,7 +11,10 @@ export class TenantService {
   currentSlug$ = this.currentSlugSubject.asObservable().pipe(distinctUntilChanged());
 
   // Reserved subdomains that are NOT shops
-  private readonly RESERVED_SUBDOMAINS = ['www', 'admin', 'api', 'auth', 'clothify', 'app'];
+  private readonly RESERVED_SUBDOMAINS = [
+    'www', 'admin', 'api', 'auth', 'clothify', 'app',
+    'dashkit', 'dashkiiit', 'dashkit-server', 'dashkit-admin'
+  ];
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -42,7 +45,7 @@ export class TenantService {
   getSubdomainSlug(): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;
 
-    const hostname = this.document.location.hostname;
+    const hostname = this.document.location.hostname.toLowerCase();
     const domainParts = hostname.split('.');
     let subdomain = '';
 
@@ -54,13 +57,13 @@ export class TenantService {
       if (domainParts.length > 6) {
         subdomain = domainParts[0];
       }
-    } else if (hostname.includes('clothify.com') || hostname.includes('clothify.in')) {
-      // Assuming platform domains, extract subdomain
+    } else if (hostname.includes('vercel.app') || hostname.includes('clothify.com') || hostname.includes('clothify.in') || hostname.includes('dashkit.com')) {
+      // Platform domains (e.g. shop.dashkiiit.vercel.app or zara.dashkit.com)
       if (domainParts.length >= 3) {
         subdomain = domainParts[0];
       }
     } else {
-      // It's a custom domain, return the full hostname
+      // It's a custom domain (e.g. zarastore.com), return full hostname
       subdomain = hostname;
     }
 
