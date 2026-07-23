@@ -1,9 +1,13 @@
-declare const process: any;
-
 // Production Environment configuration for Showcase UI
+const getProcessEnvApiUrl = (): string | undefined => {
+  try {
+    return (window as any)?.process?.env?.API_URL || (globalThis as any)?.process?.env?.API_URL;
+  } catch {
+    return undefined;
+  }
+};
+
 export const environment = {
   production: true,
-  apiUrl: (typeof process !== 'undefined' && process && process.env && process.env['API_URL']) 
-    ? process.env['API_URL'] 
-    : 'http://localhost:3003/api/v1'
+  apiUrl: getProcessEnvApiUrl() || 'http://localhost:3003/api/v1'
 };
