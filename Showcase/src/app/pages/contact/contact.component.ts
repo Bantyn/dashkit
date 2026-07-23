@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-contact',
   standalone: true,
@@ -44,11 +46,7 @@ export class ContactComponent implements OnInit {
   }
 
   private getApiUrl(): string {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3003/api/v1';
-    }
-    return 'https://dashkit-server.onrender.com/api/v1';
+    return environment.apiUrl;
   }
 
   submitForm(formDirective: any) {

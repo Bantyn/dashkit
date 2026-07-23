@@ -13,6 +13,8 @@ interface FeatureHighlight {
   illustrationType: 'sync' | 'packages' | 'vendors';
 }
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-whats-new',
   standalone: true,
@@ -63,11 +65,7 @@ export class WhatsNewComponent {
   ];
 
   private getApiUrl(): string {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3003/api/v1';
-    }
-    return 'https://dashkit-server.onrender.com/api/v1';
+    return environment.apiUrl;
   }
 
   submitForm(formDirective: any) {

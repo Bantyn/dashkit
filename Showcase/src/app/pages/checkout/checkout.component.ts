@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlanService, SubscriptionPlan } from '../../services/plan.service';
 import { FormsModule } from '@angular/forms';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-checkout',
   standalone: true,
@@ -196,6 +198,6 @@ export class CheckoutComponent implements OnInit {
     const branches = this.branchCount();
     const domain = this.includeDomain();
     
-    window.location.href = `http://localhost:4200/register?plan=${code}&period=${period}&branches=${branches}&domain=${domain}`;
+    window.location.href = `${environment.dashboardUrl}/register?plan=${code}&period=${period}&branches=${branches}&domain=${domain}`;
   }
 }

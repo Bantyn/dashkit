@@ -6,6 +6,8 @@ import { PlanService, SubscriptionPlan } from '../../services/plan.service';
 import { UiCounterComponent } from '../../components/ui-counter.component';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-pricing',
   standalone: true,
@@ -305,11 +307,7 @@ export class PricingComponent implements OnInit {
   }
   
   private getApiUrl(): string {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3003/api/v1';
-    }
-    return 'https://dashkit-server.onrender.com/api/v1';
+    return environment.apiUrl;
   }
 
   async submitCustomPlanRequest() {

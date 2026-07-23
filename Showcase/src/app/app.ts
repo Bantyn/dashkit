@@ -15,6 +15,7 @@ import { environment } from '../environments/environment';
   styleUrl: './app.css'
 })
 export class App {
+  dashboardUrl = environment.dashboardUrl;
   isMobileMenuOpen = signal(false);
   announcements = signal<any[]>([]);
   private seoService = inject(SeoService);

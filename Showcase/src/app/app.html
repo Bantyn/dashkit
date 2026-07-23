@@ -39,7 +39,7 @@
 
         <!-- CTA Action Buttons -->
         <div class="hidden lg:flex items-center gap-4">
-          <a href="http://localhost:4200/login"
+          <a [href]="dashboardUrl + '/login'"
             class="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors px-4 py-2">
             Login
             <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
@@ -78,7 +78,7 @@
         class="block text-sm font-medium py-2 border-b border-gray-50 text-gray-700 hover:text-primary-600">Contact
         Us</a>
       <div class="flex flex-col gap-2 pt-4">
-        <a href="http://localhost:4200/login" (click)="closeMobileMenu()"
+        <a [href]="dashboardUrl + '/login'" (click)="closeMobileMenu()"
           class="text-center font-semibold text-primary-600 border border-primary-100 rounded-xl py-2.5 hover:bg-primary-50">
           Login
         </a>

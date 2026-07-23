@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
   templateUrl: './home.component.html'
 })
 export class HomeComponent {
+  dashboardUrl = environment.dashboardUrl;
   activeTab = signal<'pos' | 'inventory' | 'marketing' | 'reports' | 'website'>('pos');
   isModalOpen = signal(false);
 
