@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../environments/environment';
+
 export interface SubscriptionPlan {
   id: string;
   code: string;
@@ -56,14 +58,9 @@ export class PlanService {
   private http = inject(HttpClient);
   
   private getApiUrl(): string {
-    const customApi = (window as any)?.__env?.API_URL;
-    if (customApi) return `${customApi}/plans`;
-
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3003/api/v1/plans';
-    }
-    return `http://${hostname}:3003/api/v1/plans`;
+    const windowEnv = (window as any)?.__env?.API_URL;
+    if (windowEnv) return `${windowEnv}/plans`;
+    return `${environment.apiUrl}/plans`;
   }
   private apiUrl = this.getApiUrl();
 

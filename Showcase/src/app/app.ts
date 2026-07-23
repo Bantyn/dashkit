@@ -5,6 +5,8 @@ import { BannerComponent } from './components/banner.component';
 import { SeoService } from './services/seo.service';
 import { HttpClient } from '@angular/common/http';
 
+import { environment } from '../environments/environment';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -26,14 +28,9 @@ export class App {
   }
 
   private getApiUrl(): string {
-    const customApi = (window as any)?.__env?.API_URL;
-    if (customApi) return customApi;
-
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3003/api/v1';
-    }
-    return `http://${hostname}:3003/api/v1`;
+    const windowEnv = (window as any)?.__env?.API_URL;
+    if (windowEnv) return windowEnv;
+    return environment.apiUrl;
   }
 
   private loadTheme() {

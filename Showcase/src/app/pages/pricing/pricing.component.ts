@@ -309,7 +309,7 @@ export class PricingComponent implements OnInit {
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'http://localhost:3003/api/v1';
     }
-    return `http://${hostname}:3003/api/v1`;
+    return 'https://dashkit-server.onrender.com/api/v1';
   }
 
   async submitCustomPlanRequest() {
