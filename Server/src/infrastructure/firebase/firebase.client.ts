@@ -7,9 +7,23 @@ dotenv.config({ quiet: true } as any);
 
 try {
   let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
+
+  // 1. If base64 encoded, decode it
+  if (!privateKey.includes("-----BEGIN PRIVATE KEY-----") && privateKey.length > 100) {
+    try {
+      const decoded = Buffer.from(privateKey, "base64").toString("utf-8");
+      if (decoded.includes("-----BEGIN PRIVATE KEY-----")) {
+        privateKey = decoded;
+      }
+    } catch (_) {}
+  }
+
+  // 2. Clean outer quotes if any
   if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
     privateKey = privateKey.slice(1, -1);
   }
+
+  // 3. Convert escaped newlines \n to actual newlines
   privateKey = privateKey.replace(/\\n/g, "\n");
 
   if (!admin.apps.length) {
