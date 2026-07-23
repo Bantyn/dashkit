@@ -6,15 +6,21 @@ import { initFirestoreTracker, wrapFirestore } from "./firestore-tracker";
 dotenv.config({ quiet: true } as any);
 
 try {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    }),
-  });
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
+  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+    privateKey = privateKey.slice(1, -1);
+  }
+  privateKey = privateKey.replace(/\\n/g, "\n");
 
-  // console.log("Firebase Admin initialized successfully");
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: privateKey,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      }),
+    });
+  }
 } catch (error) {
   console.error("Error initializing Firebase Admin:", error);
 }
