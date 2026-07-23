@@ -1,0 +1,567 @@
+<div class="flex-1 overflow-y-auto relative">
+  <!-- Change Plan Sliding Panel (Shopify-style) -->
+  <div *ngIf="showChangePlan" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300" (click)="closeChangePlanPanel()">
+    <div class="relative w-full bg-white shadow-2xl border-b border-slate-200 transform transition-transform duration-500 ease-out translate-y-0" (click)="$event.stopPropagation()">
+      <!-- Panel Header -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 border-b border-slate-100 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Change Your Plan</h2>
+          <p class="text-sm text-slate-500">Switch plans instantly during your trial period. No charges until your trial ends.</p>
+        </div>
+        <button (click)="closeChangePlanPanel()" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Plan selection list -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div *ngFor="let plan of availablePlans"
+               [class.ring-2]="plan.code === currentShop?.subscriptionPlan"
+               [class.ring-primary-600]="plan.code === currentShop?.subscriptionPlan"
+               [class.bg-primary-50/20]="plan.code === currentShop?.subscriptionPlan"
+               class="relative border border-slate-200 rounded-2xl p-6 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
+               
+            <!-- Current Plan Badge -->
+            <span *ngIf="plan.code === currentShop?.subscriptionPlan" class="absolute -top-3 left-4 bg-primary-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-primary-700 shadow-sm">
+              Current Plan
+            </span>
+
+            <div>
+              <h3 class="text-lg font-bold text-slate-900 mt-2">{{ plan.name }}</h3>
+              <p class="text-xs text-slate-500 mt-1 h-8">{{ plan.description }}</p>
+              <div class="mt-4 flex items-baseline text-slate-900">
+                <span class="text-3xl font-extrabold" *ngIf="!plan.isCustom">₹{{ plan.monthlyPrice }}</span>
+                <span class="text-sm text-slate-500 ml-1" *ngIf="!plan.isCustom">/mo</span>
+                <span class="text-2xl font-extrabold" *ngIf="plan.isCustom">Custom</span>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <!-- Change Plan Button -->
+              <button 
+                [disabled]="plan.code === currentShop?.subscriptionPlan || isUpdatingPlan"
+                (click)="changePlan(plan.code)"
+                [class.bg-primary-600]="plan.code !== currentShop?.subscriptionPlan"
+                [class.text-white]="plan.code !== currentShop?.subscriptionPlan"
+                [class.hover:bg-primary-700]="plan.code !== currentShop?.subscriptionPlan"
+                [class.bg-slate-100]="plan.code === currentShop?.subscriptionPlan"
+                [class.text-slate-400]="plan.code === currentShop?.subscriptionPlan"
+                class="w-full py-2.5 px-4 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span *ngIf="plan.code === currentShop?.subscriptionPlan">Current Plan</span>
+                <span *ngIf="plan.code !== currentShop?.subscriptionPlan && !isUpdatingPlan">Switch Plan</span>
+                <span *ngIf="isUpdatingPlan && selectedNewPlan === plan.code" class="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="p-5 xl:p-7">
+
+    @if (loading) {
+      <div class="flex items-center justify-center h-[calc(100vh-100px)] w-full">
+        <app-ui-loading></app-ui-loading>
+      </div>
+    } @else if (error) {
+      <div class="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600">{{ error }}</div>
+    } @else if (dashboardData) {
+      <div class="animate-dashboard-reveal">
+
+      <!-- SaaS Subscription Lifecycle Banner -->
+      <app-billing-status-banner [shop]="currentShop"></app-billing-status-banner>
+
+      <!-- Enterprise Custom Payment Banner -->
+      @if (currentShop?.subscriptionPlan === 'custom' && currentShop?.paymentStatus !== 'active' && currentShop?.customPrice) {
+      <div class="mb-5 p-4 sm:p-6 bg-primary-600 rounded-2xl shadow-lg shadow-indigo-500/20 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
+            <i class="bi bi-shield-lock-fill text-2xl text-white"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg leading-tight">Enterprise Plan Setup Complete</h3>
+            <p class="text-indigo-100 text-sm mt-0.5">Please complete your payment of ₹{{ currentShop?.customPrice | number }} to activate all your custom features.</p>
+          </div>
+        </div>
+        <button (click)="payCustomPlan()" [disabled]="payingCustom" class="px-6 py-2.5 bg-white text-primary-600 hover:bg-primary-50 rounded-xl font-bold shadow-sm transition-all whitespace-nowrap flex items-center gap-2">
+          @if (payingCustom) {
+            <div class="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+          } @else {
+            <i class="bi bi-credit-card-fill"></i>
+          }
+          Pay Now
+        </button>
+      </div>
+    } @else if (currentShop?.subscriptionPlan === 'custom' && currentShop?.paymentStatus !== 'active' && !currentShop?.customPrice) {
+      <div class="mb-5 p-4 sm:p-6 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 flex items-start gap-3">
+        <i class="bi bi-info-circle-fill text-amber-500 text-xl mt-0.5"></i>
+        <div>
+          <h3 class="font-bold">Enterprise Plan Pending</h3>
+          <p class="text-sm mt-1 opacity-90">Your custom plan request is currently under review by the administration. You will be able to make the payment once the custom price is configured.</p>
+        </div>
+      </div>
+    }
+
+    <!-- Announcement Banner -->
+    <app-announcement-banner [announcements]="(announcements$ | async) || []"></app-announcement-banner>
+
+    <!-- ══════════════════════════════════════════════
+         PAGE HEADER
+    ══════════════════════════════════════════════ -->
+    <div class="mb-5">
+      <h1 class="text-[22px] font-extrabold text-slate-800">{{ greeting }}, {{ shopName }} {{ greetingEmoji }}</h1>
+      <p class="text-sm text-slate-400 mt-0.5">Here's what's happening with your store today.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         ROW 1 — 4 STAT CARDS  (horizontal + sparkline)
+    ══════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+
+      <!-- ─ Revenue ─ -->
+      <div *appHasFeature="'analytics_sales'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between">
+          <!-- icon -->
+          <div class="w-11 h-11 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-600">
+            <i class="bi bi-currency-rupee text-xl"></i>
+          </div>
+          <button class="text-slate-300 hover:text-slate-500 transition-colors"><i class="bi bi-three-dots text-sm"></i></button>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 mb-1">Total Revenue</p>
+          <div class="flex items-baseline text-slate-800">
+            <span class="text-[28px] font-black leading-none mr-0.5">₹</span>
+            <app-ui-counter
+              [value]="dashboardData.stats.totalRevenue"
+              [fontSize]="28"
+              [fontWeight]="900"
+              textColor="#1e293b"
+              [gap]="1"
+              gradientFrom="transparent"
+              gradientTo="transparent"
+              [gradientHeight]="0"
+              class="leading-none"
+            ></app-ui-counter>
+          </div>
+        </div>
+        <!-- trend + sparkline -->
+        <div class="flex items-end justify-between gap-3">
+          <span [class]="getTrendClass(dashboardData.stats.revenueTrend)" class="text-[11px]! flex items-center gap-0.5 whitespace-nowrap">
+            {{ getTrendIcon(dashboardData.stats.revenueTrend) }} {{ dashboardData.stats.revenueTrend | number:'1.0-1' }}%
+            <span class="text-slate-400 font-normal ml-1">from last month</span>
+          </span>
+          <div class="shrink-0" style="width:125px; height:50px;">
+            <app-sparkline
+              [data]="revenueSparkline"
+              [color]="getTrendColor(dashboardData.stats.revenueTrend)"
+              [width]="125" [height]="50"
+            ></app-sparkline>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ Orders ─ -->
+      <div *appHasFeature="'analytics_sales'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+            <i class="bi bi-cart-check-fill text-xl"></i>
+          </div>
+          <button class="text-slate-300 hover:text-slate-500 transition-colors"><i class="bi bi-three-dots text-sm"></i></button>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 mb-1">Orders</p>
+          <app-ui-counter
+            [value]="dashboardData.stats.totalOrders"
+            [fontSize]="28"
+            [fontWeight]="900"
+            textColor="#1e293b"
+            [gap]="1"
+            gradientFrom="transparent"
+            gradientTo="transparent"
+            [gradientHeight]="0"
+            class="leading-none"
+          ></app-ui-counter>
+        </div>
+        <div class="flex items-end justify-between gap-3">
+          <span [class]="getTrendClass(dashboardData.stats.orderTrend)" class="text-[11px]! flex items-center gap-0.5 whitespace-nowrap">
+            {{ getTrendIcon(dashboardData.stats.orderTrend) }} {{ dashboardData.stats.orderTrend | number:'1.0-1' }}%
+            <span class="text-slate-400 font-normal ml-1">from last month</span>
+          </span>
+          <div class="shrink-0" style="width:125px; height:50px;">
+            <app-sparkline [data]="orderSparkline" [color]="getTrendColor(dashboardData.stats.orderTrend)" [width]="125" [height]="50"></app-sparkline>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ Customers ─ -->
+      <div *appHasFeature="'analytics_customers'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between">
+          <div class="w-11 h-11 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600">
+            <i class="bi bi-people-fill text-xl"></i>
+          </div>
+          <button class="text-slate-300 hover:text-slate-500 transition-colors"><i class="bi bi-three-dots text-sm"></i></button>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 mb-1">Customers</p>
+          <app-ui-counter
+            [value]="dashboardData.stats.totalCustomers"
+            [fontSize]="28"
+            [fontWeight]="900"
+            textColor="#1e293b"
+            [gap]="1"
+            gradientFrom="transparent"
+            gradientTo="transparent"
+            [gradientHeight]="0"
+            class="leading-none"
+          ></app-ui-counter>
+        </div>
+        <div class="flex items-end justify-between gap-3">
+          <span [class]="getTrendClass(dashboardData.stats.customerTrend)" class="text-[11px]! flex items-center gap-0.5 whitespace-nowrap">
+            {{ getTrendIcon(dashboardData.stats.customerTrend) }} {{ dashboardData.stats.customerTrend | number:'1.0-1' }}%
+            <span class="text-slate-400 font-normal ml-1">from last month</span>
+          </span>
+          <div class="shrink-0" style="width:125px; height:50px;">
+            <app-sparkline [data]="customerSparkline" [color]="getTrendColor(dashboardData.stats.customerTrend)" [width]="125" [height]="50"></app-sparkline>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ Total Products ─ -->
+      <div *appHasFeature="'analytics_products'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between">
+          <div class="w-11 h-11 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-500">
+            <i class="bi bi-bag-fill text-xl"></i>
+          </div>
+          <button class="text-slate-300 hover:text-slate-500 transition-colors"><i class="bi bi-three-dots text-sm"></i></button>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 mb-1">Total Products</p>
+          <app-ui-counter
+            [value]="dashboardData.stats.totalProducts"
+            [fontSize]="28"
+            [fontWeight]="900"
+            textColor="#1e293b"
+            [gap]="1"
+            gradientFrom="transparent"
+            gradientTo="transparent"
+            [gradientHeight]="0"
+            class="leading-none"
+          ></app-ui-counter>
+        </div>
+        <div class="flex items-end justify-between gap-3">
+          <span class="text-[11px] flex items-center gap-0.5 whitespace-nowrap text-slate-400 font-semibold">
+            ↑ 0% <span class="font-normal ml-1">from last month</span>
+          </span>
+          <div class="shrink-0" style="width:125px; height:50px;">
+            <app-sparkline [data]="productSparkline" color="#f97316" [width]="125" [height]="50"></app-sparkline>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         ROW 2 — SALES OVERVIEW + BUSINESS SUMMARY
+    ══════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-5">
+
+      <!-- Sales Chart (3/5) -->
+      <div *appHasFeature="'analytics_dashboard'" class="xl:col-span-3 bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-[15px] font-bold text-slate-800">Sales Overview</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Last 30 days daily revenue</p>
+          </div>
+          <app-ui-dropdown class="w-40" [options]="periodOptions" [(ngModel)]="selectedPeriod" (onSelect)="onPeriodChange()"></app-ui-dropdown>
+        </div>
+        <div class="h-52">
+          @if (dashboardData.salesChartData && dashboardData.salesChartData.length > 0) {
+            <app-area-chart
+              [data]="dashboardData.salesChartData"
+              xKey="date" [yKeys]="['value']"
+              [labels]="$any(salesChartData.labels) || []"
+              [colors]="['#6366f1']"
+            ></app-area-chart>
+          } @else {
+            <div class="h-full flex items-center justify-center text-slate-400 text-sm">
+              <div class="text-center">
+                <i class="bi bi-bar-chart-line text-4xl mb-2 block text-slate-200"></i>
+                No sales data for this period
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Business Summary (2/5) -->
+      <div *appHasFeature="'analytics_dashboard'" class="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <h3 class="text-[15px] font-bold text-slate-800 mb-4">Business Summary</h3>
+
+        <div class="grid grid-cols-2 gap-3">
+
+          <!-- Invoices -->
+          <div *appHasFeature="'sell_invoices'" class="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
+            <div class="flex items-center gap-2 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                <i class="bi bi-receipt text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">Invoices</span>
+            </div>
+            <p class="text-[22px] font-black text-slate-800 leading-none mb-1.5">{{ dashboardData.stats.totalInvoices }}</p>
+            <span [class]="getTrendClass(dashboardData.stats.invoiceTrend)" class="text-[10px]! font-bold">
+              {{ getTrendIcon(dashboardData.stats.invoiceTrend) }} {{ dashboardData.stats.invoiceTrend | number:'1.0-1' }}%
+            </span>
+          </div>
+
+          <!-- Pending Invoices -->
+          <div *appHasFeature="'sell_invoices'" class="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors cursor-pointer" (click)="navigateTo('invoices')">
+            <div class="flex items-center gap-2 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                <i class="bi bi-clock-history text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">Pending Invoices</span>
+            </div>
+            <p class="text-[22px] font-black text-slate-800 leading-none mb-1.5">{{ dashboardData.stats.pendingInvoices }}</p>
+            <span class="text-[10px] font-bold text-amber-500">Pending</span>
+          </div>
+
+          <!-- Expenses -->
+          <div *appHasFeature="'fin_expenses'" class="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
+            <div class="flex items-center gap-2 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
+                <i class="bi bi-cash-coin text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">Expenses</span>
+            </div>
+            <p class="text-[22px] font-black text-slate-800 leading-none mb-1.5">₹{{ dashboardData.stats.totalExpenses | number }}</p>
+            <span [class]="getTrendClass(-dashboardData.stats.expensesTrend)" class="text-[10px]! font-bold">
+              {{ getTrendIcon(dashboardData.stats.expensesTrend) }} {{ dashboardData.stats.expensesTrend | number:'1.0-1' }}%
+            </span>
+          </div>
+
+          <!-- Low Stock -->
+          <div *appHasFeature="'inv_low_stock_alerts'" class="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors cursor-pointer" (click)="navigateTo('inventory/low-stock')">
+            <div class="flex items-center gap-2 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
+                <i class="bi bi-box-seam text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">Low Stock Items</span>
+            </div>
+            <p class="text-[22px] font-black text-slate-800 leading-none mb-1.5">{{ dashboardData.stats.lowStockProducts }}</p>
+            <span class="text-[10px] font-bold text-rose-500">Alert</span>
+          </div>
+
+          <!-- Offers Running -->
+          <div *appHasFeature="'mktg_promotions'" class="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors cursor-pointer" (click)="navigateTo('offers')">
+            <div class="flex items-center gap-2 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-primary-50 flex items-center justify-center text-primary-500">
+                <i class="bi bi-tags-fill text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">Offers Running</span>
+            </div>
+            <p class="text-[22px] font-black text-slate-800 leading-none mb-1.5">–</p>
+            <span class="text-[10px] font-bold text-emerald-500">Active</span>
+          </div>
+
+          <!-- Branches -->
+          <div *appHasFeature="'ent_multi_branch'" class="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors cursor-pointer" (click)="navigateTo('branches')">
+            <div class="flex items-center gap-2 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                <i class="bi bi-building text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">Branches</span>
+            </div>
+            <p class="text-[22px] font-black text-slate-800 leading-none mb-1.5">{{ activeBranchesCount }}</p>
+            <span class="text-[10px] font-bold text-emerald-500">Active</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         ROW 3 — TOP PRODUCTS + ORDERS DONUT + RECENT ACTIVITIES
+    ══════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+      <!-- ─ Top Products (with thumbnail images) ─ -->
+      <div *appHasFeature="'analytics_products'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-[15px] font-bold text-slate-800">Top Products</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Best selling items</p>
+          </div>
+          <button (click)="navigateTo('products')"
+            class="text-xs text-primary-600 hover:text-primary-700 font-bold bg-primary-50 px-3 py-1.5 rounded-xl hover:bg-primary-100 transition-colors">
+            View All
+          </button>
+        </div>
+
+        <!-- Table header -->
+        <div class="grid grid-cols-[24px_1fr_auto] text-[10px] font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-100 mb-1 px-1">
+          <span>#</span>
+          <span>Product</span>
+          <span class="text-right">Sales</span>
+        </div>
+
+        <div class="space-y-0.5">
+          @for (product of dashboardData.topProducts; track product.id; let i = $index) {
+          <div class="grid grid-cols-[24px_1fr_auto] items-center gap-2 py-2.5 px-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer" (click)="navigateTo('products')">
+            <!-- rank -->
+            <span class="text-xs font-black text-slate-400">{{ i + 1 }}</span>
+
+            <!-- product info + thumbnail -->
+            <div class="flex items-center gap-3 min-w-0">
+              @if (product.imageUrl) {
+                <img [src]="product.imageUrl" [alt]="product.name"
+                  class="w-10 h-10 rounded-xl object-cover shrink-0 border border-slate-100">
+              } @else {
+                <!-- Fallback initials avatar -->
+                <div class="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center font-black text-sm"
+                  [style.background]="getProductAvatarBg(i).bg"
+                  [style.color]="getProductAvatarBg(i).color">
+                  {{ product.initials }}
+                </div>
+              }
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-slate-800 truncate">{{ product.name }}</p>
+                <p class="text-[11px] text-slate-400">{{ product.category }}</p>
+              </div>
+            </div>
+
+            <!-- sales -->
+            <div class="text-right shrink-0">
+              <p class="text-sm font-black text-slate-800">{{ product.sold }} <span class="text-[10px] font-normal text-slate-400">sold</span></p>
+              <p class="text-[11px] text-slate-400">₹{{ product.revenue }}</p>
+            </div>
+          </div>
+          } @empty {
+          <div class="text-center py-10 text-slate-400">
+            <i class="bi bi-bag text-4xl block mb-2 text-slate-200"></i>
+            No products sold yet
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- ─ Orders Overview (Donut) ─ -->
+      <div *appHasFeature="'analytics_sales'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-[15px] font-bold text-slate-800">Website Orders Overview</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Last 30 days</p>
+          </div>
+          <app-ui-dropdown class="w-52" [options]="periodOptions" [(ngModel)]="selectedOrderPeriod"></app-ui-dropdown>
+        </div>
+
+        <!-- Donut -->
+        <div style="height:190px;" class="mb-4">
+          <app-donut-chart
+            [completed]="0"
+            [pending]="dashboardData.stats.pendingInvoices"
+            [cancelled]="0"
+            centerLabel="Total Orders"
+          ></app-donut-chart>
+        </div>
+
+        <!-- Legend -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 block shrink-0"></span>
+              <span class="text-[13px] text-slate-600 font-semibold">Completed</span>
+            </div>
+            <span class="text-[13px] font-bold text-slate-700">0 <span class="text-slate-400 font-normal text-[11px]">(0%)</span></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 block shrink-0"></span>
+              <span class="text-[13px] text-slate-600 font-semibold">Pending</span>
+            </div>
+            <span class="text-[13px] font-bold text-slate-700">{{ dashboardData.stats.pendingInvoices }} <span class="text-slate-400 font-normal text-[11px]">(0%)</span></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 block shrink-0"></span>
+              <span class="text-[13px] text-slate-600 font-semibold">Cancelled</span>
+            </div>
+            <span class="text-[13px] font-bold text-slate-700">0 <span class="text-slate-400 font-normal text-[11px]">(0%)</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ Recent Activities ─ -->
+      <div *appHasFeature="'analytics_dashboard'" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-[15px] font-bold text-slate-800">Recent Activities</h3>
+          <button (click)="navigateTo('invoices/shop')"
+            class="text-xs text-primary-600 hover:text-primary-700 font-bold bg-primary-50 px-3 py-1.5 rounded-xl hover:bg-primary-100 transition-colors">
+            View All
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          @for (invoice of dashboardData.recentInvoices | slice:0:5; track invoice.id) {
+          <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group"
+            (click)="printInvoice(invoice)">
+            <!-- Activity icon with coloured bg -->
+            <div class="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 text-sm
+                bg-primary-50 text-primary-600 group-hover:bg-primary-100 transition-colors">
+              <i class="bi bi-receipt"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-bold text-slate-800 truncate">Invoice {{ invoice.invoiceNumber }} created</p>
+              <p class="text-[11px] text-slate-400 truncate">{{ invoice.date }}</p>
+            </div>
+            <div class="shrink-0 text-right">
+              <p class="text-[13px] font-black text-slate-800">₹{{ invoice.amount }}</p>
+              <span [class]="getStatusClass(invoice.status)">{{ invoice.status }}</span>
+            </div>
+          </div>
+          } @empty {
+          <!-- Placeholder activities when empty -->
+          <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50">
+            <div class="w-9 h-9 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
+              <i class="bi bi-person-check text-sm"></i>
+            </div>
+            <div>
+              <p class="text-[13px] font-semibold text-slate-600">New customer registered</p>
+              <p class="text-[11px] text-slate-400">No activity yet</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50">
+            <div class="w-9 h-9 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+              <i class="bi bi-receipt text-sm"></i>
+            </div>
+            <div>
+              <p class="text-[13px] font-semibold text-slate-600">Create your first invoice</p>
+              <p class="text-[11px] text-slate-400">Go to Invoices</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50">
+            <div class="w-9 h-9 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
+              <i class="bi bi-box-seam text-sm"></i>
+            </div>
+            <div>
+              <p class="text-[13px] font-semibold text-slate-600">Add products to inventory</p>
+              <p class="text-[11px] text-slate-400">Go to Products</p>
+            </div>
+          </div>
+          }
+        </div>
+
+        @if (dashboardData.recentInvoices.length > 0) {
+        <button
+          class="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 text-sm font-bold transition-colors"
+          (click)="sendWhatsApp(dashboardData.recentInvoices[0])">
+          <i class="bi bi-whatsapp"></i>
+          Share Latest Invoice
+        </button>
+        }
+      </div>
+      </div>
+      </div>
+    }
+  </main>
+</div>

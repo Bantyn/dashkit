@@ -1,0 +1,261 @@
+<div class="h-full bg-gray-50 flex flex-col overflow-hidden">
+  <!-- Header & Actions -->
+  <div class="px-8 py-6 bg-white border-b border-gray-200 flex justify-between items-center shrink-0 shadow-sm">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Purchase Orders</h1>
+      <p class="text-xs text-gray-500 mt-1">Generate and track inventory purchase orders from supplier partners</p>
+    </div>
+    <button (click)="openAddModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2">
+      <i class="bi bi-file-earmark-plus text-base"></i> Create Purchase Order
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 overflow-auto p-8 space-y-6">
+    <!-- Quick Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-file-earmark-text-fill text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Total Orders</div>
+        <div class="text-3xl font-extrabold mt-2">{{ orders.length }}</div>
+        <div class="text-xs mt-3 opacity-90">Purchase orders created</div>
+      </div>
+      <div class="bg-gradient-to-br from-amber-500 to-amber-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-truck text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Pending Delivery</div>
+        <div class="text-3xl font-extrabold mt-2">
+          {{ orders.filter(o => o.status === 'ordered').length }}
+        </div>
+        <div class="text-xs mt-3 opacity-90">Orders waiting for receipt</div>
+      </div>
+      <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-cash-stack text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Total Value</div>
+        <div class="text-3xl font-extrabold mt-2">
+          INR {{ orders.reduce((s, o) => s + o.totalAmount, 0) | number:'1.2-2' }}
+        </div>
+        <div class="text-xs mt-3 opacity-90">Value of all generated orders</div>
+      </div>
+      <div class="bg-gradient-to-br from-rose-500 to-rose-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-exclamation-triangle-fill text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Unpaid Dues</div>
+        <div class="text-3xl font-extrabold mt-2">
+          INR {{ orders.reduce((s, o) => s + (o.totalAmount - o.paidAmount), 0) | number:'1.2-2' }}
+        </div>
+        <div class="text-xs mt-3 opacity-90">Outstanding payment to suppliers</div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Card -->
+    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between gap-4">
+      <div class="relative flex-1 max-w-md">
+        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base"></i>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search orders by PO#, supplier, status..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none" />
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+              <th class="px-6 py-4">PO Number</th>
+              <th class="px-6 py-4">Order Date</th>
+              <th class="px-6 py-4">Supplier</th>
+              <th class="px-6 py-4">Total Amount</th>
+              <th class="px-6 py-4">Received Status</th>
+              <th class="px-6 py-4">Payment Status</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-150">
+            @for (order of filteredOrders; track order.id) {
+              <tr class="hover:bg-gray-50/50 transition-colors group">
+                <td class="px-6 py-4 font-semibold text-indigo-600 text-sm">
+                  {{ order.poNumber }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">
+                  {{ order.orderDate | date:'mediumDate' }}
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                  {{ order.supplierName }}
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                  INR {{ order.totalAmount | number:'1.2-2' }}
+                  <div class="text-[10px] text-gray-400 font-normal">Paid: INR {{ order.paidAmount | number:'1.2-2' }}</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span [class]="order.status === 'received' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : (order.status === 'partially_received' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-blue-50 text-blue-700 border-blue-100')" class="px-2.5 py-1 rounded-full text-xs font-semibold border inline-block capitalize">
+                    {{ order.status.replace('_', ' ') }}
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <span [class]="order.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : (order.paymentStatus === 'partial' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-rose-50 text-rose-700 border-rose-100')" class="px-2.5 py-1 rounded-full text-xs font-semibold border inline-block capitalize">
+                    {{ order.paymentStatus }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex justify-end gap-2">
+                    <button (click)="deleteOrder(order)" class="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors">
+                      <i class="bi bi-trash-fill text-base"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                  <div class="flex flex-col items-center justify-center gap-3">
+                    <i class="bi bi-file-earmark-text text-4xl text-gray-300"></i>
+                    <span class="font-medium text-gray-600">No purchase orders found</span>
+                    <button (click)="openAddModal()" class="mt-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition-colors">
+                      Create Your First PO
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Modal (Sleek Sheet Layout) -->
+  @if (isModalOpen) {
+    <div class="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm transition-opacity duration-300">
+      <div class="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col justify-between animate-slide-in p-0 border-l border-gray-150">
+        <!-- Header -->
+        <div class="px-6 py-5 bg-gray-50 border-b border-gray-200 flex justify-between items-center shrink-0">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Create Purchase Order</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Select supplier and add product variants to order</p>
+          </div>
+          <button (click)="closeModal()" class="p-2 hover:bg-gray-200 text-gray-400 hover:text-gray-700 rounded-full transition-colors">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="flex-1 p-6 space-y-6 overflow-y-auto">
+          <!-- Supplier Selection -->
+          <app-ui-dropdown
+            [(ngModel)]="selectedSupplier"
+            [options]="supplierOptions"
+            label="Select Supplier *"
+            placeholder="Choose a supplier..."
+          ></app-ui-dropdown>
+
+          <!-- Item Builder Section -->
+          <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-4">
+            <div class="text-xs font-bold text-gray-800 uppercase tracking-wide">Add Items</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Select Product -->
+              <app-ui-dropdown
+                [(ngModel)]="selectedProductIndex"
+                (onSelect)="onProductChange()"
+                [options]="productOptions"
+                label="Product"
+                placeholder="Select product..."
+              ></app-ui-dropdown>
+
+              <!-- Select Variant -->
+              <app-ui-dropdown
+                [(ngModel)]="selectedVariantIndex"
+                (onSelect)="onVariantChange()"
+                [options]="variantOptions"
+                [disabled]="selectedProductIndex === -1"
+                label="Variant"
+                placeholder="Choose variant..."
+              ></app-ui-dropdown>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              <app-ui-input
+                [(ngModel)]="itemQty"
+                type="number"
+                label="Quantity"
+              ></app-ui-input>
+              <app-ui-input
+                [(ngModel)]="itemCost"
+                type="number"
+                label="Cost Price (INR)"
+              ></app-ui-input>
+              <div class="flex items-end">
+                <button (click)="addItem()" [disabled]="selectedProductIndex === -1 || selectedVariantIndex === -1" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold rounded-lg text-xs transition-colors shadow-sm">
+                  Add Item
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Added Items Table -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Order Items</label>
+            <div class="border border-gray-150 rounded-xl overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead class="bg-gray-100 text-gray-600 font-bold uppercase">
+                  <tr>
+                    <th class="px-4 py-2.5">Item Details</th>
+                    <th class="px-4 py-2.5">Qty</th>
+                    <th class="px-4 py-2.5">Cost</th>
+                    <th class="px-4 py-2.5">Total</th>
+                    <th class="px-4 py-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  @for (item of poItems; track item.productId + item.variantSku; let i = $index) {
+                    <tr>
+                      <td class="px-4 py-3">
+                        <div class="font-semibold text-gray-800">{{ item.productName }}</div>
+                        <div class="text-[10px] text-gray-400">Variant: {{ item.variantName }} ({{ item.variantSku }})</div>
+                      </td>
+                      <td class="px-4 py-3 text-gray-700 font-medium">{{ item.quantity }}</td>
+                      <td class="px-4 py-3 text-gray-700">INR {{ item.costPrice | number:'1.2-2' }}</td>
+                      <td class="px-4 py-3 font-semibold text-gray-900">INR {{ item.amount | number:'1.2-2' }}</td>
+                      <td class="px-4 py-3 text-right">
+                        <button (click)="removeItem(i)" class="p-1 hover:bg-red-50 text-gray-400 hover:text-rose-600 rounded-md transition-colors">
+                          <i class="bi bi-x-circle-fill"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="px-4 py-6 text-center text-gray-400 italic">
+                        No items added yet. Use the tool above to add items.
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
+          <div class="text-sm font-semibold text-gray-800">
+            Total Value: <span class="text-indigo-600 font-extrabold text-base">INR {{ poTotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex gap-3">
+            <button (click)="closeModal()" class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+              Cancel
+            </button>
+            <button (click)="saveOrder()" [disabled]="poItems.length === 0" class="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 rounded-xl transition-all shadow-sm">
+              Generate PO
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

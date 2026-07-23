@@ -1,0 +1,126 @@
+<div class="h-full bg-gray-50 flex overflow-hidden">
+  <!-- Left Side: Template Selector List -->
+  <div class="w-80 border-r border-gray-200 bg-white flex flex-col shrink-0 shadow-sm">
+    <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+      <h2 class="text-lg font-bold text-gray-900">WhatsApp Templates</h2>
+      <p class="text-xs text-gray-500 mt-1">Configure automated WhatsApp notifications</p>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-2">
+      @for (tmpl of templates; track tmpl.id) {
+        <button (click)="selectTemplate(tmpl)" [class.bg-indigo-50]="selectedTemplate?.id === tmpl.id" [class.text-indigo-700]="selectedTemplate?.id === tmpl.id" class="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-gray-50 text-left transition-colors text-gray-700 text-sm font-semibold border border-transparent" [class.border-indigo-150]="selectedTemplate?.id === tmpl.id">
+          <div class="flex flex-col">
+            <span>{{ tmpl.name }}</span>
+            <span class="text-[10px] text-gray-400 font-mono mt-0.5">{{ tmpl.code }}</span>
+          </div>
+          <span [class]="tmpl.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-gray-150 text-gray-600 border-gray-200'" class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border">
+            {{ tmpl.isActive ? 'Active' : 'Off' }}
+          </span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (selectedTemplate) {
+    <!-- Center: Content Editor -->
+    <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-gray-200 overflow-y-auto p-8 space-y-6">
+      <div class="flex justify-between items-center border-b border-gray-150 pb-5">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">{{ selectedTemplate.name }}</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Customize WhatsApp notification text</p>
+        </div>
+        <button (click)="saveTemplate()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2">
+          <i class="bi bi-save2 text-base"></i> Save Changes
+        </button>
+      </div>
+
+      <!-- Content Editor -->
+      <div class="flex-1 flex flex-col">
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">WhatsApp Message Content *</label>
+        <textarea [(ngModel)]="selectedTemplate.content" class="w-full flex-1 min-h-[250px] p-4 bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none leading-relaxed resize-none"></textarea>
+      </div>
+
+      <!-- Active Toggle -->
+      <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-xl">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900">Enable Template</h4>
+          <p class="text-xs text-gray-500 mt-0.5">If disabled, this WhatsApp alert will not trigger</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" [(ngModel)]="selectedTemplate.isActive" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+        </label>
+      </div>
+
+      <!-- Placeholders Helper -->
+      <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+        <div class="text-xs font-bold text-indigo-750 uppercase tracking-wide mb-2"><i class="bi bi-info-circle-fill"></i> Available Placeholders</div>
+        <div class="flex flex-wrap gap-2">
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{customerName}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{orderNumber}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{invoiceNumber}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{totalAmount}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{status}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-emerald-700 border border-emerald-100 rounded text-xs">{{invoiceLink}}</code>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-2"><span ngNonBindable class="text-emerald-600 font-bold">{{invoiceLink}}</span> — only available in Invoice templates (auto-filled with PDF link)</p>
+      </div>
+    </div>
+
+    <!-- Right Side: WhatsApp Simulator Preview -->
+    <div class="w-[30%] min-w-[340px] max-w-[440px] border-l border-gray-200 bg-gray-50 flex flex-col shrink-0">
+      <div class="p-6 border-b border-gray-150 bg-white">
+        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">WhatsApp Simulator</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Live WhatsApp conversation preview</p>
+      </div>
+      <!-- Phone Body Mock -->
+      <div class="flex-1 p-6 flex justify-center items-start overflow-y-auto">
+        <div class="w-64 bg-gray-950 rounded-[3rem] border-8 border-gray-800 shadow-xl overflow-hidden relative flex flex-col min-h-[460px] max-h-[500px]">
+          <!-- Phone Speaker & Camera notches -->
+          <div class="h-6 bg-gray-800 flex justify-center items-center gap-1.5 shrink-0 z-10">
+            <div class="w-12 h-1 bg-gray-700 rounded-full"></div>
+            <div class="w-2.5 h-2.5 bg-gray-700 rounded-full"></div>
+          </div>
+          <!-- Screen Content (WhatsApp Theme) -->
+          <div class="flex-1 bg-[#efeae2] p-4 flex flex-col justify-end text-xs overflow-hidden relative">
+            <!-- Header WhatsApp Mock -->
+            <div class="absolute inset-x-0 top-0 bg-[#075e54] text-white p-2 flex items-center gap-2 select-none z-15 shrink-0">
+              <i class="bi bi-arrow-left text-xs"></i>
+              <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center font-bold text-[10px]">C</div>
+              <div class="flex flex-col">
+                <span class="font-bold text-[10px]">Clothify Store</span>
+                <span class="text-[8px] text-gray-200">online</span>
+              </div>
+            </div>
+            <!-- Messages Bubble area -->
+            <div class="flex-1 overflow-y-auto flex flex-col justify-end gap-3 pb-2 pt-10 select-none">
+              <!-- Text Bubble -->
+              <div class="bg-[#d9fdd3] text-gray-800 p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm self-end relative border border-gray-150 leading-normal break-words">
+                {{ compiledPreview || 'Message preview...' }}
+                <div class="text-[8px] text-gray-400 text-right mt-1.5 flex items-center justify-end gap-1">
+                  <span>10:45 AM</span>
+                  <i class="bi bi-check2-all text-blue-500"></i>
+                </div>
+              </div>
+            </div>
+            <!-- Input Area Mock -->
+            <div class="bg-white px-2 py-1.5 rounded-full flex items-center gap-2 border border-gray-250 select-none shrink-0">
+              <i class="bi bi-emoji-smile text-gray-500 text-sm"></i>
+              <div class="flex-1 text-gray-450 text-[10px]">Message</div>
+              <i class="bi bi-mic-fill text-gray-500 text-sm"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Quick Test Dispatch -->
+      <div class="p-6 bg-white border-t border-gray-200 shrink-0">
+        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Send Test WhatsApp</h4>
+        <div class="flex gap-2">
+          <input type="text" [(ngModel)]="testRecipient" placeholder="e.g. +919876543210" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 rounded-lg text-xs outline-none" />
+          <button (click)="sendTest()" [disabled]="isSendingTest" class="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-lg text-xs transition-colors shadow-sm">
+            {{ isSendingTest ? 'Sending...' : 'Send' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

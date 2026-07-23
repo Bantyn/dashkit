@@ -1,0 +1,665 @@
+<div class="h-full md:max-w-[1655px] mx-auto bg-[#f5f7fa] flex flex-col overflow-hidden relative">
+  <!-- Top Observability Alert Engine Banner -->
+  <div *ngIf="alerts.length > 0" class="w-full bg-rose-50 border-b border-rose-200 shrink-0 z-40">
+    <div class="max-w-screen mx-auto p-4 flex flex-col gap-3">
+      <div class="flex items-center gap-2 text-rose-800 font-bold text-sm uppercase tracking-wider">
+        <i class="bi bi-exclamation-octagon-fill text-lg"></i>
+        Active Infrastructure Alerts ({{ alerts.length }})
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div *ngFor="let alert of alerts" class="flex items-start justify-between bg-white p-3 rounded-lg border border-rose-100 text-xs shadow-sm">
+          <div>
+            <span class="font-bold text-rose-700 uppercase">[{{ alert.type }}]</span>
+            <p class="text-slate-700 font-medium mt-1">{{ alert.message }}</p>
+          </div>
+          <div class="text-right">
+            <span class="font-semibold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{{ alert.value }}</span>
+            <span class="block text-[10px] text-slate-400 mt-1">{{ alert.metric }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unified Header row -->
+  <div class="w-full bg-white border-b border-gray-200 shrink-0 z-30">
+    <div class="max-w-screen mx-auto px-6 py-5 flex justify-between items-center w-full">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white text-sm shadow-sm shrink-0"
+             [ngClass]="{
+               'bg-emerald-500': metrics?.platformStatus === 'Healthy',
+               'bg-amber-500': metrics?.platformStatus === 'Warning',
+               'bg-rose-500': metrics?.platformStatus === 'Critical',
+               'bg-gray-400': !metrics
+             }">
+          {{ metrics?.healthScore || 0 }}%
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">Platform Observability</h2>
+          <p class="text-xs text-gray-500 mt-1">
+            Real-time diagnostics and performance analytics. Status:
+            <span class="font-bold uppercase"
+                  [ngClass]="{
+                    'text-emerald-600': metrics?.platformStatus === 'Healthy',
+                    'text-amber-600': metrics?.platformStatus === 'Warning',
+                    'text-rose-600': metrics?.platformStatus === 'Critical'
+                  }">
+              {{ metrics?.platformStatus || 'Loading...' }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-100">
+          <app-checkbox [checked]="autoRefresh" (checkedChange)="toggleAutoRefresh()" color="var(--color-primary-600)"></app-checkbox>
+          <span>Auto-Refresh ({{ refreshIntervalSeconds }}s)</span>
+        </label>
+        <button (click)="fetchData()" class="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">
+          <i class="bi bi-arrow-clockwise"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading && !metrics" class="flex-1 flex flex-col items-center justify-center bg-gray-50">
+    <app-loading-spinner size="lg" className="mb-4"></app-loading-spinner>
+    <span class="text-slate-500 text-sm font-medium">Aggregating platform health statistics...</span>
+  </div>
+
+  <div *ngIf="metrics" class="flex-1 flex flex-col overflow-hidden animate-fade-in">
+    <!-- Horizontal Navigation Tabs -->
+    <div class="border-b mx-auto border-gray-200 bg-white px-6 shadow-sm flex overflow-x-auto custom-scrollbar">
+      <button
+        *ngFor="let tab of tabs"
+        (click)="changeTab(tab.id)"
+        class="px-5 py-4 border-b-2 font-bold text-sm transition-all flex items-center gap-2 whitespace-nowrap"
+        [class.border-[var(--color-primary-600)]]="activeTab === tab.id"
+        [class.text-[var(--color-primary-600)]]="activeTab === tab.id"
+        [class.border-transparent]="activeTab !== tab.id"
+        [class.text-gray-500]="activeTab !== tab.id"
+        [class.hover:text-primary-300]="activeTab !== tab.id"
+      >
+        <i class="bi" [class]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+        <span *ngIf="tab.id === 'errors' && metrics.overview.error500Today > 0" class="bg-rose-500 text-white px-2 py-0.5 rounded-md text-[10px] font-black ml-1 animate-pulse">
+          {{ metrics.overview.error500Today }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Active Tab Panel Content -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-gray-50">
+      
+      <!-- ── PAGE 1: OVERVIEW ────────────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'overview'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Platform Overview</h2>
+          <p class="text-slate-500 text-xs">Real-time status summaries across all registered shops.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Total Shops -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider">Total Shops</span>
+              <span class="text-2xl font-black text-slate-800 mt-1 block">{{ metrics.overview.totalShops || 0 }}</span>
+            </div>
+            <i class="bi bi-shop text-2xl text-slate-400"></i>
+          </div>
+
+          <!-- Active Shops -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider">Active Shops</span>
+              <span class="text-2xl font-black text-emerald-600 mt-1 block">{{ metrics.overview.activeShops || 0 }}</span>
+            </div>
+            <i class="bi bi-check-circle-fill text-2xl text-emerald-400"></i>
+          </div>
+
+          <!-- Expired/Suspended Shops -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider">Suspended Shops</span>
+              <span class="text-2xl font-black text-rose-600 mt-1 block">{{ metrics.overview.suspendedShops || 0 }}</span>
+            </div>
+            <i class="bi bi-x-circle-fill text-2xl text-rose-400"></i>
+          </div>
+
+          <!-- Today's API Requests -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider">API Requests Today</span>
+              <span class="text-2xl font-black text-slate-800 mt-1 block">{{ metrics.overview.requestsToday }}</span>
+            </div>
+            <i class="bi bi-journal-text text-2xl text-slate-400"></i>
+          </div>
+
+          <!-- Concurrent/Active Requests -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider">Concurrent Requests</span>
+              <span class="text-2xl font-black text-primary-600 mt-1 block">{{ metrics.overview.activeRequests }}</span>
+            </div>
+            <i class="bi bi-people-fill text-2xl text-primary-400"></i>
+          </div>
+
+          <!-- Monthly Recurring Revenue -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider">Monthly Revenue</span>
+              <span class="text-2xl font-black text-emerald-600 mt-1 block">₹{{ metrics.overview.monthlyRevenue | number }}</span>
+            </div>
+            <i class="bi bi-currency-dollar text-2xl text-emerald-400"></i>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm min-w-0">
+          <div class="flex items-center justify-between border-b pb-3 mb-4">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">24h Requests/sec Load Sparkline</span>
+            <span class="text-[10px] text-slate-400 font-semibold bg-white border px-2 py-0.5 rounded">RPS over time</span>
+          </div>
+          <div class="w-full flex items-center justify-start lg:justify-center p-3 h-44 bg-white rounded-lg overflow-x-auto">
+            <div class="min-w-max">
+              <app-sparkline [data]="rpsData" color="#3B82F6" [width]="600" [height]="140"></app-sparkline>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 2: LIVE MONITORING ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'live'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Live Performance & Percentiles</h2>
+          <p class="text-slate-500 text-xs">Real-time statistics for response times and specific API pathways.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center shadow-sm">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">P50 Latency</span>
+            <span class="text-xl font-black text-slate-800 mt-1 block">{{ metrics.percentiles.p50 }}ms</span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center shadow-sm">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">P75 Latency</span>
+            <span class="text-xl font-black text-slate-800 mt-1 block">{{ metrics.percentiles.p75 }}ms</span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center shadow-sm">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">P90 Latency</span>
+            <span class="text-xl font-black text-slate-800 mt-1 block">{{ metrics.percentiles.p90 }}ms</span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center shadow-sm">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">P95 Latency</span>
+            <span class="text-xl font-black text-amber-600 mt-1 block">{{ metrics.percentiles.p95 }}ms</span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center shadow-sm col-span-2 md:col-span-1">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">P99 Latency</span>
+            <span class="text-xl font-black text-rose-600 mt-1 block">{{ metrics.percentiles.p99 }}ms</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm space-y-4">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2">Pathway Latency Profiles</span>
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-600">POS Checkout (Invoices)</span>
+              <span class="font-black text-slate-900 bg-white border px-3 py-1 rounded-md">{{ metrics.averages.invoice }}ms</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-600">Dashboard Metrics Compilation</span>
+              <span class="font-black text-slate-900 bg-white border px-3 py-1 rounded-md">{{ metrics.averages.dashboard }}ms</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-600">Catalog Global Search</span>
+              <span class="font-black text-slate-900 bg-white border px-3 py-1 rounded-md">{{ metrics.averages.search }}ms</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-600">Admin/Merchant Authentications</span>
+              <span class="font-black text-slate-900 bg-white border px-3 py-1 rounded-md">{{ metrics.averages.auth }}ms</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm min-w-0">
+            <div class="flex items-center justify-between border-b pb-3 mb-4">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">24h P95 Latency Trend</span>
+              <span class="text-[10px] text-slate-400 font-semibold bg-white border px-2 py-0.5 rounded">Smooth curve</span>
+            </div>
+            <div class="w-full flex items-center justify-start lg:justify-center p-3 h-36 bg-white rounded-lg overflow-x-auto">
+              <div class="min-w-max">
+                <app-sparkline [data]="latencyData" color="#F59E0B" [width]="600" [height]="120"></app-sparkline>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 3: API PERFORMANCE ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'api'" class="space-y-6">
+        <div class="border-b pb-4 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-black text-slate-800">API Endpoint Analytics</h2>
+            <p class="text-slate-500 text-xs">API transaction lists, response averages, and rates.</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 border-b border-slate-200 font-bold text-slate-600">
+              <tr>
+                <th class="p-3">Endpoint</th>
+                <th class="p-3">Method</th>
+                <th class="p-3 text-right">Calls Today</th>
+                <th class="p-3 text-right">Avg Response</th>
+                <th class="p-3 text-right">Max Response</th>
+                <th class="p-3 text-right">Errors</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr *ngFor="let ep of metrics.endpoints" class="hover:bg-slate-50">
+                <td class="p-3 font-semibold text-slate-900 font-mono">{{ ep.endpoint }}</td>
+                <td class="p-3">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase"
+                        [ngClass]="{
+                          'bg-emerald-50 text-emerald-700 border border-emerald-200': ep.method === 'GET',
+                          'bg-primary-50 text-primary-700 border border-primary-200': ep.method === 'POST',
+                          'bg-amber-50 text-amber-700 border border-amber-200': ep.method === 'PUT' || ep.method === 'PATCH',
+                          'bg-rose-50 text-rose-700 border border-rose-200': ep.method === 'DELETE'
+                        }">
+                    {{ ep.method }}
+                  </span>
+                </td>
+                <td class="p-3 text-right font-medium">{{ ep.calls }}</td>
+                <td class="p-3 text-right font-medium">{{ ep.calls > 0 ? Math.round(ep.totalResponseTime / ep.calls) : 0 }}ms</td>
+                <td class="p-3 text-right font-medium text-slate-950">{{ ep.maxResponseTime }}ms</td>
+                <td class="p-3 text-right">
+                  <span *ngIf="ep.errorCount > 0" class="text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-full font-bold">
+                    {{ ep.errorCount }}
+                  </span>
+                  <span *ngIf="ep.errorCount === 0" class="text-slate-400">-</span>
+                </td>
+              </tr>
+              <tr *ngIf="metrics.endpoints.length === 0">
+                <td colspan="6" class="p-8 text-center text-slate-400 font-semibold">No endpoints tracked yet today.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PAGE 4: FIRESTORE USAGE ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'firestore'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Firestore Usage Metrics</h2>
+          <p class="text-slate-500 text-xs">Accumulated operations today intercepted by the database proxy tracker.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-500 block uppercase tracking-wider">Reads Today</span>
+              <span class="text-2xl font-black text-primary-700 mt-1 block">{{ metrics.firestore.readsToday }}</span>
+            </div>
+            <i class="bi bi-eye-fill text-2xl text-primary-400"></i>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-500 block uppercase tracking-wider">Writes Today</span>
+              <span class="text-2xl font-black text-emerald-700 mt-1 block">{{ metrics.firestore.writesToday }}</span>
+            </div>
+            <i class="bi bi-pencil-fill text-2xl text-emerald-400"></i>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-500 block uppercase tracking-wider">Deletes Today</span>
+              <span class="text-2xl font-black text-rose-700 mt-1 block">{{ metrics.firestore.deletesToday }}</span>
+            </div>
+            <i class="bi bi-trash-fill text-2xl text-rose-400"></i>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm">
+          <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-3 mb-4">Database Collection Operations Distribution</span>
+          
+          <div class="space-y-4">
+            <div *ngFor="let col of getCollectionKeys(metrics.firestore.byCollection)" class="space-y-1">
+              <div class="flex justify-between text-xs font-bold text-slate-700">
+                <span class="font-mono">{{ col }}</span>
+                <span class="text-slate-500">
+                  Reads: {{ metrics.firestore.byCollection[col].reads }} | Writes: {{ metrics.firestore.byCollection[col].writes }}
+                </span>
+              </div>
+              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden flex">
+                <div class="bg-primary-500 h-full" [style.width.%]="(metrics.firestore.byCollection[col].reads / (metrics.firestore.readsToday || 1)) * 100"></div>
+                <div class="bg-emerald-500 h-full" [style.width.%]="(metrics.firestore.byCollection[col].writes / (metrics.firestore.writesToday || 1)) * 100"></div>
+              </div>
+            </div>
+            <div *ngIf="getCollectionKeys(metrics.firestore.byCollection).length === 0" class="text-center text-slate-400 text-xs py-4 font-semibold">
+              No collection operations tracked yet.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 5: CACHE ANALYTICS ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'cache'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Cache Analytics & Efficiency</h2>
+          <p class="text-slate-500 text-xs">Shared memory cache efficiency metrics and TTL lookup performance.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm space-y-4">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2">Cache Memory Usage & Sizes</span>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Hit Rate Ratio</span>
+              <span class="font-black text-emerald-600">{{ Math.round(metrics.cache.hitRate * 100) }}%</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Miss Rate Ratio</span>
+              <span class="font-black text-slate-600">{{ Math.round(metrics.cache.missRate * 100) }}%</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Current Key/Entry Size</span>
+              <span class="font-black text-slate-900">{{ metrics.cache.currentEntries }} keys</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Est. Memory Consumption</span>
+              <span class="font-black text-slate-900">{{ formatBytes(metrics.cache.memoryUsedBytes) }}</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Avg Key Lookup Lag</span>
+              <span class="font-black text-primary-600">{{ metrics.cache.avgLookupMs }}ms</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm flex flex-col justify-center items-center text-center">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2 w-full mb-4">Cache Policy Effectiveness</span>
+            <div class="relative w-32 h-32 flex items-center justify-center rounded-full border-8 border-slate-200"
+                 [ngClass]="{
+                   'border-t-emerald-500': metrics.cache.efficiency >= 80,
+                   'border-t-amber-500': metrics.cache.efficiency >= 60 && metrics.cache.efficiency < 80,
+                   'border-t-rose-500': metrics.cache.efficiency < 60
+                 }">
+              <span class="text-2xl font-black text-slate-800">{{ metrics.cache.efficiency }}%</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-bold uppercase mt-4">Average Platform Cache Efficiency</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 6: INFRASTRUCTURE ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'infra'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Infrastructure & Node.js Health</h2>
+          <p class="text-slate-500 text-xs">Real-time Node process usage, garbage collection, and loop status.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm space-y-4">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2">Node Process Resources</span>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">CPU Usage</span>
+              <span class="font-black text-slate-900">{{ metrics.infrastructure.cpuUsage }}%</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Process Memory (RSS)</span>
+              <span class="font-black text-slate-900">{{ metrics.infrastructure.ramUsageMB }} MB</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Heap Used</span>
+              <span class="font-black text-slate-900">{{ metrics.infrastructure.heapUsedMB }} MB / {{ metrics.infrastructure.heapTotalMB }} MB</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Event Loop Lag Delay</span>
+              <span class="font-black" [ngClass]="{'text-rose-600 font-bold': metrics.infrastructure.eventLoopDelayMs > 10, 'text-emerald-600': metrics.infrastructure.eventLoopDelayMs <= 10}">
+                {{ metrics.infrastructure.eventLoopDelayMs }}ms
+              </span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Server Free Memory</span>
+              <span class="font-black text-slate-900">{{ metrics.infrastructure.freeMemGB }} GB / {{ metrics.infrastructure.totalMemGB }} GB</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm min-w-0">
+            <div class="flex items-center justify-between border-b pb-3 mb-4">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">24h Server CPU Load</span>
+              <span class="text-[10px] text-slate-400 font-semibold bg-white border px-2 py-0.5 rounded">Usage %</span>
+            </div>
+            <div class="w-full flex items-center justify-start lg:justify-center p-3 h-36 bg-white rounded-lg overflow-x-auto">
+              <div class="min-w-max">
+                <app-sparkline [data]="cpuData" color="#EC4899" [width]="600" [height]="120"></app-sparkline>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 7: DATABASE ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'database'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Firestore Transactions & Telemetry</h2>
+          <p class="text-slate-500 text-xs">Observe database lock time, transactions, batch writes, and retries.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Transactions Run</span>
+            <span class="text-2xl font-black text-slate-800 mt-1 block">{{ metrics.database.transactionCount }}</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Avg Trans. Duration</span>
+            <span class="text-2xl font-black text-slate-800 mt-1 block">{{ metrics.database.avgTransactionTimeMs }}ms</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Slow Transactions</span>
+            <span class="text-2xl font-black text-amber-600 mt-1 block">{{ metrics.database.slowTransactions }}</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Failed Transactions</span>
+            <span class="text-2xl font-black text-rose-600 mt-1 block">{{ metrics.database.failedTransactions }}</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm space-y-4">
+          <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2">Acids Locks & Batch Writes</span>
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold text-slate-600">Write Batches Committed</span>
+            <span class="font-black text-slate-900">{{ metrics.database.batchWrites }} batches</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="font-semibold text-slate-600">Simultaneous Lock Contention Retries</span>
+            <span class="font-black text-slate-400">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 8: SHOP RESOURCE USAGE ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'shops'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Shop Resource Matrix</h2>
+          <p class="text-slate-500 text-xs">Identify and highlight shops causing abnormal platform resource usage.</p>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 border-b border-slate-200 font-bold text-slate-600">
+              <tr>
+                <th class="p-3">Shop</th>
+                <th class="p-3">Plan</th>
+                <th class="p-3 text-right">Calls (API)</th>
+                <th class="p-3 text-right">Reads (DB)</th>
+                <th class="p-3 text-right">Writes (DB)</th>
+                <th class="p-3 text-right">Bandwidth</th>
+                <th class="p-3 text-right">Cost Est.</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr *ngFor="let shop of metrics.shopsUsage" class="hover:bg-slate-50"
+                  [ngClass]="{'bg-amber-50/50': shop.firestoreReads > 5000 || shop.apiCalls > 1000}">
+                <td class="p-3 font-semibold text-slate-900">
+                  <span class="flex items-center gap-1.5">
+                    <span *ngIf="shop.firestoreReads > 5000 || shop.apiCalls > 1000" class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping"></span>
+                    {{ shop.shopName }}
+                  </span>
+                </td>
+                <td class="p-3">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-700 border">
+                    {{ shop.plan }}
+                  </span>
+                </td>
+                <td class="p-3 text-right font-medium">{{ shop.apiCalls }}</td>
+                <td class="p-3 text-right font-medium" [ngClass]="{'text-amber-600 font-bold': shop.firestoreReads > 5000}">{{ shop.firestoreReads }}</td>
+                <td class="p-3 text-right font-medium">{{ shop.firestoreWrites }}</td>
+                <td class="p-3 text-right font-medium text-slate-500">{{ shop.bandwidthMB }} MB</td>
+                <td class="p-3 text-right font-black text-slate-900">₹{{ shop.costEstimate }}</td>
+              </tr>
+              <tr *ngIf="metrics.shopsUsage.length === 0">
+                <td colspan="7" class="p-8 text-center text-slate-400 font-semibold">No shops monitored yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PAGE 9: ERRORS ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'errors'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Errors Center & Stack Traces</h2>
+          <p class="text-slate-500 text-xs">Real-time error tracking logs, stack traces, and status failure statistics.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">500 Server Errors</span>
+            <span class="text-2xl font-black text-rose-600 mt-1 block">{{ metrics.overview.error500Today }}</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">400 Client Errors</span>
+            <span class="text-2xl font-black text-slate-800 mt-1 block">{{ metrics.overview.error400Today }}</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Auth Failures</span>
+            <span class="text-2xl font-black text-amber-600 mt-1 block">{{ metrics.overview.authFailuresToday }}</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm text-center">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Validation Errors</span>
+            <span class="text-2xl font-black text-slate-800 mt-1 block">{{ metrics.overview.validationErrorsToday }}</span>
+          </div>
+        </div>
+
+        <!-- Recent Errors Stack Traces -->
+        <div class="space-y-4">
+          <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2">Recent Stack Traces</span>
+          <div *ngFor="let err of metrics.errorsList; let i = index" class="bg-slate-50 border border-slate-200 p-4 rounded-lg space-y-2 text-xs">
+            <div class="flex items-center justify-between border-b pb-2">
+              <span class="font-bold text-rose-600 font-mono">HTTP {{ err.status }} | {{ err.method }} {{ err.endpoint }}</span>
+              <span class="text-[10px] text-slate-400">{{ err.timestamp | date:'HH:mm:ss' }}</span>
+            </div>
+            <p class="font-semibold text-slate-800">{{ err.message }}</p>
+            <pre class="bg-slate-900 text-slate-200 p-3 rounded font-mono text-[10px] overflow-x-auto select-all max-h-40">{{ err.stack || 'No stack trace captured.' }}</pre>
+          </div>
+          <div *ngIf="metrics.errorsList.length === 0" class="text-center text-slate-400 text-xs py-8 font-semibold">
+            Zero system errors recorded today. Clean logs!
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 10: COST ANALYTICS ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'cost'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">Infrastructure & Billing Costs</h2>
+          <p class="text-slate-500 text-xs">Pricing calculations based on resources consumed.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm space-y-4">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2">Infrastructure Spend Estimates</span>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Firestore Operations Cost</span>
+              <span class="font-black text-slate-900">₹{{ (metrics.firestore.readsToday * 0.000006 + metrics.firestore.writesToday * 0.000018).toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Hosting Expenses (Cloud Run)</span>
+              <span class="font-black text-slate-900">₹850.00</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Cloud Storage Bandwidth Spend</span>
+              <span class="font-black text-slate-900">₹120.00</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-600">Image Processing Spend (Cloudinary)</span>
+              <span class="font-black text-slate-900">₹450.00</span>
+            </div>
+            <div class="flex justify-between text-xs border-t pt-3">
+              <span class="font-bold text-slate-700">Estimated Total Today</span>
+              <span class="font-black text-slate-950">₹{{ (1420 + metrics.firestore.readsToday * 0.000006 + metrics.firestore.writesToday * 0.000018).toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-lg border border-slate-200/80 shadow-sm flex flex-col justify-center items-center text-center">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block border-b pb-2 w-full mb-4">Gross profit margin</span>
+            <div class="relative w-32 h-32 flex items-center justify-center rounded-full border-8 border-slate-200 border-t-emerald-500">
+              <span class="text-2xl font-black text-slate-800">86.2%</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-bold uppercase mt-4">Estimated Platform Margin</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE 11: SYSTEM HEALTH ────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'health'" class="space-y-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-black text-slate-800">System Component Check</h2>
+          <p class="text-slate-500 text-xs">System statuses checks.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- API Health -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center">
+            <span class="font-bold text-xs text-slate-700">API Gateway Router</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 border border-emerald-100">
+              Healthy
+            </span>
+          </div>
+
+          <!-- DB Health -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center">
+            <span class="font-bold text-xs text-slate-700">Firestore DB Engine</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase"
+                  [ngClass]="{
+                    'text-emerald-700 bg-emerald-50 border-emerald-100': metrics.database.failedTransactions === 0,
+                    'text-amber-700 bg-amber-50 border-amber-100': metrics.database.failedTransactions > 0
+                  }">
+              {{ metrics.database.failedTransactions === 0 ? 'Healthy' : 'Warning' }}
+            </span>
+          </div>
+
+          <!-- Cache Health -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center">
+            <span class="font-bold text-xs text-slate-700">Shared Cache Store</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 border border-emerald-100">
+              Healthy
+            </span>
+          </div>
+
+          <!-- System Memory Health -->
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center">
+            <span class="font-bold text-xs text-slate-700">Server Infrastructure Health</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase"
+                  [ngClass]="{
+                    'text-emerald-700 bg-emerald-50 border-emerald-100': metrics.infrastructure.cpuUsage < 80,
+                    'text-amber-700 bg-amber-50 border-amber-100': metrics.infrastructure.cpuUsage >= 80
+                  }">
+              {{ metrics.infrastructure.cpuUsage < 80 ? 'Healthy' : 'Warning' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

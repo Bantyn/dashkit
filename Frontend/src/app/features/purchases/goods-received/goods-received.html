@@ -1,0 +1,185 @@
+<div class="h-full bg-gray-50 flex flex-col overflow-hidden">
+  <!-- Header & Actions -->
+  <div class="px-8 py-6 bg-white border-b border-gray-200 flex justify-between items-center shrink-0 shadow-sm">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Goods Received Notes (GRN)</h1>
+      <p class="text-xs text-gray-500 mt-1">Receive product shipments and automatically update inventory stock</p>
+    </div>
+    <button (click)="openAddModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2">
+      <i class="bi bi-box-seam-fill text-base"></i> Record Received Goods
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 overflow-auto p-8 space-y-6">
+    <!-- Quick Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-file-earmark-spreadsheet-fill text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Total GRNs</div>
+        <div class="text-3xl font-extrabold mt-2">{{ grns.length }}</div>
+        <div class="text-xs mt-3 opacity-90">Shipments received and cataloged</div>
+      </div>
+      <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-box-fill text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Received Products</div>
+        <div class="text-3xl font-extrabold mt-2">
+          {{ grns.reduce((acc, grn) => acc + (grn.items ? grn.items.length : 0), 0) }}
+        </div>
+        <div class="text-xs mt-3 opacity-90">Unique item variants restocked</div>
+      </div>
+      <div class="bg-gradient-to-br from-amber-500 to-amber-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-hourglass-split text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Pending POs</div>
+        <div class="text-3xl font-extrabold mt-2">{{ pendingOrders.length }}</div>
+        <div class="text-xs mt-3 opacity-90">Purchase orders waiting for delivery</div>
+      </div>
+    </div>
+
+    <!-- Search Card -->
+    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between gap-4">
+      <div class="relative flex-1 max-w-md">
+        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base"></i>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search GRNs by GRN#, PO#, supplier..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none" />
+      </div>
+    </div>
+
+    <!-- GRN Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+              <th class="px-6 py-4">GRN Number</th>
+              <th class="px-6 py-4">Received Date</th>
+              <th class="px-6 py-4">PO Number</th>
+              <th class="px-6 py-4">Supplier</th>
+              <th class="px-6 py-4">Items Restocked</th>
+              <th class="px-6 py-4">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-150">
+            @for (grn of filteredGrns; track grn.id) {
+              <tr class="hover:bg-gray-50/50 transition-colors group">
+                <td class="px-6 py-4 font-semibold text-emerald-600 text-sm">
+                  {{ grn.grnNumber }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">
+                  {{ grn.receivedDate | date:'mediumDate' }}
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-indigo-600">
+                  {{ grn.poNumber }}
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                  {{ grn.supplierName }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600 font-semibold">
+                  {{ grn.items ? grn.items.length : 0 }} items
+                </td>
+                <td class="px-6 py-4 text-xs text-gray-400">
+                  {{ grn.notes || '—' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                  <div class="flex flex-col items-center justify-center gap-3">
+                    <i class="bi bi-box-seam text-4xl text-gray-300"></i>
+                    <span class="font-medium text-gray-600">No goods received notes found</span>
+                    <button (click)="openAddModal()" class="mt-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition-colors">
+                      Record Your First GRN
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Modal (Sleek Sheet Layout) -->
+  @if (isModalOpen) {
+    <div class="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm transition-opacity duration-300">
+      <div class="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col justify-between animate-slide-in p-0 border-l border-gray-150">
+        <!-- Header -->
+        <div class="px-6 py-5 bg-gray-50 border-b border-gray-200 flex justify-between items-center shrink-0">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Record Received Shipment</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Select a PO and input the actual quantities delivered by the supplier</p>
+          </div>
+          <button (click)="closeModal()" class="p-2 hover:bg-gray-200 text-gray-400 hover:text-gray-700 rounded-full transition-colors">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="flex-1 p-6 space-y-6 overflow-y-auto">
+          <!-- PO Selection -->
+          <app-ui-dropdown
+            [(ngModel)]="selectedOrderId"
+            (onSelect)="onOrderChange()"
+            [options]="pendingOrderOptions"
+            label="Select Purchase Order *"
+            placeholder="Choose a pending order..."
+          ></app-ui-dropdown>
+
+          @if (selectedOrderDetails) {
+            <!-- Received Items List -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Delivered Quantities</label>
+              <div class="border border-gray-150 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead class="bg-gray-100 text-gray-600 font-bold uppercase">
+                    <tr>
+                      <th class="px-4 py-2.5">Item Description</th>
+                      <th class="px-4 py-2.5">Ordered Qty</th>
+                      <th class="px-4 py-2.5">Received Qty</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    @for (item of receivedItems; track item.productId + item.variantSku; let i = $index) {
+                      <tr>
+                        <td class="px-4 py-3">
+                          <div class="font-semibold text-gray-800">{{ item.productName }}</div>
+                          <div class="text-[10px] text-gray-400">Variant: {{ item.variantName }} ({{ item.variantSku }})</div>
+                        </td>
+                        <td class="px-4 py-3 text-gray-500 font-semibold">{{ item.orderedQty }}</td>
+                        <td class="px-4 py-3">
+                          <input type="number" [(ngModel)]="item.receivedQty" min="0" [max]="item.orderedQty" class="w-20 px-2 py-1 bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 rounded-lg text-xs outline-none" />
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Delivery Notes (Optional)</label>
+              <textarea [(ngModel)]="grnNotes" rows="3" placeholder="Enter details about package condition, missing items, etc..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none resize-none"></textarea>
+            </div>
+          }
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 shrink-0">
+          <button (click)="closeModal()" class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button (click)="saveGRN()" [disabled]="!selectedOrderId" class="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 rounded-xl transition-all shadow-sm">
+            Record Shipment
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

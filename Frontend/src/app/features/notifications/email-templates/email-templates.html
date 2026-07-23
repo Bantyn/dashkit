@@ -1,0 +1,105 @@
+<div class="h-full bg-gray-50 flex overflow-hidden">
+  <!-- Left Side: Template Selector List -->
+  <div class="w-80 border-r border-gray-200 bg-white flex flex-col shrink-0 shadow-sm">
+    <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+      <h2 class="text-lg font-bold text-gray-900">Email Templates</h2>
+      <p class="text-xs text-gray-500 mt-1">Configure transaction and alert emails</p>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-2">
+      @for (tmpl of templates; track tmpl.id) {
+        <button (click)="selectTemplate(tmpl)" [class.bg-indigo-50]="selectedTemplate?.id === tmpl.id" [class.text-indigo-700]="selectedTemplate?.id === tmpl.id" class="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-gray-50 text-left transition-colors text-gray-700 text-sm font-semibold border border-transparent" [class.border-indigo-150]="selectedTemplate?.id === tmpl.id">
+          <div class="flex flex-col">
+            <span>{{ tmpl.name }}</span>
+            <span class="text-[10px] text-gray-400 font-mono mt-0.5">{{ tmpl.code }}</span>
+          </div>
+          <span [class]="tmpl.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-gray-150 text-gray-600 border-gray-200'" class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border">
+            {{ tmpl.isActive ? 'Active' : 'Off' }}
+          </span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (selectedTemplate) {
+    <!-- Center: Content Editor -->
+    <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-gray-200 overflow-y-auto p-8 space-y-6">
+      <div class="flex justify-between items-center border-b border-gray-150 pb-5">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">{{ selectedTemplate.name }}</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Customize template variables and visual structure</p>
+        </div>
+        <button (click)="saveTemplate()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2">
+          <i class="bi bi-save2 text-base"></i> Save Changes
+        </button>
+      </div>
+
+      <!-- Subject -->
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Subject Line *</label>
+        <input type="text" [(ngModel)]="selectedTemplate.subject" placeholder="e.g. Order Confirmation - #{{ '{' }}{{ '{' }}orderNumber{{ '}' }}{{ '}' }}" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none" />
+      </div>
+
+      <!-- Content Editor -->
+      <div class="flex-1 flex flex-col">
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">HTML Template Body *</label>
+        <textarea [(ngModel)]="selectedTemplate.content" class="w-full flex-1 min-h-[300px] p-4 bg-gray-900 text-gray-100 font-mono text-xs rounded-xl focus:ring-2 focus:ring-indigo-100 outline-none border-none leading-relaxed resize-none"></textarea>
+      </div>
+
+      <!-- Active Toggle -->
+      <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-xl">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900">Enable Template</h4>
+          <p class="text-xs text-gray-500 mt-0.5">If disabled, this notification will not trigger</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" [(ngModel)]="selectedTemplate.isActive" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+        </label>
+      </div>
+
+      <!-- Placeholders Helper -->
+      <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+        <div class="text-xs font-bold text-indigo-750 uppercase tracking-wide mb-2"><i class="bi bi-info-circle-fill"></i> Available Placeholders</div>
+        <div class="flex flex-wrap gap-2">
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{customerName}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{orderNumber}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{totalAmount}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{paymentMethod}}</code>
+          <code ngNonBindable class="px-2 py-0.5 bg-white text-indigo-700 border border-indigo-100 rounded text-xs">{{status}}</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side: Live HTML Preview Pane -->
+    <div class="w-[30%] min-w-[340px] max-w-[440px] border-l border-gray-200 bg-gray-50 flex flex-col shrink-0">
+      <div class="p-6 border-b border-gray-150 bg-white">
+        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Live Preview</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Rendered visualization with dummy variables</p>
+      </div>
+      <!-- Preview Frame -->
+      <div class="flex-1 p-6 overflow-y-auto">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col min-h-[400px]">
+          <!-- Email Client Topbar Mock -->
+          <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 text-xs text-gray-500 flex flex-col gap-1">
+            <div><span class="font-semibold text-gray-700">Subject:</span> {{ selectedTemplate.subject || '—' }}</div>
+            <div><span class="font-semibold text-gray-700">To:</span> test&#64;clothify.com</div>
+          </div>
+          <!-- Email Content Body -->
+          <div class="flex-1 p-6" style="font-family: inherit;">
+            <div [innerHTML]="compiledPreview"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Quick Test Dispatch -->
+      <div class="p-6 bg-white border-t border-gray-200">
+        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Send Test Email</h4>
+        <div class="flex gap-2">
+          <input type="email" [(ngModel)]="testRecipient" placeholder="enter recipient email..." class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 rounded-lg text-xs outline-none" />
+          <button (click)="sendTest()" [disabled]="isSendingTest" class="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-lg text-xs transition-colors shadow-sm">
+            {{ isSendingTest ? 'Sending...' : 'Send' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,190 @@
+<div class="h-full bg-gray-50 flex flex-col overflow-hidden">
+  <!-- Header & Actions -->
+  <div class="px-8 py-6 bg-white border-b border-gray-200 flex justify-between items-center shrink-0 shadow-sm">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Supplier Payments</h1>
+      <p class="text-xs text-gray-500 mt-1">Record and track financial payments made to inventory suppliers</p>
+    </div>
+    <button (click)="openAddModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all duration-200 shadow-md flex items-center gap-2">
+      <i class="bi bi-wallet2 text-base"></i> Record Supplier Payment
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 overflow-auto p-8 space-y-6">
+    <!-- Quick Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-cash-coin text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Total Paid</div>
+        <div class="text-3xl font-extrabold mt-2">
+          INR {{ payments.reduce((acc, p) => acc + p.amount, 0) | number:'1.2-2' }}
+        </div>
+        <div class="text-xs mt-3 opacity-90">Cumulative payments logged</div>
+      </div>
+      <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-wallet-fill text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Payments Count</div>
+        <div class="text-3xl font-extrabold mt-2">{{ payments.length }}</div>
+        <div class="text-xs mt-3 opacity-90">Successful transaction entries</div>
+      </div>
+      <div class="bg-gradient-to-br from-rose-500 to-rose-600 p-6 rounded-2xl shadow-sm text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 opacity-15 transition-transform duration-300 group-hover:scale-110">
+          <i class="bi bi-exclamation-octagon-fill text-8xl"></i>
+        </div>
+        <div class="text-sm font-semibold opacity-80 uppercase tracking-wider">Unpaid Dues</div>
+        <div class="text-3xl font-extrabold mt-2">{{ unpaidOrders.length }} POs</div>
+        <div class="text-xs mt-3 opacity-90">Purchase orders requiring payment</div>
+      </div>
+    </div>
+
+    <!-- Search Card -->
+    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between gap-4">
+      <div class="relative flex-1 max-w-md">
+        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base"></i>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search payments by SP#, PO#, supplier, method..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none" />
+      </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+              <th class="px-6 py-4">Receipt/SP Number</th>
+              <th class="px-6 py-4">Payment Date</th>
+              <th class="px-6 py-4">PO Number</th>
+              <th class="px-6 py-4">Supplier</th>
+              <th class="px-6 py-4">Paid Amount</th>
+              <th class="px-6 py-4">Payment Method</th>
+              <th class="px-6 py-4">Ref/Transaction No</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-150">
+            @for (payment of filteredPayments; track payment.id) {
+              <tr class="hover:bg-gray-50/50 transition-colors group">
+                <td class="px-6 py-4 font-semibold text-emerald-600 text-sm">
+                  {{ payment.paymentNumber }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">
+                  {{ payment.paymentDate | date:'mediumDate' }}
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-indigo-600">
+                  {{ payment.poNumber }}
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                  {{ payment.supplierName }}
+                </td>
+                <td class="px-6 py-4 text-sm font-extrabold text-gray-900">
+                  INR {{ payment.amount | number:'1.2-2' }}
+                </td>
+                <td class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  {{ payment.paymentMethod.replace('_', ' ') }}
+                </td>
+                <td class="px-6 py-4 text-xs text-gray-500 font-mono">
+                  {{ payment.referenceNo || '—' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                  <div class="flex flex-col items-center justify-center gap-3">
+                    <i class="bi bi-wallet2 text-4xl text-gray-300"></i>
+                    <span class="font-medium text-gray-600">No supplier payments logged</span>
+                    <button (click)="openAddModal()" class="mt-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition-colors">
+                      Record Your First Payment
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Modal (Sleek Sheet Layout) -->
+  @if (isModalOpen) {
+    <div class="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm transition-opacity duration-300">
+      <div class="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between animate-slide-in p-0 border-l border-gray-150">
+        <!-- Header -->
+        <div class="px-6 py-5 bg-gray-50 border-b border-gray-200 flex justify-between items-center shrink-0">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Record Supplier Payment</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Select a PO with outstanding balance and document pay-out</p>
+          </div>
+          <button (click)="closeModal()" class="p-2 hover:bg-gray-200 text-gray-400 hover:text-gray-700 rounded-full transition-colors">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="flex-1 p-6 space-y-6 overflow-y-auto">
+          <!-- PO Selection -->
+          <app-ui-dropdown
+            [(ngModel)]="selectedOrderId"
+            (onSelect)="onOrderChange()"
+            [options]="unpaidOrderOptions"
+            label="Select Purchase Order *"
+            placeholder="Choose PO with outstanding dues..."
+          ></app-ui-dropdown>
+
+          @if (selectedOrderDetails) {
+            <!-- Due Dues Summary -->
+            <div class="grid grid-cols-3 gap-4 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-center">
+              <div>
+                <div class="text-[10px] uppercase font-bold text-indigo-500">PO Value</div>
+                <div class="text-sm font-extrabold text-indigo-900 mt-1">INR {{ selectedOrderDetails.totalAmount | number:'1.2-2' }}</div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase font-bold text-indigo-500">Paid</div>
+                <div class="text-sm font-extrabold text-indigo-900 mt-1">INR {{ selectedOrderDetails.paidAmount | number:'1.2-2' }}</div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase font-bold text-indigo-500">Dues</div>
+                <div class="text-sm font-extrabold text-indigo-950 mt-1">INR {{ (selectedOrderDetails.totalAmount - selectedOrderDetails.paidAmount) | number:'1.2-2' }}</div>
+              </div>
+            </div>
+
+            <!-- Payment Amount -->
+            <app-ui-input
+              [(ngModel)]="paymentAmount"
+              type="number"
+              label="Payment Amount (INR) *"
+            ></app-ui-input>
+
+            <!-- Payment Method -->
+            <app-ui-dropdown
+              [(ngModel)]="paymentMethod"
+              [options]="paymentMethodOptions"
+              label="Payment Method *"
+            ></app-ui-dropdown>
+
+            <!-- Reference No -->
+            <app-ui-input
+              [(ngModel)]="referenceNo"
+              label="Reference / Transaction Number (Optional)"
+              placeholder="UTR or reference code..."
+            ></app-ui-input>
+          }
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 shrink-0">
+          <button (click)="closeModal()" class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button (click)="savePayment()" [disabled]="!selectedOrderId || paymentAmount <= 0" class="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 rounded-xl transition-all shadow-sm">
+            Save Payment Record
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

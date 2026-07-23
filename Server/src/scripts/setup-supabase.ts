@@ -1,0 +1,189 @@
+import { createClient } from "@supabase/supabase-js";
+import * as dotenv from "dotenv";
+import * as path from "path";
+
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+
+async function setupSupabaseSchema() {
+  const schemaSQL = `
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Base Table Schema Template
+-- We use a hybrid approach to maintain NoSQL flexibility while enforcing tenant isolation
+
+CREATE TABLE IF NOT EXISTS products (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "branchId" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "isDeleted" BOOLEAN DEFAULT FALSE,
+    "status" TEXT,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_products_shop ON products("shopId");
+CREATE INDEX IF NOT EXISTS idx_products_branch ON products("branchId");
+
+CREATE TABLE IF NOT EXISTS inventory (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "branchId" TEXT,
+    "productId" TEXT NOT NULL,
+    "variantSku" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "isDeleted" BOOLEAN DEFAULT FALSE,
+    "status" TEXT,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_inventory_shop ON inventory("shopId");
+CREATE INDEX IF NOT EXISTS idx_inventory_sku ON inventory("variantSku");
+
+CREATE TABLE IF NOT EXISTS customers (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "branchId" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "isDeleted" BOOLEAN DEFAULT FALSE,
+    "status" TEXT,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_customers_shop ON customers("shopId");
+
+CREATE TABLE IF NOT EXISTS inventory_history (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "variantSku" TEXT,
+    "movementType" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_inventory_history_shop ON inventory_history("shopId");
+CREATE INDEX IF NOT EXISTS idx_inventory_history_prod ON inventory_history("productId");
+
+
+CREATE TABLE IF NOT EXISTS orders (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "branchId" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "isDeleted" BOOLEAN DEFAULT FALSE,
+    "status" TEXT,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_orders_shop ON orders("shopId");
+
+CREATE TABLE IF NOT EXISTS invoices (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "branchId" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "isDeleted" BOOLEAN DEFAULT FALSE,
+    "status" TEXT,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_invoices_shop ON invoices("shopId");
+
+CREATE TABLE IF NOT EXISTS suppliers (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_suppliers_shop ON suppliers("shopId");
+
+CREATE TABLE IF NOT EXISTS purchase_orders (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_shop ON purchase_orders("shopId");
+
+CREATE TABLE IF NOT EXISTS goods_received (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_goods_received_shop ON goods_received("shopId");
+
+CREATE TABLE IF NOT EXISTS supplier_payments (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_supplier_payments_shop ON supplier_payments("shopId");
+
+CREATE TABLE IF NOT EXISTS purchase_returns (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_purchase_returns_shop ON purchase_returns("shopId");
+
+CREATE TABLE IF NOT EXISTS categories (
+
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    data JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_categories_shop ON categories("shopId");
+
+CREATE TABLE IF NOT EXISTS brands (
+    id TEXT PRIMARY KEY,
+    "shopId" TEXT NOT NULL,
+    "data" JSONB NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_brands_shop ON brands("shopId");
+
+-- Helper function to patch JSONB data column dynamically
+CREATE OR REPLACE FUNCTION patch_table_row(
+  table_name text,
+  row_id text,
+  payload jsonb
+) RETURNS void AS $$
+DECLARE
+  update_query text;
+  set_clauses text[] := array['data = data || $1'];
+BEGIN
+  set_clauses := array_append(set_clauses, '"updatedAt" = NOW()');
+
+  IF payload ? 'status' THEN
+    set_clauses := array_append(set_clauses, '"status" = ($1->>\'status\')');
+  END IF;
+
+  IF payload ? 'isDeleted' THEN
+    set_clauses := array_append(set_clauses, '"isDeleted" = ($1->>\'isDeleted\')::boolean');
+  END IF;
+
+  IF payload ? 'branchId' THEN
+    set_clauses := array_append(set_clauses, '"branchId" = ($1->>\'branchId\')');
+  END IF;
+
+  update_query := format(
+    'UPDATE %I SET %s WHERE id = $2',
+    table_name,
+    array_to_string(set_clauses, ', ')
+  );
+
+  EXECUTE update_query USING payload, row_id;
+END;
+$$ LANGUAGE plpgsql;
+`;
+
+  console.log("=========================================================");
+  console.log("Supabase Schema Initialization SQL:");
+  console.log("=========================================================");
+  console.log(schemaSQL);
+  console.log("=========================================================");
+  console.log("ACTION REQUIRED: Copy the above SQL and run it in your Supabase project's SQL Editor.");
+}
+
+setupSupabaseSchema().catch(console.error);

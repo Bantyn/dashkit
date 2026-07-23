@@ -1,0 +1,41 @@
+export interface SubscriptionPlan {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  price?: number | null;
+  monthlyPrice: number | null;
+  yearlyPrice?: number | null;
+  currency: string;
+  badge?: string;
+  targetAudience?: string;
+  capabilityLabel?: string;
+  icon?: string;
+  color?: string;
+  bgColor?: string;
+  featured: boolean;
+  active: boolean;
+  sortOrder: number;
+  features: string[];
+  isCustom?: boolean;
+  assignedShopId?: string;
+  limits?: Record<string, number | null | undefined>;
+  limitations?: string[];
+  metadata?: {
+    maxInvoices?: number | null;
+    maxStaff?: number | null;
+    maxBranches?: number | null;
+    websiteEnabled?: boolean;
+    onlineSellingEnabled?: boolean;
+    apiAccess?: boolean;
+    customBranding?: boolean;
+    autoPayEligible?: boolean;
+    isUltraSmallBusiness?: boolean;
+  };
+  includedStorageBytes?: number;
+  includedStorageMB?: number;
+  storageUnit?: 'MB' | 'GB';
+  storageDisplay?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

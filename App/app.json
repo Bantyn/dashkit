@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Clothify Staff",
+    "slug": "clothify-staff-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "com.clothify.staffapp",
+      "versionCode": 1
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      "expo-barcode-scanner"
+    ]
+  }
+}
