@@ -121,7 +121,7 @@ app.get("/", (req, res) => {
       overflow: hidden;
     }
 
-    /* Star Layers */
+    /* Star Layers & Parallax Pseudo Element for Continuous Loop */
     .cosmic-stars, .cosmic-stars-medium, .cosmic-stars-large {
       position: absolute;
       top: 0;
@@ -134,19 +134,52 @@ app.get("/", (req, res) => {
     .cosmic-stars {
       width: 1px;
       height: 1px;
-      animation: animStar 50s linear var(--animation-iteration);
+      animation: animStar 50s linear infinite;
+    }
+    .cosmic-stars::after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      left: 0;
+      width: 1px;
+      height: 1px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow: inherit;
     }
 
     .cosmic-stars-medium {
       width: 2px;
       height: 2px;
-      animation: animStar 100s linear var(--animation-iteration);
+      animation: animStar 100s linear infinite;
+    }
+    .cosmic-stars-medium::after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      left: 0;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow: inherit;
     }
 
     .cosmic-stars-large {
       width: 3px;
       height: 3px;
-      animation: animStar 150s linear var(--animation-iteration);
+      animation: animStar 150s linear infinite;
+    }
+    .cosmic-stars-large::after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      left: 0;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow: inherit;
     }
 
     /* Horizon and Earth Glow Effects */
@@ -395,7 +428,7 @@ app.get("/", (req, res) => {
   </div>
 
   <script>
-    (function initCosmicParallax() {
+    document.addEventListener("DOMContentLoaded", function() {
       function generateStarBoxShadow(count) {
         var shadows = [];
         for (var i = 0; i < count; i++) {
@@ -413,7 +446,7 @@ app.get("/", (req, res) => {
       if (starsSmall) starsSmall.style.boxShadow = generateStarBoxShadow(700);
       if (starsMedium) starsMedium.style.boxShadow = generateStarBoxShadow(200);
       if (starsLarge) starsLarge.style.boxShadow = generateStarBoxShadow(100);
-    })();
+    });
   </script>
 </body>
 </html>
