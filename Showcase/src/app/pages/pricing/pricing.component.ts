@@ -218,7 +218,7 @@ export class PricingComponent implements OnInit {
       icon: 'bi-plug',
       colorClass: 'text-cyan-500 bg-cyan-50',
       features: [
-        { key: 'intg_api_access', name: 'API Access', price: 299, description: 'Connect Clothify to your existing software and custom apps.' },
+        { key: 'intg_api_access', name: 'API Access', price: 299, description: 'Connect DashKit to your existing software and custom apps.' },
         { key: 'intg_invoice_template', name: 'Invoice Templates', price: 39, description: 'Choose from professional designs to match your brand identity.' }
       ]
     },

@@ -39,10 +39,10 @@ export class BlogsComponent {
     
     // Update SEO meta tags for specific blog post
     this.seoService.applySeo({
-      title: `${blog.title} | Clothify Blog`,
+      title: `${blog.title} | DashKit Blog`,
       description: blog.summary,
-      keywords: `clothify blog, boutique management, ${blog.category.toLowerCase()}, ${blog.title.toLowerCase()}`,
-      ogTitle: `${blog.title} | Clothify Blog`,
+      keywords: `Dashkit blog, boutique management, ${blog.category.toLowerCase()}, ${blog.title.toLowerCase()}`,
+      ogTitle: `${blog.title} | DashKit Blog`,
       ogDescription: blog.summary,
       ogType: 'article'
     });
@@ -69,12 +69,12 @@ export class BlogsComponent {
       },
       'publisher': {
         '@type': 'Organization',
-        'name': 'Clothify',
-        'logo': 'https://clothify.co/favicon.png'
+        'name': 'DashKit',
+        'logo': 'https://Dashkit.co/favicon.png'
       },
       'mainEntityOfPage': {
         '@type': 'WebPage',
-        '@id': `https://clothify.co/blogs#${blog.id}`
+        '@id': `https://Dashkit.co/blogs#${blog.id}`
       },
       'articleBody': blog.content.join(' ')
     }, 'blog-article-schema');
@@ -86,7 +86,7 @@ export class BlogsComponent {
     
     // Reapply default blogs route metadata
     this.seoService.applySeo({
-      title: 'Retail Boutique Growth Tips, Trends & Success Stories | Clothify Blog',
+      title: 'Retail Boutique Growth Tips, Trends & Success Stories | DashKit Blog',
       description: 'Explore expert insights, how-to guides, boutique inventory matrix strategies, and success stories on scaling your clothing store operations and boosting sales.',
       keywords: 'apparel retail blog, boutique business tips, how to grow fashion boutique, cloud pos software guide'
     });
@@ -145,11 +145,11 @@ export class BlogsComponent {
       date: 'April 09, 2026',
       readTime: '6 min',
       summary:
-        'Discover how a traditional apparel outlet transitioned from paper ledgers to digital billing and multi-branch inventory tracking with Clothify.',
+        'Discover how a traditional apparel outlet transitioned from paper ledgers to digital billing and multi-branch inventory tracking with DashKit.',
       content: [
         'Vastram Boutique began in a small 400 sq. ft. room in Bangalore, selling handloom sarees and ethnic wear. As the shop gained popularity, the owner, Priya Rao, expanded to a second outlet. However, managing two physical locations using spreadsheets and paper ledgers quickly became a management nightmare.',
         'Stock transfers between stores were recorded on paper slips, leading to discrepancies, missing garments, and customer frustrations. Billing took several minutes per client, causing long queues during festive weekends.',
-        'Priya decided to integrate Clothify across both outlets. The results were transformational:',
+        'Priya decided to integrate DashKit across both outlets. The results were transformational:',
         '- Inventory Control: The shared size-color inventory matrix allowed Priya to instantly check if a specific handloom saree size was available in store B, facilitating immediate customer deliveries.',
         '- Billing Speed: Checkout times dropped from 3 minutes per customer to under 30 seconds, improving holiday peak sales throughput.',
         '- CRM Campaigns: Vastram utilized the SMS marketing tool, sending tailored offers during Diwali. This single campaign generated a 25% repeat purchase rate.',

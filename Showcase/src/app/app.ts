@@ -97,22 +97,22 @@ export class App {
     this.seoService.setJsonLd({
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      'name': 'Clothify',
-      'url': 'https://clothify.co',
-      'logo': 'https://clothify.co/favicon.png',
+      'name': 'DashKit',
+      'url': 'https://dashkit.js.org',
+      'logo': 'https://dashkit.js.org/favicon.png',
       'sameAs': [
-        'https://twitter.com/clothify',
-        'https://facebook.com/clothify',
-        'https://instagram.com/clothify'
+        'https://twitter.com/dashkit',
+        'https://facebook.com/dashkit',
+        'https://instagram.com/dashkit'
       ],
-      'description': 'All-in-One Retail & E-commerce Management Platform for boutiques and fashion brands.'
+      'description': 'All-in-One Retail & E-commerce Management Platform for modern businesses and stores.'
     }, 'org-schema');
 
     this.seoService.setJsonLd({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      'name': 'Clothify',
-      'url': 'https://clothify.co'
+      'name': 'Dashkit',
+      'url': 'https://Dashkit.co'
     }, 'website-schema');
   }
 
@@ -126,12 +126,12 @@ export class App {
   faqData = {
     "pos": [
       {
-        question: "Does Clothify POS support offline billing?",
-        answer: "Yes! Clothify POS has an offline mode that queues transactions locally and uploads them automatically once internet connectivity is restored, ensuring you never stop billing."
+        question: "Does Dashkit POS support offline billing?",
+        answer: "Yes! Dashkit POS has an offline mode that queues transactions locally and uploads them automatically once internet connectivity is restored, ensuring you never stop billing."
       },
       {
         question: "Can I generate digital bills and send them to WhatsApp?",
-        answer: "Absolutely. Clothify integrates with WhatsApp to send digital PDF invoices directly to customer phone numbers, reducing paper receipt printing costs."
+        answer: "Absolutely. Dashkit integrates with WhatsApp to send digital PDF invoices directly to customer phone numbers, reducing paper receipt printing costs."
       },
       {
         question: "Does the POS support custom discount calculations?",
@@ -141,15 +141,15 @@ export class App {
     "inventory": [
       {
         question: "How does the size and color matrix work?",
-        answer: "Clothify allows you to group variants under a single item. You can track stocks of a specific apparel across multiple size ranges (S, M, L, XL) and color codes dynamically."
+        answer: "Dashkit allows you to group variants under a single item. You can track stocks of a specific apparel across multiple size ranges (S, M, L, XL) and color codes dynamically."
       },
       {
-        question: "Can I generate and print barcodes through Clothify?",
-        answer: "Yes, Clothify has a built-in barcoding engine that designs and prints custom 1D/2D barcodes on thermal labels for your clothing racks."
+        question: "Can I generate and print barcodes through Dashkit?",
+        answer: "Yes, Dashkit has a built-in barcoding engine that designs and prints custom 1D/2D barcodes on thermal labels for your clothing racks."
       },
       {
         question: "Will I get notifications when inventory runs low?",
-        answer: "Yes, you can set custom safety-stock thresholds for each item variant. Clothify triggers automated alerts when stock drops below your set limit."
+        answer: "Yes, you can set custom safety-stock thresholds for each item variant. Dashkit triggers automated alerts when stock drops below your set limit."
       }
     ],
     "marketing": [
@@ -162,18 +162,18 @@ export class App {
         answer: "During checkout, cashiers can view available loyalty points and apply them as a discount code based on your custom point-redemption rules."
       },
       {
-        question: "Does Clothify support bulk SMS campaigns?",
+        question: "Does Dashkit support bulk SMS campaigns?",
         answer: "Yes, our built-in CRM lets you run targeted SMS campaigns for birthdays, holidays, or seasonal store clearances to drive repeat footfalls."
       }
     ],
     "support": [
       {
-        question: "How long does it take to set up Clothify in my boutique?",
+        question: "How long does it take to set up Dashkit in my boutique?",
         answer: "It takes less than 30 minutes! You can upload your inventory catalog via Excel sheets and configure your POS receipt printer immediately."
       },
       {
-        question: "Can I use Clothify on multiple devices?",
-        answer: "Yes, Clothify runs on secure cloud servers, meaning you can access your sales dashboard and track inventory from your browser, tablet, or mobile phone."
+        question: "Can I use Dashkit on multiple devices?",
+        answer: "Yes, Dashkit runs on secure cloud servers, meaning you can access your sales dashboard and track inventory from your browser, tablet, or mobile phone."
       },
       {
         question: "Do you provide onboarding training for store cashiers?",

@@ -15,7 +15,7 @@ export class HowToInstall {
   pcSteps = [
     {
       title: 'Log in / Register',
-      description: 'Start your journey by creating a new account or logging into your existing Clothify profile. Simply enter your registered email and password. If you are new, click on \'Register\', fill in your basic store details, and verify your email to access the platform.',
+      description: 'Start your journey by creating a new account or logging into your existing DashKit profile. Simply enter your registered email and password. If you are new, click on \'Register\', fill in your basic store details, and verify your email to access the platform.',
       placeholder: 'Login / Register Image Placeholder'
     },
     {
@@ -25,7 +25,7 @@ export class HowToInstall {
     },
     {
       title: 'Set up Image Storage',
-      description: 'Before uploading products, you need to configure your image storage settings. Navigate to the settings tab to connect your preferred cloud storage or use Clothify\'s default secure storage. This ensures all your product photos, banners, and logos are saved securely and load quickly for your customers.',
+      description: 'Before uploading products, you need to configure your image storage settings. Navigate to the settings tab to connect your preferred cloud storage or use DashKit\'s default secure storage. This ensures all your product photos, banners, and logos are saved securely and load quickly for your customers.',
       placeholder: 'Image Storage Settings Placeholder'
     },
     {

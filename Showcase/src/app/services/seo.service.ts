@@ -31,11 +31,11 @@ export class SeoService {
   private activatedRoute = inject(ActivatedRoute);
   private document = inject(DOCUMENT);
 
-  private readonly defaultTitle = 'Clothify - All-in-One Retail & E-commerce Management Platform';
-  private readonly defaultDesc = 'Supercharge your clothing store with Clothify. Dynamic boutique billing POS, size-color inventory matrix, multi-branch tracking, and built-in retail CRM.';
-  private readonly defaultKeywords = 'boutique pos billing system, clothing store billing, retail inventory matrix, boutique management software, apparel inventory tracker';
-  private readonly defaultOgImage = 'https://clothify.co/og-card.png';
-  private readonly baseDomain = 'https://clothify.co';
+  private readonly defaultTitle = 'DashKit - All-in-One Retail & E-commerce Management Platform';
+  private readonly defaultDesc = 'Supercharge your store with DashKit. Dynamic billing POS, inventory matrix, multi-branch tracking, and built-in retail CRM.';
+  private readonly defaultKeywords = 'pos billing system, store billing, retail inventory matrix, store management software, inventory tracker';
+  private readonly defaultOgImage = 'https://dashkit.js.org/og-card.png';
+  private readonly baseDomain = 'https://dashkit.js.org';
 
   init() {
     this.router.events.pipe(
