@@ -128,6 +128,7 @@ app.get("/", (req, res) => {
       left: 0;
       border-radius: 50%;
       background: transparent;
+      z-index: 1;
     }
 
     .cosmic-stars {
@@ -243,7 +244,6 @@ app.get("/", (req, res) => {
       width: 90%;
       max-width: 440px;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     }
 
     .status-badge {
@@ -284,16 +284,16 @@ app.get("/", (req, res) => {
     }
 
     .stat-label {
-      font-size: 10px;
+      font-size: 13px;
       color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
+      text-transform: capitalize;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
     }
 
     .stat-value {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 500;
       color: #cbd5e1;
     }
 
@@ -397,18 +397,18 @@ app.get("/", (req, res) => {
   <script>
     (function initCosmicParallax() {
       function generateStarBoxShadow(count) {
-        const shadows = [];
-        for (let i = 0; i < count; i++) {
-          const x = Math.floor(Math.random() * 2000);
-          const y = Math.floor(Math.random() * 2000);
-          shadows.push(\`\${x}px \${y}px #FFF\`);
+        var shadows = [];
+        for (var i = 0; i < count; i++) {
+          var x = Math.floor(Math.random() * 2000);
+          var y = Math.floor(Math.random() * 2000);
+          shadows.push(x + 'px ' + y + 'px #FFF');
         }
         return shadows.join(', ');
       }
 
-      const starsSmall = document.getElementById('stars');
-      const starsMedium = document.getElementById('stars2');
-      const starsLarge = document.getElementById('stars3');
+      var starsSmall = document.getElementById('stars');
+      var starsMedium = document.getElementById('stars2');
+      var starsLarge = document.getElementById('stars3');
 
       if (starsSmall) starsSmall.style.boxShadow = generateStarBoxShadow(700);
       if (starsMedium) starsMedium.style.boxShadow = generateStarBoxShadow(200);
