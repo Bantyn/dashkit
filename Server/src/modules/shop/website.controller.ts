@@ -35,7 +35,7 @@ export const getShopConfig = asyncHandler(async (req: Request, res: Response) =>
       cartEnabled = ['pro', 'custom', 'trial', 'plus'].includes(req.shop.subscriptionPlan);
       subdomainEnabled = ['pro', 'custom'].includes(req.shop.subscriptionPlan);
     }
-  }
+  } 
 
   return sendSuccess(res, { ...config, cartEnabled, subdomainEnabled }, "Shop configuration fetched successfully");
 });
