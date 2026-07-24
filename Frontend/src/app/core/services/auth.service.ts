@@ -692,13 +692,24 @@ export class AuthService {
       return { success: true, user: profile };
     } catch (error: any) {
       console.error('Detailed login error:', error);
-      let errorMessage = error?.message || 'Invalid email or password.';
-      if (error?.code === 'auth/wrong-password' || error?.code === 'auth/user-not-found' || error?.code === 'auth/invalid-credential') {
+      const code: string = error?.code || '';
+      const msg: string = error?.message || '';
+
+      let errorMessage = 'Invalid email or password.';
+
+      if (code === 'auth/user-disabled') {
+        errorMessage = 'This account has been disabled. Please contact support.';
+      } else if (code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      } else {
+        // According to Security Requirements: "Return identical authentication errors for invalid email/password combinations."
         errorMessage = 'Invalid email or password.';
       }
+
       return { success: false, error: errorMessage };
     }
   }
+
 
 
   /**
