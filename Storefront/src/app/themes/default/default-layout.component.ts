@@ -153,12 +153,12 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <div class="relative" #profileDropdownRef>
                   <button class="flex items-center gap-2 hover-lift focus:outline-none" (click)="toggleProfileDropdown($event)" aria-haspopup="true" [attr.aria-expanded]="showProfileDropdown">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-100 to-indigo-50 flex items-center justify-center text-primary-700 font-bold border border-gray-200 shadow-sm ring-2 transition-all duration-300" [class.ring-primary-300]="showProfileDropdown" [class.ring-transparent]="!showProfileDropdown">
-                      {{ (user.displayName || 'U').charAt(0).toUpperCase() }}
+                      {{ (user['displayName'] || 'U').charAt(0).toUpperCase() }}
                     </div>
                   </button>
                   <div *ngIf="showProfileDropdown" class="absolute right-0 mt-3 w-56 glass-panel rounded-2xl shadow-xl py-2 border border-white/60 z-50 animate-fade-in">
                     <div class="px-5 py-4 border-b border-gray-100 mb-2 bg-white/40">
-                      <p class="text-sm font-bold text-gray-900 truncate">{{ user.displayName || 'User' }}</p>
+                      <p class="text-sm font-bold text-gray-900 truncate">{{ user['displayName'] || 'User' }}</p>
                       <p class="text-xs text-gray-500 truncate mt-0.5">{{ user.email || user.mobile }}</p>
                     </div>
                     <a [routerLink]="routePrefix.concat(['account'])" (click)="closeProfileDropdown()" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 font-medium transition-colors"><i class="bi bi-person opacity-50"></i> My Account</a>
