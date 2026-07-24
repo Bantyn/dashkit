@@ -437,6 +437,15 @@ export class AdminApiService {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/shops/${id}/details`);
   }
 
+  getShopSecurityStatus(id: string) {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/shops/${id}/security-status`);
+  }
+
+  reactivateShop(id: string) {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/shops/${id}/reactivate`, {});
+  }
+
+
   getUsers(search = '') {
     const suffix = search ? `?search=${encodeURIComponent(search)}` : '';
     return this.http.get<ApiResponse<AdminUser[]>>(`${this.apiUrl}/users${suffix}`);

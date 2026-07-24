@@ -141,10 +141,31 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
 
             <!-- Error -->
             <div
-              *ngIf="errorMessage && !inactiveShopId"
+              *ngIf="errorMessage && !inactiveShopId && !isLocked && !isSuspended"
               class="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-[var(--radius-md)]"
             >
               {{ errorMessage }}
+            </div>
+
+            <!-- Temporary Lockout Countdown UI -->
+            <div
+              *ngIf="isLocked"
+              class="p-4 text-center bg-red-50 border border-red-200 rounded-[var(--radius-md)] space-y-2"
+            >
+              <p class="text-sm font-medium text-red-800">Too many failed login attempts.</p>
+              <p class="text-xs text-red-600">Please try again in:</p>
+              <div class="text-3xl font-mono font-bold text-red-700 tracking-wider">
+                {{ formattedRemainingTime }}
+              </div>
+            </div>
+
+            <!-- Suspended Account UI -->
+            <div
+              *ngIf="isSuspended"
+              class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-[var(--radius-md)] space-y-2"
+            >
+              <p class="font-semibold">Account Suspended</p>
+              <p>Your shop has been temporarily suspended due to multiple unsuccessful login attempts. Please contact the DashKit Team to reactivate your account.</p>
             </div>
 
             <!-- Inactive Account Prompt -->
@@ -163,10 +184,12 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
               type="submit"
               [fullWidth]="true"
               [loading]="loading"
+              [disabled]="isLocked || isSuspended"
               loadingText="Signing in..."
             >
               Sign In
             </app-ui-button>
+
 
             <!-- Divider -->
             <div class="relative py-2">
@@ -209,6 +232,12 @@ export class LoginComponent {
   reactivating = false;
   errorMessage = '';
   inactiveShopId: string | null = null;
+
+  isLocked = false;
+  isSuspended = false;
+  remainingSeconds = 0;
+  timerInterval: any = null;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -219,6 +248,36 @@ export class LoginComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [true],
     });
+  }
+
+  get formattedRemainingTime(): string {
+    const minutes = Math.floor(this.remainingSeconds / 60);
+    const seconds = this.remainingSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  startCountdown(seconds: number) {
+    this.isLocked = true;
+    this.remainingSeconds = seconds;
+
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+
+    this.timerInterval = setInterval(() => {
+      this.remainingSeconds--;
+      if (this.remainingSeconds <= 0) {
+        clearInterval(this.timerInterval);
+        this.isLocked = false;
+        this.remainingSeconds = 0;
+      }
+    }, 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
   }
 
   get f() {
@@ -242,8 +301,9 @@ export class LoginComponent {
     this.submitted = true;
     this.loginForm.markAllAsTouched();
     this.errorMessage = '';
+    this.isSuspended = false;
 
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.isLocked) {
       return;
     }
 
@@ -254,6 +314,12 @@ export class LoginComponent {
 
     if (result.success) {
       // Router navigation handled in authService
+    } else if (result.code === 'ACCOUNT_LOCKED') {
+      this.startCountdown(result.remainingSeconds || 120);
+      this.loading = false;
+    } else if (result.code === 'ACCOUNT_SUSPENDED') {
+      this.isSuspended = true;
+      this.loading = false;
     } else if (result.inactive) {
       this.inactiveShopId = result.shopId || null;
       this.loading = false;
@@ -262,6 +328,7 @@ export class LoginComponent {
       this.loading = false;
     }
   }
+
 
   async requestReactivation() {
     if (!this.inactiveShopId) return;

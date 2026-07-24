@@ -9,6 +9,8 @@ import {
   getAdminActivityLogs,
   getRevenueReport,
   getUsageReport,
+  getShopSecurityStatus,
+  reactivateShop,
 } from "../../../modules/admin/admin.controller";
 import { checkPermission } from "../../../middlewares/role.middleware";
 
@@ -23,5 +25,8 @@ router.get("/activity-logs", checkPermission("users.view"), getAdminActivityLogs
 router.get("/transactions", checkPermission("transactions.view"), getAdminTransactions);
 router.get("/reports/revenue", checkPermission("overview.view"), getRevenueReport);
 router.get("/reports/usage", checkPermission("overview.view"), getUsageReport);
+router.get("/shops/:shopId/security-status", checkPermission("shops.view"), getShopSecurityStatus);
+router.post("/shops/:shopId/reactivate", checkPermission("shops.edit"), reactivateShop);
 
 export default router;
+

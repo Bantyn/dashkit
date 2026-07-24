@@ -1187,136 +1187,162 @@ import { ToastService } from '../../core/services/toast.service';
               </div>
             </div>
 
-
-          </div>
-        </div>
-
-        <!-- RIGHT SIDEBAR (Part 5 - Sticky Right Sidebar) -->
-        <div class="w-[30%] min-w-[320px] max-w-[400px] border-l border-gray-200 bg-white flex flex-col justify-between shrink-0 h-full p-6 shadow-sm overflow-y-auto sticky top-0">
-          
-          <!-- Loading Skeleton -->
-          <div class="space-y-6 animate-pulse" *ngIf="loading">
-            <div class="h-4 bg-gray-100 w-24 rounded"></div>
-            @for (i of [1,2,3,4,5]; track i) {
-              <div class="flex justify-between border-b border-gray-100 pb-2">
-                <div class="h-3 bg-gray-100 w-16 rounded"></div>
-                <div class="h-3 bg-gray-100 w-20 rounded"></div>
+            <!-- SECURITY TAB -->
+            <div *ngIf="activeTab === 'security'" class="space-y-6">
+              <!-- Loading Skeleton -->
+              <div *ngIf="loadingSecurity" class="p-6 bg-white rounded-xl shadow-sm border border-gray-100 animate-pulse space-y-4">
+                <div class="h-6 bg-gray-200 w-1/4 rounded"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="h-20 bg-gray-100 rounded-lg"></div>
+                  <div class="h-20 bg-gray-100 rounded-lg"></div>
+                  <div class="h-20 bg-gray-100 rounded-lg"></div>
+                </div>
               </div>
-            }
-          </div>
 
-          <!-- Actual Content -->
-          <div class="space-y-6" *ngIf="!loading && shop">
-            <div>
-              <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Quick Info</h3>
-              <div class="space-y-4">
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Current Plan</span>
-                  <span class="font-bold text-gray-900 uppercase">{{ shop.selectedPlan || shop.subscriptionPlan || 'free' }}</span>
+              <ng-container *ngIf="!loadingSecurity">
+                <!-- Status Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <!-- Card 1: Failed Login Attempts -->
+                  <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs text-gray-400 font-semibold uppercase">Failed Login Attempts</div>
+                      <div class="text-2xl font-bold text-gray-900 mt-1">
+                        {{ securityStatus?.failedLoginAttempts || 0 }} / 6
+                      </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-lg">
+                      <i class="bi bi-shield-slash"></i>
+                    </div>
+                  </div>
+
+                  <!-- Card 2: Lockout Status -->
+                  <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs text-gray-400 font-semibold uppercase">Lockout Status</div>
+                      <div class="text-sm font-bold mt-1">
+                        <span *ngIf="securityStatus?.lockoutStatus === 'LOCKED'" class="px-2.5 py-1 rounded-full text-xs bg-red-100 text-red-800 font-semibold">
+                          LOCKED ({{ securityStatus?.remainingLockTime }}s)
+                        </span>
+                        <span *ngIf="securityStatus?.lockoutStatus !== 'LOCKED'" class="px-2.5 py-1 rounded-full text-xs bg-green-100 text-green-800 font-semibold">
+                          NORMAL
+                        </span>
+                      </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-lg">
+                      <i class="bi bi-clock-history"></i>
+                    </div>
+                  </div>
+
+                  <!-- Card 3: Account Status & Action -->
+                  <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs text-gray-400 font-semibold uppercase">Account Status</div>
+                      <div class="text-sm font-bold mt-1 uppercase">
+                        <span [class]="'px-2.5 py-1 rounded-full text-xs font-semibold ' + (securityStatus?.accountStatus === 'suspended' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800')">
+                          {{ securityStatus?.accountStatus || 'ACTIVE' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        *ngIf="securityStatus?.accountStatus === 'suspended' || securityStatus?.lockoutStatus === 'LOCKED' || (securityStatus?.failedLoginAttempts || 0) > 0"
+                        (click)="reactivateShopAccount()"
+                        [disabled]="reactivatingAccount"
+                        class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors flex items-center gap-1.5"
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i> Reactivate Shop
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Card 4: Last Failed Login -->
+                  <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs text-gray-400 font-semibold uppercase">Last Failed Attempt</div>
+                      <div class="text-xs font-semibold text-gray-900 mt-1">
+                        {{ formatDate(securityStatus?.lastFailedLogin) }}
+                      </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center text-lg">
+                      <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                  </div>
                 </div>
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Trial Days Remaining</span>
-                  <span class="font-bold text-primary-600">{{ getTrialDaysRemaining(shop) }}</span>
-                </div>
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Subscription Status</span>
-                  <span class="font-bold"
-                    [class.text-blue-600]="getSubscriptionStatus(shop) === 'trial'"
-                    [class.text-green-600]="getSubscriptionStatus(shop) === 'active'"
-                    [class.text-red-600]="getSubscriptionStatus(shop) === 'expired' || getSubscriptionStatus(shop) === 'cancelled'"
+
+                <!-- Suspension Reason Alert if Suspended -->
+                <div *ngIf="securityStatus?.accountStatus === 'suspended'" class="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <i class="bi bi-exclamation-octagon text-2xl text-red-600"></i>
+                    <div>
+                      <h4 class="text-sm font-bold text-red-900">Shop Account Suspended</h4>
+                      <p class="text-xs text-red-700 mt-0.5">{{ securityStatus?.suspensionReason || 'Automated progressive lockout policy limit exceeded.' }}</p>
+                    </div>
+                  </div>
+                  <button
+                    (click)="reactivateShopAccount()"
+                    [disabled]="reactivatingAccount"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold shadow-sm transition-colors shrink-0"
                   >
-                    {{ getSubscriptionStatus(shop) | titlecase }}
-                  </span>
+                    Reactivate Account Now
+                  </button>
                 </div>
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Last Payment</span>
-                  <span class="font-bold text-gray-900">
-                    {{ invoices.length > 0 ? '₹' + invoices[0].amount : 'N/A' }}
-                  </span>
+
+                <!-- Security Activity Audit Log Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                      <h3 class="text-sm font-bold text-gray-900">Security Audit History</h3>
+                      <p class="text-xs text-gray-500">Log of authentication events, progressive lockouts, and account status changes</p>
+                    </div>
+                    <button (click)="loadSecurityStatus()" class="p-2 text-gray-500 hover:text-gray-900 rounded-lg border border-gray-200 bg-white">
+                      <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                  </div>
+
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
+                        <tr>
+                          <th class="px-6 py-3">Timestamp</th>
+                          <th class="px-6 py-3">Event Type</th>
+                          <th class="px-6 py-3">Email</th>
+                          <th class="px-6 py-3">IP Address</th>
+                          <th class="px-6 py-3">Browser / Device</th>
+                          <th class="px-6 py-3">Reason / Details</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100">
+                        <tr *ngFor="let log of securityStatus?.securityLogs || []" class="hover:bg-gray-50/50 transition-colors">
+                          <td class="px-6 py-3 text-gray-600 font-mono">
+                            {{ formatDate(log.timestamp) }}
+                          </td>
+                          <td class="px-6 py-3">
+                            <span [class]="'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ' + getSecurityEventBadgeClass(log.eventType)">
+                              {{ log.eventType }}
+                            </span>
+                          </td>
+                          <td class="px-6 py-3 text-gray-900 font-medium">{{ log.email }}</td>
+                          <td class="px-6 py-3 text-gray-600 font-mono">{{ log.ipAddress }}</td>
+                          <td class="px-6 py-3 text-gray-600">
+                            {{ log.browser }} ({{ log.operatingSystem }}) • {{ log.device }}
+                          </td>
+                          <td class="px-6 py-3 text-gray-500">
+                            {{ log.failureReason || (log.details ? (log.details | json) : '—') }}
+                          </td>
+                        </tr>
+
+                        <tr *ngIf="!(securityStatus?.securityLogs?.length)">
+                          <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                            No security audit logs recorded yet.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Next Billing</span>
-                  <span class="font-bold text-gray-900">15 Sep 2026</span>
-                </div>
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Branches Active</span>
-                  <span class="font-bold text-gray-900">{{ branches.length }}</span>
-                </div>
-                <div class="flex justify-between text-sm border-b border-gray-100 pb-2">
-                  <span class="text-gray-500">Staff Count</span>
-                  <span class="font-bold text-gray-900">{{ staff.length }} Members</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                  <span class="text-gray-500">Storage Used</span>
-                  <span class="font-bold text-gray-900">{{ formatBytes(usage?.storage?.usedBytes || 0) }} ({{ usage?.storage?.percentage || 0 }}%)</span>
-                </div>
-              </div>
+              </ng-container>
             </div>
 
-            <div>
-              <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Quick Actions</h3>
-              <div class="grid grid-cols-1 gap-2">
-                @if (shop.status === 'active') {
-                  <button
-                    (click)="updateStatus('suspended')"
-                    [disabled]="actionLoading"
-                    class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <i class="bi bi-slash-circle"></i> Suspend Shop
-                  </button>
-                } @else {
-                  <button
-                    (click)="updateStatus('active')"
-                    [disabled]="actionLoading"
-                    class="w-full py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <i class="bi bi-check-circle"></i> Activate Shop
-                  </button>
-                }
-
-                <button
-                  (click)="changePlan()"
-                  class="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <i class="bi bi-credit-card-2-back"></i> Change Plan
-                </button>
-
-                <button
-                  (click)="extendTrial()"
-                  class="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <i class="bi bi-clock-history"></i> Extend Trial
-                </button>
-
-                <button
-                  (click)="resetPassword()"
-                  class="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <i class="bi bi-key"></i> Reset Password
-                </button>
-
-                <button
-                  (click)="loginAsShop()"
-                  class="w-full py-2 bg-primary-50 hover:bg-primary-100 text-primary-600 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <i class="bi bi-box-arrow-in-right"></i> Login as Shop
-                </button>
-
-                <button
-                  (click)="archiveShop()"
-                  class="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <i class="bi bi-archive"></i> Archive Shop
-                </button>
-
-                <button
-                  (click)="deleteShop()"
-                  class="w-full py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <i class="bi bi-trash"></i> Delete Shop
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -1333,6 +1359,7 @@ import { ToastService } from '../../core/services/toast.service';
 
     </div>
   `,
+
   styles: [`
     .scrollbar-none::-webkit-scrollbar { display: none; }
     .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
@@ -1596,9 +1623,11 @@ export class ShopDetailsComponent implements OnInit {
         this.limits = d.limits || null;
         this.usage = d.usage || null;
         
-        // Load addons asynchronously
+        // Load addons & security status asynchronously
         this.loadAddons(id);
+        this.loadSecurityStatus();
       } else {
+
         this.error = 'Unable to fetch shop details.';
       }
     } catch (e: any) {
@@ -1961,5 +1990,67 @@ export class ShopDetailsComponent implements OnInit {
       return '—';
     }
   }
+
+  // SECURITY TAB METHODS
+  securityStatus: any = null;
+  loadingSecurity = false;
+  reactivatingAccount = false;
+
+  async loadSecurityStatus() {
+    if (!this.shop) return;
+    this.loadingSecurity = true;
+    try {
+      const res = await firstValueFrom(this.adminApi.getShopSecurityStatus(this.shop.id));
+      if (res.success && res.data) {
+        this.securityStatus = res.data;
+      }
+    } catch (e: any) {
+      console.error('Failed to load security status', e);
+      this.toastService.showError(e.message || 'Failed to load security status');
+    } finally {
+      this.loadingSecurity = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async reactivateShopAccount() {
+    if (!this.shop) return;
+    if (!confirm('Are you sure you want to reactivate this shop account? This will reset all failed login counters, clear lockouts, and reactivate the account.')) return;
+
+    this.reactivatingAccount = true;
+    try {
+      const res = await firstValueFrom(this.adminApi.reactivateShop(this.shop.id));
+      if (res.success) {
+        this.toastService.showSuccess('Shop account reactivated successfully!');
+        await this.loadSecurityStatus();
+        await this.reloadShopDetails();
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (e: any) {
+      this.toastService.showError(e.message || 'Failed to reactivate shop account');
+    } finally {
+      this.reactivatingAccount = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  getSecurityEventBadgeClass(eventType?: string): string {
+    switch (eventType) {
+      case 'SUCCESSFUL_LOGIN':
+        return 'bg-emerald-100 text-emerald-800';
+      case 'FAILED_LOGIN':
+        return 'bg-amber-100 text-amber-800';
+      case 'TEMPORARY_LOCK_APPLIED':
+        return 'bg-orange-100 text-orange-800';
+      case 'ACCOUNT_SUSPENDED':
+        return 'bg-red-100 text-red-800';
+      case 'ACCOUNT_REACTIVATED':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  }
 }
+
 

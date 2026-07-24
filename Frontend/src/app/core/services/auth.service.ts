@@ -438,29 +438,47 @@ export class AuthService {
   }
 
   async sendRegistrationEmailOtp(email: string): Promise<any> {
-    const response = await fetch(`${this.publicApiUrl}/auth/send-email-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to send verification code');
+    try {
+      const response = await fetch(`${this.publicApiUrl}/auth/send-email-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      let data: any;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error('Server returned an invalid response.');
+      }
+      if (!response.ok) {
+        throw new Error(data?.error?.message || data?.message || 'Failed to send verification code');
+      }
+      return data;
+    } catch (err: any) {
+      throw new Error(err.message || 'Failed to send verification code');
     }
-    return data;
   }
 
   async verifyRegistrationEmailOtp(email: string, otp: string): Promise<any> {
-    const response = await fetch(`${this.publicApiUrl}/auth/verify-email-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, otp }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Verification failed');
+    try {
+      const response = await fetch(`${this.publicApiUrl}/auth/verify-email-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+      let data: any;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error('Server returned an invalid response.');
+      }
+      if (!response.ok) {
+        throw new Error(data?.error?.message || data?.message || 'Verification failed');
+      }
+      return data;
+    } catch (err: any) {
+      throw new Error(err.message || 'Verification failed');
     }
-    return data;
   }
 
   async registerWithPayment(
@@ -605,10 +623,54 @@ export class AuthService {
    */
   async login(email: string, password: string, rememberMe: boolean = true) {
     try {
-      // Set persistence based on rememberMe flag
       const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
       await setPersistence(this.auth, persistence);
 
+      // 1. Call backend server-side progressive lockout & account status verification
+      const response = await fetch(`${this.publicApiUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const body = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        if (body?.code === 'ACCOUNT_LOCKED') {
+          return {
+            success: false,
+            code: 'ACCOUNT_LOCKED',
+            lockUntil: body.lockUntil,
+            remainingSeconds: body.remainingSeconds || 120,
+            message: body.message || 'Too many failed login attempts. Please try again later.',
+          };
+        }
+
+        if (body?.code === 'ACCOUNT_SUSPENDED') {
+          return {
+            success: false,
+            code: 'ACCOUNT_SUSPENDED',
+            message:
+              body.message ||
+              'Your shop has been temporarily suspended due to multiple unsuccessful login attempts. Please contact the DashKit Team to reactivate your account.',
+          };
+        }
+
+        if (body?.code === 'ACCOUNT_DISABLED' || body?.code === 'ACCOUNT_ARCHIVED' || body?.code === 'ACCOUNT_DELETED') {
+          return {
+            success: false,
+            code: body.code,
+            message: body.message,
+          };
+        }
+
+        return {
+          success: false,
+          error: body?.message || 'Invalid email or password.',
+        };
+      }
+
+      // 2. Perform Firebase Auth Sign-in once server validates credentials
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       const user = userCredential.user;
 
@@ -630,42 +692,14 @@ export class AuthService {
       return { success: true, user: profile };
     } catch (error: any) {
       console.error('Detailed login error:', error);
-
-      const code: string = error?.code || '';
-      const msg: string = error?.message || '';
-      const suffix = code ? ` (Error: ${code})` : '';
-
-      let errorMessage: string;
-
-      if (code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (code === 'auth/user-not-found') {
-        errorMessage = 'Email not found. Please check your email or sign up.';
-      } else if (code === 'auth/invalid-credential') {
-        errorMessage = 'Invalid email or password. Please check your credentials.';
-      } else if (code === 'auth/invalid-email') {
-        errorMessage = 'Please enter a valid email address.';
-      } else if (code === 'auth/too-many-requests') {
-        errorMessage = 'Too many failed attempts. Please try again later.';
-      } else if (code === 'auth/network-request-failed') {
-        errorMessage = 'Invalid Credentials. Please Check your credentials.';
-      } else if (code === 'auth/user-disabled') {
-        errorMessage = 'This account has been disabled. Please contact support.';
-      } else if (msg.includes('auth/wrong-password')) {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (msg.includes('auth/user-not-found')) {
-        errorMessage = 'Email not found. Please check your email or sign up.';
-      } else if (msg.includes('auth/invalid-credential')) {
-        errorMessage = 'Invalid email or password. Please check your credentials.';
-      } else if (msg) {
-        errorMessage = msg;
-      } else {
-        errorMessage = 'Sign in failed. Please try again.';
+      let errorMessage = error?.message || 'Invalid email or password.';
+      if (error?.code === 'auth/wrong-password' || error?.code === 'auth/user-not-found' || error?.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password.';
       }
-
       return { success: false, error: errorMessage };
     }
   }
+
 
   /**
    * Refresh the current user profile from the backend.
