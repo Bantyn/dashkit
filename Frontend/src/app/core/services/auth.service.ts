@@ -437,6 +437,32 @@ export class AuthService {
     }
   }
 
+  async sendRegistrationEmailOtp(email: string): Promise<any> {
+    const response = await fetch(`${this.publicApiUrl}/auth/send-email-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send verification code');
+    }
+    return data;
+  }
+
+  async verifyRegistrationEmailOtp(email: string, otp: string): Promise<any> {
+    const response = await fetch(`${this.publicApiUrl}/auth/verify-email-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Verification failed');
+    }
+    return data;
+  }
+
   async registerWithPayment(
     email: string,
     password: string,

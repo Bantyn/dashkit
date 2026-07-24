@@ -158,7 +158,7 @@ import { DashboardService } from '../../features/dashboard/dashboard.service';
             <div class="px-4 pt-4 pb-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
               <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
-                  <h3 class="font-bold text-gray-900 text-sm">🔔 Notifications</h3>
+                  <h3 class="font-bold text-gray-900 text-sm flex items-center gap-1.5"><i class="bi bi-bell-fill text-primary-600"></i> Notifications</h3>
                   <span *ngIf="unreadCount > 0"
                     class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-black"
                   >{{ unreadCount }} NEW</span>
@@ -184,9 +184,12 @@ import { DashboardService } from '../../features/dashboard/dashboard.service';
                   <button
                     (click)="setNotificationFilter(filter.key); $event.stopPropagation()"
                     [class]="activeFilter === filter.key
-                      ? 'flex-shrink-0 text-[10px] px-2.5 py-1 rounded-full font-bold bg-primary-600 text-white transition-colors'
-                      : 'flex-shrink-0 text-[10px] px-2.5 py-1 rounded-full font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'"
-                  >{{ filter.label }}</button>
+                      ? 'flex-shrink-0 text-[10px] px-2.5 py-1.5 rounded-full font-bold bg-primary-600 text-white transition-colors flex items-center gap-1'
+                      : 'flex-shrink-0 text-[10px] px-2.5 py-1.5 rounded-full font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors flex items-center gap-1'"
+                  >
+                    <i [class]="getFilterIcon(filter.key)"></i>
+                    {{ filter.label }}
+                  </button>
                 }
               </div>
             </div>
@@ -206,7 +209,7 @@ import { DashboardService } from '../../features/dashboard/dashboard.service';
                 @if (criticalNotifications.length > 0 && (activeFilter === 'all' || activeFilter === 'critical')) {
                   <div class="px-4 pt-3 pb-1">
                     <div class="flex items-center gap-2 mb-2">
-                      <span class="text-[10px] font-black text-red-600 uppercase tracking-wider">🔴 Critical — Immediate Action</span>
+                      <span class="text-[10px] font-black text-red-600 uppercase tracking-wider flex items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> Critical — Immediate Action</span>
                       <div class="flex-1 h-px bg-red-100"></div>
                     </div>
                     @for (n of criticalNotifications; track n.id) {
@@ -480,15 +483,15 @@ export class HeaderComponent implements OnInit {
   activeFilter: string = 'all';
   notificationFilters = [
     { key: 'all', label: 'All' },
-    { key: 'critical', label: '🔴 Critical' },
-    { key: 'sales', label: '🛒 Sales' },
-    { key: 'inventory', label: '📦 Inventory' },
-    { key: 'finance', label: '💰 Finance' },
-    { key: 'customer', label: '👥 Customer' },
-    { key: 'staff', label: '👔 Staff' },
-    { key: 'website', label: '🌐 Website' },
-    { key: 'subscription', label: '🟣 Subscription' },
-    { key: 'security', label: '🔐 Security' },
+    { key: 'critical', label: 'Critical' },
+    { key: 'sales', label: 'Sales' },
+    { key: 'inventory', label: 'Inventory' },
+    { key: 'finance', label: 'Finance' },
+    { key: 'customer', label: 'Customer' },
+    { key: 'staff', label: 'Staff' },
+    { key: 'website', label: 'Website' },
+    { key: 'subscription', label: 'Subscription' },
+    { key: 'security', label: 'Security' },
     { key: 'unread', label: 'Unread' },
   ];
 
@@ -1134,6 +1137,23 @@ getResultSubtitle(res: any): string {
       case 'festival_offer_started':   return 'bi bi-gift-fill';
       case 'coupon_expired':           return 'bi bi-tag-fill';
       default:                         return 'bi bi-bell-fill';
+    }
+  }
+
+  getFilterIcon(key: string): string {
+    switch (key) {
+      case 'all':          return 'bi bi-grid-fill';
+      case 'critical':     return 'bi bi-exclamation-triangle-fill';
+      case 'sales':        return 'bi bi-cart-fill';
+      case 'inventory':    return 'bi bi-box-seam-fill';
+      case 'finance':      return 'bi bi-wallet2';
+      case 'customer':     return 'bi bi-people-fill';
+      case 'staff':        return 'bi bi-person-fill-gear';
+      case 'website':      return 'bi bi-globe';
+      case 'subscription': return 'bi bi-credit-card-fill';
+      case 'security':     return 'bi bi-shield-lock-fill';
+      case 'unread':       return 'bi bi-envelope-fill';
+      default:             return 'bi bi-bell-fill';
     }
   }
 

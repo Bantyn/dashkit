@@ -4,7 +4,7 @@ import { AuthRequest } from "../../middlewares/auth.middleware";
 import { authService } from "./auth.service";
 import { userService } from "../user/user.service";
 import { subscriptionService } from "../subscription/subscription.service";
-import { sendWelcomeEmail } from "../../shared/utils/email.util";
+import { sendWelcomeEmail, sendAdminRegistrationNotification } from "../../shared/utils/email.util";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { uid, email, displayName, role, mobile, shopName, ownerName, gstIn, pickupAddress, branchCount, planCode, reqId, token } = req.body as any;
@@ -18,6 +18,11 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const shopId = isPlatformAdmin ? undefined : `shop_${uid}`;
 
   if (!isPlatformAdmin) {
+    const otpDoc = await db.collection("email_verification_otps").doc(email.trim().toLowerCase()).get();
+    if (!otpDoc.exists || !otpDoc.data()?.verified) {
+      return sendError(res, "Email address has not been verified.", 400);
+    }
+    
     // Determine if this is a paid plan or free plan
     const chosenPlan = String(planCode || "free").toLowerCase();
     const isFree = chosenPlan === "free" || chosenPlan === "trial";
@@ -38,6 +43,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       displayName: shopName || displayName || "My Shop",
       ownerName: ownerName || displayName || "",
       gstIn: gstIn || "",
+      phone: mobile || "",
       status: "active",
       createdAt: now,
       updatedAt: now,
@@ -108,6 +114,22 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     }
 
     await db.collection("shops").doc(shopId!).set(shopData);
+
+    // Fire-and-forget admin notification — inside this block where shopData and now are in scope
+    sendAdminRegistrationNotification({
+      shopName: shopData.shopName,
+      ownerName: shopData.ownerName || displayName || "",
+      email: String(email),
+      mobile: mobile ? String(mobile) : undefined,
+      planCode: shopData.selectedPlan || shopData.subscriptionPlan,
+      subscriptionStatus: shopData.subscriptionStatus,
+      paymentStatus: shopData.paymentStatus,
+      trialStatus: shopData.subscriptionStatus === "trial" || shopData.paymentStatus === "pending" ? "Active" : "N/A",
+      trialExpiresAt: shopData.trialExpiresAt || null,
+      shopId: shopId,
+      branchCount: branchCount ? Number(branchCount) : 1,
+      registeredAt: now,
+    }).catch((err: any) => console.error("[Admin Notification] Error:", err));
   }
 
   const newUser = await authService.registerUser({
@@ -158,6 +180,14 @@ export const registerWithPayment = asyncHandler(async (req: Request, res: Respon
 
   // 2. Register User & Shop
   const db = (await import("../../config/firebase.config")).db;
+  const isPlatformAdmin = role === "platform_admin";
+  if (!isPlatformAdmin) {
+    const otpDoc = await db.collection("email_verification_otps").doc(email.trim().toLowerCase()).get();
+    if (!otpDoc.exists || !otpDoc.data()?.verified) {
+      return sendError(res, "Email address has not been verified.", 400);
+    }
+  }
+
   const shopId = `shop_${uid}`;
   const slug = shopName.toLowerCase().replace(/\s+/g, "-");
   const shopData: any = {
@@ -169,6 +199,7 @@ export const registerWithPayment = asyncHandler(async (req: Request, res: Respon
     displayName: shopName,
     ownerName: ownerName || displayName || "",
     gstIn: gstIn || "",
+    phone: mobile || "",
     status: "active",
     createdAt: new Date(),
     subscriptionPlan: planCode,
@@ -197,6 +228,22 @@ export const registerWithPayment = asyncHandler(async (req: Request, res: Respon
   if (email && shopName) {
     await sendWelcomeEmail(String(email), String(shopName), displayName ? String(displayName) : "");
   }
+
+  // Send Admin Registration Notification (fire-and-forget)
+  sendAdminRegistrationNotification({
+    shopName: shopData.shopName,
+    ownerName: shopData.ownerName || displayName || "",
+    email: String(email),
+    mobile: mobile ? String(mobile) : undefined,
+    planCode: shopData.subscriptionPlan,
+    subscriptionStatus: shopData.subscriptionStatus || "active",
+    paymentStatus: shopData.paymentStatus,
+    trialStatus: "N/A",
+    trialExpiresAt: null,
+    shopId: shopId,
+    branchCount: branchCount ? Number(branchCount) : 1,
+    registeredAt: new Date(),
+  }).catch((err: any) => console.error("[Admin Notification] Error:", err));
 
   return sendSuccess(res, newUser, "User registered and payment verified successfully");
 });

@@ -14,6 +14,8 @@ import {
   updateTelemetrySettings,
   getIntegrationSettings,
   updateIntegrationSettings,
+  getGeneralSettings,
+  updateGeneralSettings,
 } from "../../../modules/platform-settings/platform-settings.controller";
 import { checkPermission } from "../../../middlewares/role.middleware";
 
@@ -44,5 +46,9 @@ router.put("/telemetry", checkPermission("platform.settings.manage"), updateTele
 // API Integrations settings
 router.get("/integrations", checkPermission("platform.settings.manage"), getIntegrationSettings);
 router.put("/integrations", checkPermission("platform.settings.manage"), updateIntegrationSettings);
+
+// General settings (platform name, support email, admin notification email)
+router.get("/general", checkPermission("platform.settings.manage"), getGeneralSettings);
+router.put("/general", checkPermission("platform.settings.manage"), updateGeneralSettings);
 
 export default router;

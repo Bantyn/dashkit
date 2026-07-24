@@ -112,9 +112,13 @@ export class DashboardComponent implements OnInit {
 
   get greetingEmoji(): string {
     const h = new Date().getHours();
-    if (h < 12) return '👋';
-    if (h < 17) return '☀️';
-    return '🌙';
+    if (h < 12) return 'bi bi-hand-index-thumb-fill';
+    if (h < 17) return 'bi bi-sun-fill';
+    return 'bi bi-moon-stars-fill';
+  }
+
+  get ownerName(): string {
+    return this.currentShop?.ownerName || this.authService.getCurrentUser()?.displayName || 'Owner';
   }
 
   get shopName(): string {

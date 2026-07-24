@@ -91,4 +91,14 @@ export const updateIntegrationSettings = asyncHandler(async (req: AuthRequest, r
   return sendSuccess(res, settings, "Platform integration settings updated");
 });
 
+// ── General Settings ──────────────────────────────────────────────────────
 
+export const getGeneralSettings = asyncHandler(async (req: Request, res: Response) => {
+  const settings = await platformSettingsService.getGeneralSettings();
+  return sendSuccess(res, settings, "Platform general settings fetched");
+});
+
+export const updateGeneralSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const settings = await platformSettingsService.updateGeneralSettings(req.body);
+  return sendSuccess(res, settings, "Platform general settings updated");
+});

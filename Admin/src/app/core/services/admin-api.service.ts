@@ -728,6 +728,19 @@ export class AdminApiService {
     return this.http.put<ApiResponse<any>>(`${this.apiUrl}/platform/telemetry`, payload);
   }
 
+  // ── Platform General Settings ──────────────────────────────────────────────────────
+
+  getPlatformGeneralSettings(): Observable<ApiResponse<any>> {
+    return this.cacheRequest('platform:general', () =>
+      this.http.get<ApiResponse<any>>(`${this.apiUrl}/platform/general`),
+    );
+  }
+
+  updatePlatformGeneralSettings(payload: any): Observable<ApiResponse<any>> {
+    this.invalidateKeys('platform:general');
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/platform/general`, payload);
+  }
+
   // ── Platform GST Settings ─────────────────────────────────────────────────
 
   getPlatformGstSettings(): Observable<ApiResponse<PlatformGstSettings>> {

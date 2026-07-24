@@ -7,6 +7,7 @@ import {
   PlatformThemeSettings,
   PlatformCostSettings,
   PlatformIntegrationSettings,
+  PlatformGeneralSettings,
 } from "./platform-settings.model";
 import {
   validateGSTIN,
@@ -451,6 +452,44 @@ export class PlatformSettingsService {
 
     await db.collection(COLLECTION).doc("integrations").set(nextValue, { merge: true });
     this.cache.set(this.getKey("integrations"), nextValue, this.ttlMs);
+    return nextValue;
+  }
+
+  // ── General Settings ──────────────────────────────────────────────────────
+
+  async getGeneralSettings(): Promise<PlatformGeneralSettings> {
+    const cached = this.cache.get<PlatformGeneralSettings>(this.getKey("general"));
+    if (cached) return cached;
+
+    const doc = await db.collection(COLLECTION).doc("general").get();
+    const data = doc.exists ? (doc.data() as PlatformGeneralSettings) : null;
+    const settings: PlatformGeneralSettings = {
+      platformName: data?.platformName || "DashKit",
+      supportEmail: data?.supportEmail || (process.env.SMTP_USER || ""),
+      adminEmail: data?.adminEmail || (process.env.ADMIN_EMAIL || ""),
+      updatedAt: data?.updatedAt || new Date(),
+    };
+
+    this.cache.set(this.getKey("general"), settings, this.ttlMs);
+    return settings;
+  }
+
+  async updateGeneralSettings(payload: Partial<PlatformGeneralSettings>): Promise<PlatformGeneralSettings> {
+    const current = await this.getGeneralSettings();
+    const nextValue: PlatformGeneralSettings = {
+      ...current,
+      ...payload,
+      updatedAt: new Date(),
+    };
+
+    await db.collection(COLLECTION).doc("general").set(nextValue, { merge: true });
+    this.cache.set(this.getKey("general"), nextValue, this.ttlMs);
+
+    // Keep runtime env in sync so sendAdminRegistrationNotification picks it up immediately
+    if (nextValue.adminEmail) {
+      process.env.ADMIN_EMAIL = nextValue.adminEmail;
+    }
+
     return nextValue;
   }
 }

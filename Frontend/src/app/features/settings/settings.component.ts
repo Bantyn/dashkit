@@ -40,7 +40,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
             <!-- GENERAL SETTINGS -->
             <div class="space-y-6">
               <!-- Shop Profile Section -->
-              <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                 <form [formGroup]="shopForm" (ngSubmit)="onSubmit()">
                   <div class="flex items-center justify-between mb-8">
                     <div>
@@ -64,18 +64,34 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                   </div>
 
                   <div class="flex flex-col gap-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <app-ui-input
-                        formControlName="shopName"
-                        label="Shop Name"
-                        placeholder="Enter shop name"
-                      ></app-ui-input>
-                      <app-ui-input
-                        formControlName="email"
-                        type="email"
-                        label="Support Email"
-                        placeholder="Enter support email"
-                      ></app-ui-input>
+                    <!-- Owner Information -->
+                    <div>
+                      <p class="text-sm font-bold text-gray-700 mb-3">Owner Information</p>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <app-ui-input
+                          formControlName="ownerName"
+                          label="Owner Name"
+                          placeholder="Enter owner full name"
+                        ></app-ui-input>
+                      </div>
+                    </div>
+
+                    <!-- Shop Information -->
+                    <div class="border-t border-gray-200 pt-5">
+                      <p class="text-sm font-bold text-gray-700 mb-3">Shop Information</p>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <app-ui-input
+                          formControlName="shopName"
+                          label="Shop Name"
+                          placeholder="Enter shop name"
+                        ></app-ui-input>
+                        <app-ui-input
+                          formControlName="email"
+                          type="email"
+                          label="Support Email"
+                          placeholder="Enter support email"
+                        ></app-ui-input>
+                      </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <app-ui-input
@@ -99,7 +115,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                   </div>
 
                   <!-- Pickup Address -->
-                  <div class="mt-8 pt-6 border-t border-gray-100" formGroupName="pickupAddress">
+                  <div class="mt-8 pt-6 border-t border-gray-200" formGroupName="pickupAddress">
                     <h4 class="text-sm font-bold text-gray-700 mb-4">Shop / Pickup Address</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <app-ui-input
@@ -129,8 +145,8 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
               </div>
 
               <!-- Subscription & Usage Limits Section -->
-              <div class="bg-white border border-gray-100 shadow-sm rounded-2xl p-8">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b border-gray-100 pb-4 mb-6">
+              <div class="bg-white border border-gray-200 shadow-sm rounded-2xl p-8">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b border-gray-200 pb-4 mb-6">
                   <div>
                     <h3 class="text-lg font-bold text-gray-900">Subscription & Usage Limits</h3>
                     <p class="text-sm text-gray-500 mt-1">
@@ -152,7 +168,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <!-- Staff Count -->
-                    <div class="border border-gray-100 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Staff Members</h4>
@@ -164,7 +180,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                           <div class="bg-primary-600 h-1.5 rounded-full" [style.width.%]="usageDetails.staff_count?.allowed === null ? 0 : usageDetails.staff_count?.percentage"></div>
                         </div>
                       </div>
-                      <div class="flex justify-between items-center pt-2 border-t border-gray-100/50 mt-2">
+                      <div class="flex justify-between items-center pt-2 border-t border-gray-200/50 mt-2">
                         <span class="text-xs text-gray-400 font-medium">₹199 / additional staff</span>
                         <button type="button" (click)="buyAddon('staff_count')" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 hover:border-primary-200 transition-all shadow-sm">
                           Buy Add-on
@@ -173,7 +189,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
 
                     <!-- Branch Count -->
-                    <div class="border border-gray-100 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Branches Active</h4>
@@ -185,7 +201,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                           <div class="bg-primary-600 h-1.5 rounded-full" [style.width.%]="usageDetails.branch_count?.allowed === null ? 0 : usageDetails.branch_count?.percentage"></div>
                         </div>
                       </div>
-                      <div class="flex justify-between items-center pt-2 border-t border-gray-100/50 mt-2">
+                      <div class="flex justify-between items-center pt-2 border-t border-gray-200/50 mt-2">
                         <span class="text-xs text-gray-400 font-medium">₹500/mo / location</span>
                         <button type="button" (click)="buyAddon('branch_count')" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 hover:border-primary-200 transition-all shadow-sm">
                           Buy Add-on
@@ -194,7 +210,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
 
                     <!-- Products Count -->
-                    <div class="border border-gray-100 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Products Count</h4>
@@ -206,7 +222,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                           <div class="bg-primary-600 h-1.5 rounded-full" [style.width.%]="usageDetails.products_count?.allowed === null ? 0 : usageDetails.products_count?.percentage"></div>
                         </div>
                       </div>
-                      <div class="flex justify-between items-center pt-2 border-t border-gray-100/50 mt-2">
+                      <div class="flex justify-between items-center pt-2 border-t border-gray-200/50 mt-2">
                         <span class="text-xs text-gray-400 font-medium">₹99 / 1,000 products</span>
                         <button type="button" (click)="buyAddon('products_count')" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 hover:border-primary-200 transition-all shadow-sm">
                           Buy Add-on
@@ -215,7 +231,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
 
                     <!-- Invoices Count -->
-                    <div class="border border-gray-100 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Invoices / Month</h4>
@@ -227,7 +243,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                           <div class="bg-primary-600 h-1.5 rounded-full" [style.width.%]="usageDetails.invoices_per_month?.allowed === null ? 0 : usageDetails.invoices_per_month?.percentage"></div>
                         </div>
                       </div>
-                      <div class="flex justify-between items-center pt-2 border-t border-gray-100/50 mt-2">
+                      <div class="flex justify-between items-center pt-2 border-t border-gray-200/50 mt-2">
                         <span class="text-xs text-gray-400 font-medium">₹199 / 500 invoices</span>
                         <button type="button" (click)="buyAddon('invoices_per_month')" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 hover:border-primary-200 transition-all shadow-sm">
                           Buy Add-on
@@ -240,7 +256,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
               </div>
 
               <!-- Preferences Section -->
-              <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                 <h3 class="text-lg font-bold text-gray-900 mb-6">Preferences</h3>
                 <div class="space-y-4">
                   <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -371,6 +387,7 @@ export class SettingsComponent implements OnInit {
     private toastService: ToastService,
   ) {
     this.shopForm = this.fb.group({
+      ownerName: ['', [Validators.required]],
       shopName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       description: [''],
@@ -502,6 +519,7 @@ export class SettingsComponent implements OnInit {
         this.shop = res.data;
         if (this.shop) {
           this.shopForm.patchValue({
+            ownerName: this.shop.ownerName || '',
             shopName: this.shop.shopName,
             email: this.shop.email,
             description: this.shop.description,

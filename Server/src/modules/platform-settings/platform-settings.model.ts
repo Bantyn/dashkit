@@ -1,3 +1,10 @@
+export interface PlatformGeneralSettings {
+  platformName: string;
+  supportEmail: string;
+  adminEmail: string;
+  updatedAt: Date;
+}
+
 export interface DashboardThemePalette {
   primaryColor: string;
   secondaryColor: string;

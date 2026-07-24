@@ -17,6 +17,7 @@ export interface Shop {
   banner?: string;
   status: 'active' | 'suspended' | 'inactive';
   subscriptionPlan: string;
+  ownerName?: string;
   selectedPlan?: string;
   subscriptionStatus?: 'trial' | 'active' | 'expired' | 'cancelled';
   paymentStatus?: 'pending' | 'active' | 'failed' | 'trial' | 'expired' | 'refunded' | 'past_due';

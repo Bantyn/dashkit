@@ -107,13 +107,13 @@
     <!-- Announcement Banner -->
     <app-announcement-banner [announcements]="(announcements$ | async) || []"></app-announcement-banner>
 
-    <!-- ══════════════════════════════════════════════
-         PAGE HEADER
-    ══════════════════════════════════════════════ -->
-    <div class="mb-5">
-      <h1 class="text-[22px] font-extrabold text-slate-800">{{ greeting }}, {{ shopName }} {{ greetingEmoji }}</h1>
-      <p class="text-sm text-slate-400 mt-0.5">Here's what's happening with your store today.</p>
+    <div class="mb-5 flex items-center gap-2">
+      <h1 class="text-[22px] font-extrabold text-slate-800 flex items-center gap-2">
+        {{ greeting }}, {{ ownerName }}
+        <i [class]="greetingEmoji + ' text-yellow-500'"></i>
+      </h1>
     </div>
+    <p class="text-sm text-slate-400 -mt-4 mb-5">Here's what's happening with your store today.</p>
 
     <!-- ══════════════════════════════════════════════
          ROW 1 — 4 STAT CARDS  (horizontal + sparkline)
