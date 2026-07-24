@@ -251,11 +251,10 @@ export const registerWithPayment = asyncHandler(async (req: Request, res: Respon
 import { auditLogService } from "../audit/audit-log.service";
 
 const LOCKOUT_DURATIONS: Record<number, number> = {
-  2: 2 * 60,   // 2 minutes
-  3: 5 * 60,   // 5 minutes
-  4: 10 * 60,  // 10 minutes
-  5: 15 * 60,  // 15 minutes
+  4: 2 * 60,   // 4th attempt: Lock login for 2 minutes
+  5: 5 * 60,   // 5th attempt: Lock login for 5 minutes
 };
+
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, uid } = req.body as any;
@@ -492,7 +491,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       });
     }
 
-    if (currentAttempts >= 2 && currentAttempts <= 5) {
+    if (currentAttempts === 4 || currentAttempts === 5) {
       const lockSeconds = LOCKOUT_DURATIONS[currentAttempts] || 120;
       const lockUntilDate = new Date(now.getTime() + lockSeconds * 1000);
       updateData.lockUntil = lockUntilDate.toISOString();
@@ -517,6 +516,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         message: "Too many failed login attempts. Please try again later.",
       });
     }
+
 
     // 1st failed attempt or non-lockout failed attempt
     await db.collection("users").doc(userId).update(updateData);

@@ -18,7 +18,7 @@ export interface UserAccessContext {
 
 export class AuthService {
   private readonly accessCache = new CacheService();
-  private readonly accessCacheTtlMs = 15 * 60 * 1000; // 15 minutes
+  private readonly accessCacheTtlMs = 15 * 60 * 1000;
 
   private uniquePermissions(permissions: string[]) {
     return Array.from(new Set(permissions));
@@ -46,6 +46,8 @@ export class AuthService {
     mobile?: string;
     shopId?: string;
     role?: string;
+    additionalPermissions?: string[];
+    restrictedPermissions?: string[];
   }) {
     const user = await userService.upsertUser({
       uid: input.uid,
@@ -60,6 +62,8 @@ export class AuthService {
       emailVerified: false,
       mobileVerified: false,
       isBlocked: false,
+      additionalPermissions: input.additionalPermissions || [],
+      restrictedPermissions: input.restrictedPermissions || [],
     });
 
     if (input.role && input.shopId) {
@@ -78,7 +82,6 @@ export class AuthService {
       }
     }
 
-    // Remove any legacy direct role if it exists in older user docs.
     await db.collection(USERS_COLLECTION).doc(user.uid).set(
       { role: admin.firestore.FieldValue.delete() },
       { merge: true },
@@ -108,6 +111,8 @@ export class AuthService {
       planId: payload.planId,
       gstNumber: payload.gstNumber,
       panNumber: payload.panNumber,
+      additionalPermissions: payload.additionalPermissions,
+      restrictedPermissions: payload.restrictedPermissions,
       emailVerified: payload.emailVerified,
       mobileVerified: payload.mobileVerified,
       isActive: payload.isActive,
@@ -160,9 +165,18 @@ export class AuthService {
 
     const roleIds = mappings.map((mapping) => mapping.roleId);
     let roles = await roleService.getRolesByIds(roleIds);
-    let permissions = this.uniquePermissions(
-      roles.flatMap((role) => role.permissions || []),
-    );
+
+    // Combine template role permissions + user additional permissions
+    let permissions = this.uniquePermissions([
+      ...roles.flatMap((role) => role.permissions || []),
+      ...(profile.additionalPermissions || []),
+    ]);
+
+    // Subtract user restricted permissions
+    if (profile.restrictedPermissions && profile.restrictedPermissions.length > 0) {
+      const restrictedSet = new Set(profile.restrictedPermissions);
+      permissions = permissions.filter((p) => !restrictedSet.has(p));
+    }
 
     if (isPlatformAdmin) {
       if (!roles.length) {

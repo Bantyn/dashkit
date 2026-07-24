@@ -91,6 +91,8 @@ export class UserService {
     kycStatus?: "pending" | "verified" | "rejected";
     gstNumber?: string;
     panNumber?: string;
+    additionalPermissions?: string[];
+    restrictedPermissions?: string[];
     metadata?: Record<string, any>;
   }): Promise<User> {
     const existing = await this.getByUid(input.uid);
@@ -116,6 +118,8 @@ export class UserService {
       kycStatus: input.kycStatus ?? existing?.kycStatus,
       gstNumber: input.gstNumber ?? existing?.gstNumber,
       panNumber: input.panNumber ?? existing?.panNumber,
+      additionalPermissions: input.additionalPermissions ?? existing?.additionalPermissions,
+      restrictedPermissions: input.restrictedPermissions ?? existing?.restrictedPermissions,
       metadata: {
         ...(existing?.metadata || {}),
         ...(input.metadata || {}),

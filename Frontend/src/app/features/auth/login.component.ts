@@ -20,17 +20,27 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
     CheckboxComponent,
     VerticalCutRevealComponent,
   ],
-  styles: [`
-    .page-enter {
-      animation: pageFadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes pageFadeInUp {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-  `],
+  styles: [
+    `
+      .page-enter {
+        animation: pageFadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes pageFadeInUp {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    `,
+  ],
   template: `
-    <div class="min-h-screen grid grid-cols-1 md:grid-cols-2 page-enter selection:text-white selection:bg-primary-600">
+    <div
+      class="min-h-screen grid grid-cols-1 md:grid-cols-2 page-enter selection:text-white selection:bg-primary-600"
+    >
       <!-- LEFT PANEL -->
       <div
         class="hidden md:flex flex-col justify-center items-center text-center px-12 
@@ -57,30 +67,54 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
         <!-- Elegant SaaS Glassmorphic Graphic -->
         <div class="mt-12 relative w-full max-w-sm aspect-square flex items-center justify-center">
           <!-- Floating Glows -->
-          <div class="absolute -top-4 -right-4 w-40 h-40 bg-gradient-to-tr from-amber-300/30 to-orange-400/30 rounded-full blur-3xl"></div>
-          <div class="absolute -bottom-8 -left-8 w-44 h-44 bg-blue-400/30 to-indigo-500/30 rounded-full blur-3xl"></div>
-          
+          <div
+            class="absolute -top-4 -right-4 w-40 h-40 bg-gradient-to-tr from-amber-300/30 to-orange-400/30 rounded-full blur-3xl"
+          ></div>
+          <div
+            class="absolute -bottom-8 -left-8 w-44 h-44 bg-blue-400/30 to-indigo-500/30 rounded-full blur-3xl"
+          ></div>
+
           <!-- Main Card -->
-          <div class="absolute w-72 h-44 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col justify-between p-6">
+          <div
+            class="absolute w-72 h-44 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col justify-between p-6"
+          >
             <div class="flex justify-between items-start">
-              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center border border-white/10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
+              <div
+                class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center border border-white/10"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
+                    clip-rule="evenodd"
+                  />
                 </svg>
               </div>
-              <span class="text-[10px] bg-emerald-500/25 px-2.5 py-1 rounded-full text-emerald-300 font-semibold border border-emerald-500/20 uppercase tracking-widest">Active</span>
+              <span
+                class="text-[10px] bg-emerald-500/25 px-2.5 py-1 rounded-full text-emerald-300 font-semibold border border-emerald-500/20 uppercase tracking-widest"
+                >Active</span
+              >
             </div>
-            
+
             <div class="space-y-2 text-left">
               <div class="h-2 w-12 bg-white/20 rounded"></div>
               <div class="text-lg font-normal text-white tracking-wide">Clothify Store</div>
               <div class="h-1.5 w-24 bg-white/20 rounded"></div>
             </div>
           </div>
-          
+
           <!-- Mini Float Badge -->
-          <div class="absolute bottom-2 -right-4 bg-white/15 backdrop-blur-md px-4 py-3 rounded-xl border border-white/20 flex items-center gap-3">
-            <div class="w-7 h-7 rounded-full bg-emerald-400/20 flex items-center justify-center border border-emerald-500/20">
+          <div
+            class="absolute bottom-2 -right-4 bg-white/15 backdrop-blur-md px-4 py-3 rounded-xl border border-white/20 flex items-center gap-3"
+          >
+            <div
+              class="w-7 h-7 rounded-full bg-emerald-400/20 flex items-center justify-center border border-emerald-500/20"
+            >
               <span class="text-emerald-300 text-xs font-normal">✓</span>
             </div>
             <div class="text-left">
@@ -108,8 +142,8 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
 
             <!-- Password -->
             <div class="space-y-2">
-              <label class="text-sm font-medium text-[var(--text-primary)]"> Password </label>
               <app-ui-input
+                label="Password"
                 type="password"
                 formControlName="password"
                 placeholder="••••••••"
@@ -118,16 +152,31 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
 
               <!-- Warning Line: Attempt warning after 2 or more failed attempts -->
               <div
-                *ngIf="failedAttempts >= 2 && remainingAttempts !== null && !isLocked && !isSuspended"
+                *ngIf="
+                  failedAttempts >= 2 && remainingAttempts !== null && !isLocked && !isSuspended
+                "
                 class="p-2 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-300 rounded-[var(--radius-md)] flex items-center gap-1.5"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 text-amber-600 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
                 </svg>
-                <span>Warning: Invalid password. {{ remainingAttempts }} attempts remaining before lockout / suspension.</span>
+                <span
+                  >Warning: Invalid password. {{ remainingAttempts }} attempts remaining before
+                  lockout / suspension.</span
+                >
               </div>
             </div>
-
 
             <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between mt-1">
@@ -138,7 +187,9 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
                 ></app-checkbox>
                 <span
                   class="text-sm font-medium text-[var(--text-secondary)] cursor-pointer select-none"
-                  (click)="loginForm.get('rememberMe')?.setValue(!loginForm.get('rememberMe')?.value)"
+                  (click)="
+                    loginForm.get('rememberMe')?.setValue(!loginForm.get('rememberMe')?.value)
+                  "
                 >
                   Remember Me
                 </span>
@@ -166,7 +217,7 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
             >
               <p class="text-sm font-medium text-red-800">Too many failed login attempts.</p>
               <p class="text-xs text-red-600">Please try again in:</p>
-              <div class="text-3xl font-mono font-bold text-red-700 tracking-wider">
+              <div class="text-3xl font-normal  text-red-700 tracking-wider">
                 {{ formattedRemainingTime }}
               </div>
             </div>
@@ -177,7 +228,10 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
               class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-[var(--radius-md)] space-y-2"
             >
               <p class="font-semibold">Account Suspended</p>
-              <p>Your shop has been temporarily suspended due to multiple unsuccessful login attempts. Please contact the DashKit Team to reactivate your account.</p>
+              <p>
+                Your shop has been temporarily suspended due to multiple unsuccessful login
+                attempts. Please contact the DashKit Team to reactivate your account.
+              </p>
             </div>
 
             <!-- Inactive Account Prompt -->
@@ -185,8 +239,16 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
               *ngIf="inactiveShopId"
               class="p-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-[var(--radius-md)] flex flex-col gap-3"
             >
-              <p>This account is deactivated from admin according to your request. If you want to reactivate your account, please press Confirm.</p>
-              <app-ui-button type="button" (onClick)="requestReactivation()" [loading]="reactivating" loadingText="Requesting...">
+              <p>
+                This account is deactivated from admin according to your request. If you want to
+                reactivate your account, please press Confirm.
+              </p>
+              <app-ui-button
+                type="button"
+                (onClick)="requestReactivation()"
+                [loading]="reactivating"
+                loadingText="Requesting..."
+              >
                 Confirm Reactivation
               </app-ui-button>
             </div>
@@ -201,7 +263,6 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
             >
               Sign In
             </app-ui-button>
-
 
             <!-- Divider -->
             <div class="relative py-2">
@@ -228,7 +289,10 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
 
           <p class="text-sm text-center text-[var(--text-secondary)]">
             Don't have an account?
-            <a href="http://localhost:4202/pricing" class="text-[var(--color-primary-600)] hover:underline">
+            <a
+              href="http://localhost:4202/pricing"
+              class="text-[var(--color-primary-600)] hover:underline"
+            >
               Sign up
             </a>
           </p>
@@ -353,24 +417,26 @@ export class LoginComponent {
     }
   }
 
-
-
   async requestReactivation() {
     if (!this.inactiveShopId) return;
     this.reactivating = true;
     try {
       const { environment } = await import('../../../environments/environment');
-      const response = await fetch(`${environment.apiUrl}/shops/${this.inactiveShopId}/reactivate-request`, {
-        method: 'POST'
-      });
+      const response = await fetch(
+        `${environment.apiUrl}/shops/${this.inactiveShopId}/reactivate-request`,
+        {
+          method: 'POST',
+        },
+      );
       if (response.ok) {
         this.inactiveShopId = null;
-        this.errorMessage = "Reactivation request submitted successfully. We will notify you by email once approved.";
+        this.errorMessage =
+          'Reactivation request submitted successfully. We will notify you by email once approved.';
       } else {
-        this.errorMessage = "Failed to submit reactivation request.";
+        this.errorMessage = 'Failed to submit reactivation request.';
       }
     } catch (e) {
-      this.errorMessage = "An error occurred while requesting reactivation.";
+      this.errorMessage = 'An error occurred while requesting reactivation.';
     } finally {
       this.reactivating = false;
     }
@@ -379,9 +445,9 @@ export class LoginComponent {
   async loginWithGoogle() {
     this.errorMessage = '';
     this.loading = true;
-    
+
     const result = await this.authService.loginWithGoogleProvider();
-    
+
     if (result.success) {
       if (result.isNewUser) {
         // If new user, they should sign up instead of logging in here
@@ -395,7 +461,7 @@ export class LoginComponent {
     } else {
       this.errorMessage = result.error || 'Google Sign-In failed.';
     }
-    
+
     this.loading = false;
   }
 }

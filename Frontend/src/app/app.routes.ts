@@ -3,46 +3,22 @@ import { authGuard, roleGuard } from './core/guards/auth.guard';
 import { planAccessGuard } from './core/guards/plan-access.guard';
 import { subscriptionRedirectGuard } from './core/guards/subscription-redirect.guard';
 import { enforcementGuard } from './core/guards/enforcement.guard';
-import { hasSubdomainGuard, noSubdomainGuard } from './core/guards/subdomain.guard';
-import { websiteRoutes } from './features/website/website.routes';
 
 export const routes: Routes = [
-  // 1. Public Shop Website (if subdomain exists)
   {
-    path: '',
-    canMatch: [hasSubdomainGuard],
-    children: websiteRoutes,
+    path: 'shop/:shopId/analytics',
+    pathMatch: 'full',
+    redirectTo: ':shopId/analytics',
   },
-
-  // 2. Main App Routes (if NO subdomain)
+  {
+    path: 'shop/:shopId/analytics/:page',
+    redirectTo: ':shopId/analytics/:page',
+  },
   {
     path: '',
-    canMatch: [noSubdomainGuard],
-    children: [
-      {
-        path: 'shop/:shopId/analytics',
-        pathMatch: 'full',
-        redirectTo: ':shopId/analytics',
-      },
-      {
-        path: 'shop/:shopId/analytics/:page',
-        redirectTo: ':shopId/analytics/:page',
-      },
-      // Plus Plan Shop Route (Path-based) - Prioritize specific paths
-      {
-        path: 'shop/:slug',
-        children: websiteRoutes,
-      },
-      // Local testing for shops
-      {
-        path: 'store/:subdomain',
-        children: websiteRoutes,
-      },
-      {
-        path: '',
-        redirectTo: 'login',
-        pathMatch: 'full',
-      },
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
       {
         path: 'login',
         loadComponent: () =>
@@ -788,8 +764,6 @@ export const routes: Routes = [
             (m) => m.InvoicePrintPageComponent,
           ),
       },
-    ],
-  },
   // Fallback
   {
     path: '**',

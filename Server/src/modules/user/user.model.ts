@@ -20,6 +20,8 @@ export interface User {
   kycStatus?: "pending" | "verified" | "rejected";
   gstNumber?: string;
   panNumber?: string;
+  additionalPermissions?: string[];
+  restrictedPermissions?: string[];
   failedLoginAttempts?: number;
   lastFailedLoginAt?: Date | string | null;
   lockUntil?: Date | string | null;
@@ -29,4 +31,3 @@ export interface User {
   suspendedBy?: string | null;
   metadata?: Record<string, any>;
 }
-

@@ -224,6 +224,7 @@ export class StaffService {
     await db.collection(COLLECTION).doc(staffId).set(staffRecord);
     this.invalidateStaffCache(staffId, newStaff.shopId);
 
+    const assignedRoleId = (payload.roleId || (payload.role ? payload.role.toLowerCase().replace(/\s+/g, '_') : 'staff'));
     await userService.upsertUser({
       uid: userId,
       email: newStaff.email,
@@ -232,10 +233,13 @@ export class StaffService {
       name: newStaff.fullName,
       displayName: newStaff.fullName,
       shopId: newStaff.shopId,
+      roleId: assignedRoleId,
+      additionalPermissions: payload.additionalPermissions || [],
+      restrictedPermissions: payload.restrictedPermissions || [],
       isActive: newStaff.status === "Active",
     });
 
-    const roleDoc = await roleService.ensureLegacyStaffRole({
+    const roleDoc = await roleService.getRole(assignedRoleId) || await roleService.ensureLegacyStaffRole({
       staffId,
       shopId: newStaff.shopId,
       displayName: newStaff.fullName,
@@ -287,6 +291,7 @@ export class StaffService {
     }
 
     if (existingStaff?.userId) {
+      const assignedRoleId = (payload.roleId || (payload.role ? payload.role.toLowerCase().replace(/\s+/g, '_') : (existingStaff as any).roleId || 'staff'));
       await userService.upsertUser({
         uid: existingStaff.userId,
         email: payload.email || existingStaff.email,
@@ -295,28 +300,29 @@ export class StaffService {
         name: payload.fullName || existingStaff.fullName,
         displayName: payload.fullName || existingStaff.fullName,
         shopId: payload.shopId || existingStaff.shopId,
+        roleId: assignedRoleId,
+        additionalPermissions: payload.additionalPermissions || (existingStaff as any).additionalPermissions || [],
+        restrictedPermissions: payload.restrictedPermissions || (existingStaff as any).restrictedPermissions || [],
         isActive: (payload.status || existingStaff.status) === "Active",
       });
 
-      if (payload.permissions) {
-        const roleDoc = await roleService.ensureLegacyStaffRole({
-          staffId: id,
-          shopId: payload.shopId || existingStaff.shopId,
-          displayName: payload.fullName || existingStaff.fullName,
-          permissions: payload.permissions as any,
-        });
+      const roleDoc = await roleService.getRole(assignedRoleId) || await roleService.ensureLegacyStaffRole({
+        staffId: id,
+        shopId: payload.shopId || existingStaff.shopId,
+        displayName: payload.fullName || existingStaff.fullName,
+        permissions: payload.permissions as any,
+      });
 
-        await userRoleService.assignRole({
-          userId: existingStaff.userId,
-          roleId: roleDoc.id,
-          shopId: payload.shopId || existingStaff.shopId,
-        });
+      await userRoleService.assignRole({
+        userId: existingStaff.userId,
+        roleId: roleDoc.id,
+        shopId: payload.shopId || existingStaff.shopId,
+      });
 
-        authService.invalidateAccessContext(
-          existingStaff.userId,
-          payload.shopId || existingStaff.shopId,
-        );
-      }
+      authService.invalidateAccessContext(
+        existingStaff.userId,
+        payload.shopId || existingStaff.shopId,
+      );
     }
 
     const headerStaffId = Array.isArray(actingStaffId)

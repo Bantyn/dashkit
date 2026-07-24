@@ -674,12 +674,16 @@ export class AuthService {
 
 
       // 2. Perform Firebase Auth Sign-in once server validates credentials
-      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-      const user = userCredential.user;
+      let user = this.auth.currentUser;
+      if (!user || user.email?.toLowerCase() !== email.toLowerCase()) {
+        const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+        user = userCredential.user;
+      }
 
       const profile = await runInInjectionContext(this.injector, () =>
-        this.getUserProfile(user.uid),
+        this.getUserProfile(user!.uid),
       );
+
 
       if (profile && profile.isActive === false) {
         await signOut(this.auth);

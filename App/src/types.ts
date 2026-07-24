@@ -7,15 +7,17 @@ export interface PermissionActions {
   delete: boolean;
 }
 
-export interface StaffPermissions {
-  invoices: PermissionActions;
-  products: PermissionActions;
-  inventory: PermissionActions;
-  customers: PermissionActions;
-  staff: PermissionActions;
-  analytics: { view: boolean };
-  settings: { view: boolean; edit: boolean };
+export interface StaffPermissionsObject {
+  invoices?: PermissionActions;
+  products?: PermissionActions;
+  inventory?: PermissionActions;
+  customers?: PermissionActions;
+  staff?: PermissionActions;
+  analytics?: { view: boolean };
+  settings?: { view: boolean; edit: boolean };
 }
+
+export type StaffPermissions = string[] | StaffPermissionsObject;
 
 export interface User {
   id: string;

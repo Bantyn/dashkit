@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary-50: #f3f4ff;
+    --color-primary-100: #e8eaff;
+    --color-primary-200: #d6d9ff;
+    --color-primary-300: #c3c7ff;
+    --color-primary-400: #aab0ff;
+    --color-primary-500: #8e94f2;
+    --color-primary-600: #7379e8;
+    --color-primary-700: #5f65d8;
+    --color-primary-800: #4a4fb5;
+    --color-primary-900: #3b3f8f;
+    --color-primary: var(--color-primary-500);
+
+    --color-gray-50: #f8f9ff;
+    --color-gray-100: #eef0fa;
+    --color-gray-200: #e0e4f5;
+    --color-gray-300: #cfd3e8;
+    --color-gray-400: #a5a9c2;
+    --color-gray-500: #9094a6;
+    --color-gray-600: #6b7094;
+    --color-gray-700: #4a4f6a;
+    --color-gray-800: #2d3142;
+    --color-gray-900: #1c2033;
+
+    --bg-page: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #2d3142;
+    --text-secondary: #9094a6;
+    --text-muted: #bfc3d9;
+    --border-color: #e0e4f5;
+    --radius-md: 0.5rem;
+  }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  margin: 0;
+  padding: 0;
+}

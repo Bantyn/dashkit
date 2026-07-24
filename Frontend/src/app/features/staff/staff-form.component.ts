@@ -9,191 +9,143 @@ import { UiDropdownComponent } from '../../shared/components/ui-dropdown.compone
 import { UiDatePickerComponent } from '../../shared/components/ui-date-picker.component';
 import { CheckboxComponent } from '../../shared/components/ui/checkbox.component';
 
+export interface PermissionCategory {
+  key: string;
+  name: string;
+  actions: string[];
+}
+
 @Component({
   selector: 'app-staff-form',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, UiInputComponent, UiDropdownComponent, UiDatePickerComponent, CheckboxComponent],
   template: `
-    <div
-      class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4"
-    >
-      <div
-        class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
-      >
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col">
         <!-- Header -->
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <div>
             <h2 class="text-xl font-bold text-gray-900">{{ isEdit ? 'Edit Staff Member' : 'Add New Staff Member' }}</h2>
-            <p class="text-sm text-gray-500">Enter staff details and permissions below</p>
+            <p class="text-xs text-gray-500">Configure role assignment, custom grants, and restrictions</p>
           </div>
-          <button
-            (click)="close.emit()"
-            class="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
-          >
+          <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
             <i class="bi bi-x-lg text-xl"></i>
           </button>
         </div>
 
-        <!-- Form Area -->
+        <!-- Form Body -->
         <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
-          <form [formGroup]="staffForm" (ngSubmit)="onSubmit()" class="space-y-10">
-            <!-- Basic Information -->
+          <form [formGroup]="staffForm" (ngSubmit)="onSubmit()" class="space-y-8">
+            <!-- 1. Basic Information -->
             <div>
-              <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-6 flex items-center gap-2">
-                 <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                 Basic Information
+              <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                 <span class="w-2 h-2 rounded-full bg-primary-500"></span> Basic Information
               </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <app-ui-input formControlName="fullName" label="Full Name" placeholder="e.g. Rahul Sharma"></app-ui-input>
                 <app-ui-input formControlName="phoneNumber" label="Phone Number" placeholder="e.g. +91 98765-43210"></app-ui-input>
                 <app-ui-input formControlName="email" label="Email Address" placeholder="e.g. rahul@clothify.com"></app-ui-input>
                 <app-ui-input *ngIf="!isEdit" formControlName="password" label="Password" type="password" placeholder="••••••••"></app-ui-input>
-                <app-ui-input *ngIf="!isEdit" formControlName="confirmPassword" label="Confirm Password" type="password" placeholder="••••••••"></app-ui-input>
               </div>
             </div>
 
-            <!-- Role & Assignment -->
+            <!-- 2. Role & Branch Assignment -->
             <div>
-               <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-6 flex items-center gap-2">
-                 <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                 Role & Assignment
+              <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                 <span class="w-2 h-2 rounded-full bg-primary-500"></span> Role & Branch Assignment
               </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <app-ui-dropdown formControlName="role" [options]="roleOptions" placeholder="Select Role"></app-ui-dropdown>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Assigned Role Template</label>
+                  <app-ui-dropdown formControlName="role" [options]="roleOptions" (ngModelChange)="onRoleChange($event)" placeholder="Select Role"></app-ui-dropdown>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Branch</label>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Branch</label>
                   <app-ui-dropdown formControlName="branch" [options]="branchOptions" placeholder="Select Branch"></app-ui-dropdown>
                 </div>
-                <app-ui-date-picker formControlName="joiningDate" label="Joining Date"></app-ui-date-picker>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Account Status</label>
                   <app-ui-dropdown formControlName="status" [options]="statusOptions"></app-ui-dropdown>
                 </div>
               </div>
             </div>
 
-            <!-- Permissions Matrix -->
-            <div formGroupName="permissions">
-               <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2 flex items-center gap-2">
-                 <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                 Access Permissions
-              </h3>
-              <p class="text-xs text-gray-500 mb-6">Define what this staff member can see and do in the dashboard.</p>
-              
-              <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
-                 <table class="w-full text-left text-sm">
-                    <thead class="bg-white border-b border-gray-100">
-                       <tr class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                          <th class="px-6 py-3">Module</th>
-                          <th class="px-6 py-3 text-center">View</th>
-                          <th class="px-6 py-3 text-center">Create</th>
-                          <th class="px-6 py-3 text-center">Edit</th>
-                          <th class="px-6 py-3 text-center">Delete</th>
-                       </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                       <!-- Invoices -->
-                       <tr formGroupName="invoices">
-                          <td class="px-6 py-4 font-medium text-gray-900">Invoices</td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="view" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="create" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="edit" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="delete" [size]="18" class="text-primary-600"></app-checkbox></td>
-                       </tr>
-                       <!-- Products -->
-                       <tr formGroupName="products">
-                          <td class="px-6 py-4 font-medium text-gray-900">Products</td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="view" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="create" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="edit" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="delete" [size]="18" class="text-primary-600"></app-checkbox></td>
-                       </tr>
-                       <!-- Customers -->
-                       <tr formGroupName="customers">
-                          <td class="px-6 py-4 font-medium text-gray-900">Customers</td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="view" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="create" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="edit" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="delete" [size]="18" class="text-primary-600"></app-checkbox></td>
-                       </tr>
-                       <!-- Staff (Self/Others) -->
-                       <tr formGroupName="staff">
-                          <td class="px-6 py-4 font-medium text-gray-900">Staff Management</td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="view" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="create" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="edit" [size]="18" class="text-primary-600"></app-checkbox></td>
-                          <td class="px-6 py-4 text-center"><app-checkbox formControlName="delete" [size]="18" class="text-primary-600"></app-checkbox></td>
-                       </tr>
-                        <!-- Inventory -->
-                        <tr formGroupName="inventory">
-                           <td class="px-6 py-4 font-medium text-gray-900">Inventory</td>
-                           <td class="px-6 py-4 text-center"><app-checkbox formControlName="view" [size]="18" class="text-primary-600"></app-checkbox></td>
-                           <td class="px-6 py-4 text-center"><app-checkbox formControlName="create" [size]="18" class="text-primary-600"></app-checkbox></td>
-                           <td class="px-6 py-4 text-center"><app-checkbox formControlName="edit" [size]="18" class="text-primary-600"></app-checkbox></td>
-                           <td class="px-6 py-4 text-center"><app-checkbox formControlName="delete" [size]="18" class="text-primary-600"></app-checkbox></td>
-                        </tr>
-                    </tbody>
-                 </table>
-              </div>
-            </div>
-
-            <!-- Commission Settings -->
+            <!-- 3. Permission Architecture: Category Grid -->
             <div>
-               <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-6 flex items-center gap-2">
-                 <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                 Incentive Settings
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-blue-50 bg-opacity-30 rounded-2xl border border-blue-100">
-                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Commission Type</label>
-                  <app-ui-dropdown formControlName="commissionType" [options]="commissionTypeOptions"></app-ui-dropdown>
+              <div class="flex justify-between items-center mb-4">
+                <div>
+                  <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-primary-500"></span> Effective Permission Matrix
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">Role Template Default + Extra Grants − Restricted Revokes</p>
                 </div>
-                <app-ui-input formControlName="commissionRate" label="Commission Rate" type="number" placeholder="0.00"></app-ui-input>
+
+                <div class="flex gap-2">
+                  <button type="button" (click)="activeTab = 'grant'" class="px-3 py-1.5 rounded-lg text-xs font-bold transition" [class.bg-green-600]="activeTab === 'grant'" [class.text-white]="activeTab === 'grant'" [class.bg-gray-100]="activeTab !== 'grant'" [class.text-gray-600]="activeTab !== 'grant'">
+                    + Additional Grants ({{ additionalPermissions.length }})
+                  </button>
+                  <button type="button" (click)="activeTab = 'revoke'" class="px-3 py-1.5 rounded-lg text-xs font-bold transition" [class.bg-red-600]="activeTab === 'revoke'" [class.text-white]="activeTab === 'revoke'" [class.bg-gray-100]="activeTab !== 'revoke'" [class.text-gray-600]="activeTab !== 'revoke'">
+                    − Restricted Revokes ({{ restrictedPermissions.length }})
+                  </button>
+                </div>
+              </div>
+
+              <!-- Categories -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let category of permissionCategories" class="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                  <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-200">
+                    <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">{{ category.name }}</span>
+                    <span class="text-[10px] font-bold text-gray-400">category: {{ category.key }}</span>
+                  </div>
+
+                  <div class="space-y-2">
+                    <div *ngFor="let act of category.actions" class="flex justify-between items-center text-xs">
+                      <span class="font-medium text-gray-700 capitalize">{{ act }}</span>
+                      
+                      <div class="flex items-center gap-2">
+                        <!-- Grant Toggle -->
+                        <button
+                          type="button"
+                          (click)="toggleGrant(category.key + '.' + act)"
+                          class="px-2 py-0.5 rounded text-[10px] font-bold transition"
+                          [class.bg-green-600]="isGranted(category.key + '.' + act)"
+                          [class.text-white]="isGranted(category.key + '.' + act)"
+                          [class.bg-gray-200]="!isGranted(category.key + '.' + act)"
+                          [class.text-gray-500]="!isGranted(category.key + '.' + act)"
+                        >
+                          Grant
+                        </button>
+
+                        <!-- Revoke Toggle -->
+                        <button
+                          type="button"
+                          (click)="toggleRevoke(category.key + '.' + act)"
+                          class="px-2 py-0.5 rounded text-[10px] font-bold transition"
+                          [class.bg-red-600]="isRevoked(category.key + '.' + act)"
+                          [class.text-white]="isRevoked(category.key + '.' + act)"
+                          [class.bg-gray-200]="!isRevoked(category.key + '.' + act)"
+                          [class.text-gray-500]="!isRevoked(category.key + '.' + act)"
+                        >
+                          Revoke
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </form>
         </div>
 
         <!-- Footer -->
-        <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
-          <button
-            type="button"
-            (click)="close.emit()"
-            class="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            (click)="onSubmit()"
-            [disabled]="staffForm.invalid || loading"
-            class="px-8 py-2.5 bg-gray-900 text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-black transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-gray-200"
-          >
-            <span
-              *ngIf="loading"
-              class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
-            ></span>
-            {{ loading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Confirm & Add Staff') }}
+        <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+          <button (click)="close.emit()" class="px-5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-200 rounded-lg">Cancel</button>
+          <button (click)="onSubmit()" [disabled]="loading" class="px-6 py-2 text-xs font-bold bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            {{ isEdit ? 'Save Staff Changes' : 'Create Staff Member' }}
           </button>
         </div>
       </div>
     </div>
-
-    <style>
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 3px;
-      }
-    </style>
   `
 })
 export class StaffFormComponent implements OnInit {
@@ -205,13 +157,26 @@ export class StaffFormComponent implements OnInit {
   isEdit = false;
   loading = false;
   shopId = '';
+  activeTab: 'grant' | 'revoke' = 'grant';
+
+  additionalPermissions: string[] = [];
+  restrictedPermissions: string[] = [];
 
   roleOptions = [
-    { label: 'Manager', value: 'Manager' },
-    { label: 'Cashier', value: 'Cashier' },
-    { label: 'Sales Staff', value: 'Sales Staff' },
-    { label: 'Inventory Staff', value: 'Inventory Staff' },
-    { label: 'Other', value: 'Other' },
+    { label: 'Shop Owner', value: 'owner' },
+    { label: 'Store Manager', value: 'store_manager' },
+    { label: 'Cashier', value: 'cashier' },
+    { label: 'Sales Executive', value: 'sales_executive' },
+    { label: 'Inventory Manager', value: 'inventory_manager' },
+    { label: 'Purchase Manager', value: 'purchase_manager' },
+    { label: 'Accountant', value: 'accountant' },
+    { label: 'CRM Executive', value: 'crm_executive' },
+    { label: 'Marketing Executive', value: 'marketing_executive' },
+    { label: 'Website Manager', value: 'website_manager' },
+    { label: 'Tailor', value: 'tailor' },
+    { label: 'Delivery Staff', value: 'delivery_staff' },
+    { label: 'Branch Manager', value: 'branch_manager' },
+    { label: 'Auditor', value: 'auditor' },
   ];
 
   branchOptions = [
@@ -224,10 +189,18 @@ export class StaffFormComponent implements OnInit {
     { label: 'Inactive', value: 'Inactive' },
   ];
 
-  commissionTypeOptions = [
-    { label: 'No Commission', value: 'None' },
-    { label: 'Percentage of Sales', value: 'Percentage' },
-    { label: 'Fixed Amount per Order', value: 'Fixed' },
+  permissionCategories: PermissionCategory[] = [
+    { key: 'sales', name: 'Sales & POS', actions: ['view', 'create', 'edit', 'delete', 'print'] },
+    { key: 'inventory', name: 'Inventory & Stock', actions: ['view', 'create', 'edit', 'delete', 'manage'] },
+    { key: 'products', name: 'Products Catalog', actions: ['view', 'create', 'edit', 'delete', 'export'] },
+    { key: 'customers', name: 'Customers & CRM', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'purchases', name: 'Purchase Orders', actions: ['view', 'create', 'edit', 'delete', 'approve'] },
+    { key: 'accounting', name: 'Accounting & Ledger', actions: ['view', 'create', 'edit', 'delete', 'export'] },
+    { key: 'reports', name: 'Reports & Analytics', actions: ['view', 'export'] },
+    { key: 'website', name: 'Storefront Website', actions: ['view', 'edit', 'manage'] },
+    { key: 'staff', name: 'Staff Management', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'branches', name: 'Branch Locations', actions: ['view', 'edit', 'manage'] },
+    { key: 'settings', name: 'Shop Settings', actions: ['view', 'edit'] },
   ];
 
   constructor(
@@ -241,20 +214,10 @@ export class StaffFormComponent implements OnInit {
       phoneNumber: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
-      confirmPassword: [''],
-      role: ['', Validators.required],
+      role: ['sales_executive', Validators.required],
       branch: ['Main Branch', Validators.required],
-      commissionType: ['None'],
-      commissionRate: [0],
       status: ['Active'],
       joiningDate: [getLocalISODate(), Validators.required],
-      permissions: this.fb.group({
-        invoices: this.fb.group({ view: [true], create: [false], edit: [false], delete: [false] }),
-        products: this.fb.group({ view: [true], create: [false], edit: [false], delete: [false] }),
-        customers: this.fb.group({ view: [true], create: [false], edit: [false], delete: [false] }),
-        staff: this.fb.group({ view: [false], create: [false], edit: [false], delete: [false] }),
-        inventory: this.fb.group({ view: [true], create: [false], edit: [false], delete: [false] })
-      })
     });
   }
 
@@ -266,17 +229,37 @@ export class StaffFormComponent implements OnInit {
     if (this.staffId) {
       this.isEdit = true;
       this.loadStaff();
-    } else {
-      this.staffForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
-      this.staffForm.get('confirmPassword')?.setValidators([Validators.required]);
-      this.staffForm.addValidators(this.passwordMatchValidator);
     }
   }
 
-  passwordMatchValidator(control: AbstractControl) {
-    const g = control as FormGroup;
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-       ? null : {'mismatch': true};
+  onRoleChange(roleVal: string) {
+    // Role selection provides baseline permission set
+  }
+
+  toggleGrant(permission: string) {
+    if (this.additionalPermissions.includes(permission)) {
+      this.additionalPermissions = this.additionalPermissions.filter(p => p !== permission);
+    } else {
+      this.additionalPermissions.push(permission);
+      this.restrictedPermissions = this.restrictedPermissions.filter(p => p !== permission);
+    }
+  }
+
+  toggleRevoke(permission: string) {
+    if (this.restrictedPermissions.includes(permission)) {
+      this.restrictedPermissions = this.restrictedPermissions.filter(p => p !== permission);
+    } else {
+      this.restrictedPermissions.push(permission);
+      this.additionalPermissions = this.additionalPermissions.filter(p => p !== permission);
+    }
+  }
+
+  isGranted(permission: string): boolean {
+    return this.additionalPermissions.includes(permission);
+  }
+
+  isRevoked(permission: string): boolean {
+    return this.restrictedPermissions.includes(permission);
   }
 
   loadStaff() {
@@ -284,6 +267,8 @@ export class StaffFormComponent implements OnInit {
     this.staffService.getStaffById(this.staffId).subscribe(res => {
       if (res.data) {
         this.staffForm.patchValue(res.data);
+        this.additionalPermissions = res.data.additionalPermissions || [];
+        this.restrictedPermissions = res.data.restrictedPermissions || [];
       }
       this.loading = false;
     });
@@ -296,7 +281,13 @@ export class StaffFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const staffData = { ...this.staffForm.value, shopId: this.shopId };
+    const staffData = {
+      ...this.staffForm.value,
+      roleId: this.staffForm.value.role,
+      shopId: this.shopId,
+      additionalPermissions: this.additionalPermissions,
+      restrictedPermissions: this.restrictedPermissions,
+    };
 
     if (this.isEdit) {
       this.staffService.updateStaff(this.staffId, staffData).subscribe(() => {
