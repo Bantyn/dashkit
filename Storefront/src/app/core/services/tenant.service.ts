@@ -18,14 +18,13 @@ export class TenantService {
     "admin",
     "api",
     "auth",
-    "clothify",
     "app",
     "dashkit",
     "dashkiit",
     "dashkit-server",
     "dashkit-admin",
     "storefront",
-    "dashboard"
+    "dashboard",
   ];
 
   constructor(
