@@ -7,10 +7,12 @@ import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
 
+import { UiLogoComponent } from './components/ui-logo.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, FaqTabsComponent, BannerComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, FaqTabsComponent, BannerComponent, UiLogoComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

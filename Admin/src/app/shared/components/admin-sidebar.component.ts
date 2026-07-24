@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
+import { UiLogoComponent } from './ui-logo.component';
+
 @Component({
   selector: 'app-admin-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, UiLogoComponent],
   styles: [
     `
       .custom-scrollbar::-webkit-scrollbar {
@@ -24,14 +26,12 @@ import { AuthService } from '../../core/services/auth.service';
     <aside class="fixed left-0 top-0 h-screen w-64 bg-white flex flex-col z-50">
       <!-- Logo -->
       <div class="p-6 flex items-center gap-3">
-        <div
-          class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold"
-        >
-          C
+        <div class="w-10 h-10 bg-[var(--color-primary-600)] rounded-xl flex items-center justify-center text-white shadow-md shadow-primary-500/20">
+          <app-ui-logo size="24px" className="fill-current text-white"></app-ui-logo>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-gray-900">Clothify</h1>
-          <p class="text-xs text-gray-500">Admin Panel</p>
+          <h1 class="text-xl font-bold text-gray-900">DashKit</h1>
+          <p class="text-xs text-gray-500 font-medium">Admin Panel</p>
         </div>
       </div>
 

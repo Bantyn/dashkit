@@ -8,9 +8,11 @@ import { PermissionService } from '../../core/services/permission.service';
 import { BranchContextService } from '../../core/services/branch-context.service';
 import { BranchService, Branch } from '../../core/services/branch.service';
 
+import { UiLogoComponent } from './ui/ui-logo.component';
+
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, RouterModule, HasPermissionDirective],
+  imports: [CommonModule, RouterModule, HasPermissionDirective, UiLogoComponent],
   styles: [
     `
       .custom-scrollbar::-webkit-scrollbar {
@@ -23,8 +25,14 @@ import { BranchService, Branch } from '../../core/services/branch.service';
         display: none;
       }
       @keyframes slideDownFader {
-        0% { opacity: 0; transform: translateY(-15px); }
-        100% { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       .animate-menu-item {
         animation: slideDownFader 0.4s ease-out forwards;
@@ -35,16 +43,17 @@ import { BranchService, Branch } from '../../core/services/branch.service';
   template: `
     <aside class="fixed left-0 top-0 h-screen w-64 bg-white flex flex-col z-50">
       <!-- Logo -->
-      <div class="p-6  flex items-center gap-3">
-        <div
-          class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold"
-        >
-          C
+      <div class="p-6 flex items-center gap-3">
+
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-primary-600 shadow-md shadow-primary-500/20">
+          <app-ui-logo size="34px" className="text-current"></app-ui-logo>
         </div>
+        
         <div>
-          <h1 class="text-xl font-bold text-gray-900">Clothify</h1>
-          <p class="text-xs text-primary-500">Shop Management</p>
+          <h1 class="text-xl font-bold text-gray-900">DashKit</h1>
+          <p class="text-xs text-[var(--color-primary-500)] font-medium">Shop Management</p>
         </div>
+
       </div>
 
       <!-- Navigation -->

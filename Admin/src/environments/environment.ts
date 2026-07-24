@@ -3,22 +3,26 @@ function getApiUrl(): string {
   const customApi = (window as any)?.__env?.API_URL;
   if (customApi) return `${customApi}/admin`;
 
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:3003/api/v1/admin';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3003/api/v1/admin';
+    }
   }
-  return `http://${hostname}:3003/api/v1/admin`;
+  return 'https://dashkit-server.onrender.com/api/v1/admin';
 }
 
 function getPublicApiUrl(): string {
   const customApi = (window as any)?.__env?.API_URL;
   if (customApi) return customApi;
 
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:3003/api/v1';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3003/api/v1';
+    }
   }
-  return `http://${hostname}:3003/api/v1`;
+  return 'https://dashkit-server.onrender.com/api/v1';
 }
 
 export const environment = {
