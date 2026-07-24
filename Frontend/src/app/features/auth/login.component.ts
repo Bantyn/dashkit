@@ -115,7 +115,19 @@ import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-
                 placeholder="••••••••"
                 [error]="getError('password')"
               ></app-ui-input>
+
+              <!-- Warning Line: Attempt warning after 2 or more failed attempts -->
+              <div
+                *ngIf="failedAttempts >= 2 && remainingAttempts !== null && !isLocked && !isSuspended"
+                class="p-2 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-300 rounded-[var(--radius-md)] flex items-center gap-1.5"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Warning: Invalid password. {{ remainingAttempts }} attempts remaining before lockout / suspension.</span>
+              </div>
             </div>
+
 
             <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between mt-1">
@@ -237,6 +249,8 @@ export class LoginComponent {
   isSuspended = false;
   remainingSeconds = 0;
   timerInterval: any = null;
+  failedAttempts = 0;
+  remainingAttempts: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -314,6 +328,8 @@ export class LoginComponent {
 
     if (result.success) {
       // Router navigation handled in authService
+      this.failedAttempts = 0;
+      this.remainingAttempts = null;
     } else if (result.code === 'ACCOUNT_LOCKED') {
       this.startCountdown(result.remainingSeconds || 120);
       this.loading = false;
@@ -324,10 +340,19 @@ export class LoginComponent {
       this.inactiveShopId = result.shopId || null;
       this.loading = false;
     } else {
+      if (result.failedLoginAttempts !== undefined) {
+        this.failedAttempts = result.failedLoginAttempts;
+      } else {
+        this.failedAttempts++;
+      }
+      if (result.remainingAttempts !== undefined) {
+        this.remainingAttempts = result.remainingAttempts;
+      }
       this.errorMessage = result.error || 'Login failed. Please try again.';
       this.loading = false;
     }
   }
+
 
 
   async requestReactivation() {

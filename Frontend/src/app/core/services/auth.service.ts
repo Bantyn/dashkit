@@ -667,8 +667,11 @@ export class AuthService {
         return {
           success: false,
           error: body?.message || 'Invalid email or password.',
+          failedLoginAttempts: body?.failedLoginAttempts,
+          remainingAttempts: body?.remainingAttempts,
         };
       }
+
 
       // 2. Perform Firebase Auth Sign-in once server validates credentials
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);

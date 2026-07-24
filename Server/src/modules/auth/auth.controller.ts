@@ -518,15 +518,22 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       });
     }
 
-    // 1st failed attempt
+    // 1st failed attempt or non-lockout failed attempt
     await db.collection("users").doc(userId).update(updateData);
+
+    const maxAttempts = 6;
+    const remainingAttempts = Math.max(0, maxAttempts - currentAttempts);
 
     return res.status(401).json({
       success: false,
+      code: "INVALID_CREDENTIALS",
+      failedLoginAttempts: currentAttempts,
+      remainingAttempts,
       message: "Invalid email or password.",
     });
   }
 });
+
 
 
 export const resolveIdentifier = asyncHandler(async (req: Request, res: Response) => {
