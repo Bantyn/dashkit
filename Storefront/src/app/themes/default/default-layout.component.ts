@@ -1226,8 +1226,7 @@ export class DefaultThemeLayoutComponent implements OnInit, OnDestroy {
       if (hostname.includes('localhost')) {
         newOrigin = `${protocol}//${config.slug}.localhost:4200`;
       } else {
-        const baseDomain = 'clothify.app';
-        newOrigin = `${protocol}//${config.slug}.${baseDomain}`;
+        newOrigin = `${protocol}//${config.slug}.${hostname}`;
       }
       window.location.href = newOrigin;
     }
@@ -1239,7 +1238,12 @@ export class DefaultThemeLayoutComponent implements OnInit, OnDestroy {
       if (hostname.includes('localhost')) {
         newOrigin = `${protocol}//localhost:4200/shop/${config.slug}`;
       } else {
-        newOrigin = `${protocol}//clothify.app/shop/${config.slug}`;
+        const parts = hostname.split('.');
+        let baseHost = hostname;
+        if (parts.length > 2) {
+          baseHost = parts.slice(1).join('.');
+        }
+        newOrigin = `${protocol}//${baseHost}/shop/${config.slug}`;
       }
       window.location.href = newOrigin;
     }
