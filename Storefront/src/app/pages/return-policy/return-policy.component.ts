@@ -10,9 +10,9 @@ import { ShopContextService } from '../../core/services/shop-context.service';
 <div class="min-h-screen bg-white" *ngIf="shopConfig$ | async as config">
   <div class="max-w-3xl mx-auto px-6 py-16">
     <h1 class="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Return & Exchange Policy</h1>
-    <div *ngIf="config.pages?.returnPolicyContent" class="prose prose-sm max-w-none text-gray-600 leading-relaxed"
+    <div *ngIf="config.pages.returnPolicyContent" class="prose prose-sm max-w-none text-gray-600 leading-relaxed"
       [innerHTML]="config.pages.returnPolicyContent"></div>
-    <div *ngIf="!config.pages?.returnPolicyContent" class="space-y-6 text-gray-600 text-sm leading-relaxed">
+    <div *ngIf="!config.pages.returnPolicyContent" class="space-y-6 text-gray-600 text-sm leading-relaxed">
       <p>We want you to be completely satisfied with your purchase. If you're not happy, we offer a hassle-free return and exchange policy.</p>
       <h3 class="text-base font-bold text-gray-900">Return Window</h3>
       <p>Items can be returned or exchanged within <strong>7 days</strong> of delivery. Items must be unused, unwashed, and in their original packaging with all tags intact.</p>

@@ -10,9 +10,9 @@ import { ShopContextService } from '../../core/services/shop-context.service';
 <div class="min-h-screen bg-white" *ngIf="shopConfig$ | async as config">
   <div class="max-w-3xl mx-auto px-6 py-16">
     <h1 class="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Privacy Policy</h1>
-    <div *ngIf="config.pages?.privacyPolicyContent" class="prose prose-sm max-w-none text-gray-600 leading-relaxed"
+    <div *ngIf="config.pages.privacyPolicyContent" class="prose prose-sm max-w-none text-gray-600 leading-relaxed"
       [innerHTML]="config.pages.privacyPolicyContent"></div>
-    <div *ngIf="!config.pages?.privacyPolicyContent" class="space-y-6 text-gray-600 text-sm leading-relaxed">
+    <div *ngIf="!config.pages.privacyPolicyContent" class="space-y-6 text-gray-600 text-sm leading-relaxed">
       <p>Your privacy is important to us. This Privacy Policy explains how {{ config.displayName || config.shopName }} collects, uses, and protects your personal information.</p>
       <h3 class="text-base font-bold text-gray-900">Information We Collect</h3>
       <ul class="list-disc list-inside space-y-2">

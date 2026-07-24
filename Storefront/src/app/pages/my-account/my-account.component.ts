@@ -178,7 +178,7 @@ type AccountTab = 'orders' | 'wishlist' | 'addresses' | 'settings';
             <div class="space-y-3 text-sm">
               <div class="flex items-center justify-between py-2 border-b border-gray-100">
                 <span class="text-gray-500 text-xs">Name</span>
-                <span class="font-semibold text-gray-900">{{ user.name || user.displayName || '—' }}</span>
+                <span class="font-semibold text-gray-900">{{ user.name || user['displayName'] || '—' }}</span>
               </div>
               <div class="flex items-center justify-between py-2 border-b border-gray-100">
                 <span class="text-gray-500 text-xs">Email</span>

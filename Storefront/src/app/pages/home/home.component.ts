@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Product } from '../../core/models/product.model';
 import { map } from 'rxjs/operators';
-import { OptimizeImagePipe, PLACEHOLDER_IMAGE } from '../../shared/pipes/optimize-image.pipe';
+import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
 
 @Component({
@@ -199,7 +199,7 @@ export class WebsiteHomeComponent implements OnInit {
   seasonalCollections$: Observable<any[]> | null = null;
 
   /** Inline SVG placeholder — avoids 404s on subdomain tenants */
-  readonly placeholder = PLACEHOLDER_IMAGE;
+  readonly placeholder = 'assets/placeholder.jpg';
 
   constructor(
     private shopContext: ShopContextService,

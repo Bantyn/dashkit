@@ -73,7 +73,7 @@ export class AuthService {
     }
 
     // Firebase auth state listener
-    onAuthStateChanged(this.auth, async (user) => {
+    onAuthStateChanged(this.auth, async (user: any) => {
       if (user) {
         const profile = await this.getUserProfile(user.uid);
         this.updateProfile(profile);
@@ -178,7 +178,7 @@ export class AuthService {
 
   resetRecaptcha(verifier: RecaptchaVerifier | null) {
     try {
-      verifier?.render().then((widgetId) => {
+      verifier?.render().then((widgetId: any) => {
         if (typeof (window as any).grecaptcha !== 'undefined') {
           (window as any).grecaptcha.reset(widgetId);
         }

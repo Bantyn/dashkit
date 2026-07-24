@@ -10,9 +10,9 @@ import { ShopContextService } from '../../core/services/shop-context.service';
 <div class="min-h-screen bg-white" *ngIf="shopConfig$ | async as config">
   <div class="max-w-3xl mx-auto px-6 py-16">
     <h1 class="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Terms & Conditions</h1>
-    <div *ngIf="config.pages?.termsAndConditionsContent" class="prose prose-sm max-w-none text-gray-600 leading-relaxed"
+    <div *ngIf="config.pages.termsAndConditionsContent" class="prose prose-sm max-w-none text-gray-600 leading-relaxed"
       [innerHTML]="config.pages.termsAndConditionsContent"></div>
-    <div *ngIf="!config.pages?.termsAndConditionsContent" class="space-y-6 text-gray-600 text-sm leading-relaxed">
+    <div *ngIf="!config.pages.termsAndConditionsContent" class="space-y-6 text-gray-600 text-sm leading-relaxed">
       <p>By using this website and placing orders, you agree to the following terms and conditions. Please read them carefully.</p>
       <h3 class="text-base font-bold text-gray-900">1. Use of Website</h3>
       <p>You agree to use this website for lawful purposes only. You must not use it in any way that causes, or may cause, damage to the website or impairment of the availability or accessibility of the website.</p>

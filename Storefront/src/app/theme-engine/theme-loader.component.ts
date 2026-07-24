@@ -78,7 +78,7 @@ export class ThemeLoaderComponent implements OnInit, OnDestroy {
         case 'default':
         default:
           const defaultModule = await import('../themes/default/default-layout.component');
-          component = defaultModule.DefaultLayoutComponent;
+          component = defaultModule.DefaultThemeLayoutComponent;
           break;
       }
 
@@ -88,7 +88,7 @@ export class ThemeLoaderComponent implements OnInit, OnDestroy {
     } catch (err) {
       console.error('Failed to dynamically load active theme:', this.activeThemeId, err);
       const defaultModule = await import('../themes/default/default-layout.component');
-      this.currentComponentRef = this.themeContainer.createComponent(defaultModule.DefaultLayoutComponent);
+      this.currentComponentRef = this.themeContainer.createComponent(defaultModule.DefaultThemeLayoutComponent);
     }
   }
 

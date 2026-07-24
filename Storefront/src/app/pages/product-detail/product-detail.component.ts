@@ -8,7 +8,7 @@ import { ShopContextService } from '../../core/services/shop-context.service';
 import { Product, ProductVariant } from '../../core/models/product.model';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, tap, map, shareReplay, take } from 'rxjs/operators';
-import { PLACEHOLDER_IMAGE } from '../../shared/pipes/optimize-image.pipe';
+
 
 import { FormsModule } from '@angular/forms';
 import { UiLoadingComponent } from '../../shared/components/ui-loading.component';
@@ -173,7 +173,7 @@ export class WebsiteProductDetailComponent implements OnInit {
   getStackedImages(product: Product): string[] {
     const variant = this.selectedVariant$.value;
     const baseImages = variant?.images && variant.images.length > 0 ? variant.images : product.images || [];
-    return baseImages.length > 0 ? baseImages : [PLACEHOLDER_IMAGE];
+    return baseImages.length > 0 ? baseImages : ['assets/placeholder.jpg'];
   }
 
   isOutOfStock(product: Product): boolean {

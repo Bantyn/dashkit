@@ -4,7 +4,7 @@ import { WebsiteHomeComponent } from './pages/home/home.component';
 import { WebsiteProductsComponent } from './pages/products/products.component';
 import { WebsiteProductDetailComponent } from './pages/product-detail/product-detail.component';
 import { WebsiteCartComponent } from './pages/cart/cart.component';
-import { WebsiteCheckoutComponent } from './pages/checkout/checkout.component';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { WebsiteOffersComponent } from './pages/offers/offers.component';
 import { WebsiteOrderTrackingComponent } from './pages/order-tracking/order-tracking.component';
 
@@ -13,7 +13,7 @@ const childRoutes = [
   { path: 'products', component: WebsiteProductsComponent },
   { path: 'products/:id', component: WebsiteProductDetailComponent },
   { path: 'cart', component: WebsiteCartComponent },
-  { path: 'checkout', component: WebsiteCheckoutComponent },
+  { path: 'checkout', component: CheckoutComponent },
   { path: 'offers', component: WebsiteOffersComponent },
   { path: 'order-tracking/:id', component: WebsiteOrderTrackingComponent },
   { path: 'track/:id', component: WebsiteOrderTrackingComponent },
