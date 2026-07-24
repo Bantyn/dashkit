@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -10,6 +10,7 @@ import { UiInputComponent } from '../../shared/components/ui-input.component';
 import { UiButtonComponent } from '../../shared/components/ui-button.component';
 import { VerticalCutRevealComponent } from '../../shared/components/ui/vertical-cut-reveal.component';
 import { CheckboxComponent } from '../../shared/components/ui/checkbox.component';
+import { OtpModalComponent } from '../../shared/components/otp-modal.component';
 
 @Component({
   selector: 'app-register',
@@ -22,6 +23,7 @@ import { CheckboxComponent } from '../../shared/components/ui/checkbox.component
     UiButtonComponent,
     VerticalCutRevealComponent,
     CheckboxComponent,
+    OtpModalComponent,
   ],
   styles: [`
     .page-enter {
@@ -153,79 +155,39 @@ import { CheckboxComponent } from '../../shared/components/ui/checkbox.component
               <div class="w-1/3 flex flex-col gap-5 px-1 shrink-0">
                 <!-- Email & Verification Wrapper -->
                 <div class="space-y-2">
-                  <div class="flex items-end gap-2">
-                    <div class="flex-1">
-                      <app-ui-input
-                        label="Email"
+                  <label class="text-sm font-medium leading-none text-[var(--text-primary)]">
+                    Email
+                  </label>
+                  <div class="flex gap-2">
+                    <div class="relative flex-1">
+                      <input
                         type="email"
                         formControlName="email"
                         placeholder="you@example.com"
-                        [error]="getError('email')"
-                      ></app-ui-input>
+                        class="flex h-[44px] w-full rounded-[var(--radius-md)] border border-[var(--border-color)] bg-transparent px-3 py-2 text-sm placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium"
+                        [class.border-red-500]="getError('email')"
+                      />
                     </div>
-                    <div class="pb-1">
-                      <button
-                        *ngIf="!emailVerified"
-                        type="button"
-                        (click)="sendEmailOtp()"
-                        [disabled]="sendingOtp || emailInvalid || emailVerified"
-                        class="h-10 px-4 rounded-lg bg-[var(--color-primary-600)] hover:bg-[var(--color-primary-700)] text-white font-semibold text-xs transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center min-w-[100px]"
-                      >
-                        <span *ngIf="sendingOtp" class="animate-spin mr-1 h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"></span>
-                        {{ sendingOtp ? 'Sending...' : 'Verify Email' }}
-                      </button>
-                      <span
-                        *ngIf="emailVerified"
-                        class="h-10 px-4 rounded-lg bg-green-50 text-green-700 border border-green-200 font-semibold text-xs flex items-center justify-center gap-1 min-w-[100px]"
-                      >
-                        <i class="bi bi-patch-check-fill text-green-600"></i> Verified
-                      </span>
-                    </div>
+                    <button
+                      *ngIf="!emailVerified"
+                      type="button"
+                      (click)="sendEmailOtp()"
+                      [disabled]="sendingOtp || emailInvalid || emailVerified || verifyCooldown > 0"
+                      class="h-[44px] px-4 rounded-lg bg-[var(--color-primary-600)] hover:bg-[var(--color-primary-700)] text-white font-semibold text-xs transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center min-w-[120px]"
+                    >
+                      <span *ngIf="sendingOtp" class="animate-spin mr-1 h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"></span>
+                      {{ sendingOtp ? 'Sending...' : (verifyCooldown > 0 ? 'Wait ' + verifyCooldown + 's' : 'Verify Email') }}
+                    </button>
+                    <span
+                      *ngIf="emailVerified"
+                      class="h-[44px] px-4 rounded-lg bg-green-50 text-green-700 border border-green-200 font-semibold text-xs flex items-center justify-center gap-1 min-w-[100px]"
+                    >
+                      <i class="bi bi-patch-check-fill text-green-600"></i> Verified
+                    </span>
                   </div>
-
-                  <!-- OTP Input section -->
-                  <div *ngIf="otpSent && !emailVerified" class="p-4 bg-gray-50 border border-gray-100 rounded-xl space-y-3">
-                    <p class="text-xs text-gray-500">
-                      Verification code has been sent to your email.
-                    </p>
-                    <div class="flex items-end gap-2">
-                      <div class="flex-1">
-                        <app-ui-input
-                          label="Enter 6-Digit OTP"
-                          type="text"
-                          [(ngModel)]="otpCode"
-                          [ngModelOptions]="{standalone: true}"
-                          placeholder="e.g. 123456"
-                          maxlength="6"
-                        ></app-ui-input>
-                      </div>
-                      <div class="pb-1">
-                        <button
-                          type="button"
-                          (click)="verifyEmailOtp()"
-                          [disabled]="verifyingOtp || otpCode.length !== 6"
-                          class="h-10 px-4 rounded-lg bg-gray-900 hover:bg-black text-white font-semibold text-xs transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center min-w-[80px]"
-                        >
-                          <span *ngIf="verifyingOtp" class="animate-spin mr-1 h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"></span>
-                          Verify
-                        </button>
-                      </div>
-                    </div>
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="text-gray-400">
-                        Expires in: <strong class="text-gray-700 font-mono">{{ otpCountdown }}</strong>
-                      </span>
-                      <button
-                        *ngIf="otpCountdownExpired"
-                        type="button"
-                        (click)="sendEmailOtp()"
-                        [disabled]="sendingOtp"
-                        class="text-[var(--color-primary-600)] hover:underline font-semibold bg-transparent border-0 cursor-pointer"
-                      >
-                        Resend OTP
-                      </button>
-                    </div>
-                  </div>
+                  <p *ngIf="getError('email')" class="text-xs font-medium text-[var(--color-danger)]">
+                    {{ getError('email') }}
+                  </p>
                 </div>
 
                 <!-- Password -->
@@ -411,12 +373,19 @@ import { CheckboxComponent } from '../../shared/components/ui/checkbox.component
               Sign in
             </a>
           </p>
+          <!-- OTP Verification Modal -->
+          <app-otp-modal
+            [isOpen]="otpModalOpen"
+            [email]="registerForm.get('email')?.value"
+            (onVerified)="onEmailVerified()"
+            (onClose)="otpModalOpen = false"
+          ></app-otp-modal>
         </div>
       </div>
     </div>
   `,
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   registerForm: FormGroup;
   submitted = false;
   loading = false;
@@ -432,13 +401,10 @@ export class RegisterComponent implements OnInit {
   isGoogleAuth = false;
 
   sendingOtp = false;
-  verifyingOtp = false;
-  otpSent = false;
   emailVerified = false;
-  otpCode = '';
-  otpCountdown = '05:00';
-  otpCountdownExpired = false;
-  private countdownTimer: any;
+  otpModalOpen = false;
+  verifyCooldown = 0;
+  private cooldownTimer: any;
 
   get emailInvalid(): boolean {
     const control = this.registerForm.get('email');
@@ -473,13 +439,9 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.registerForm.get('email')?.valueChanges.subscribe(() => {
-      if (this.emailVerified || this.otpSent) {
+      if (this.emailVerified || this.otpModalOpen) {
         this.emailVerified = false;
-        this.otpSent = false;
-        this.otpCode = '';
-        if (this.countdownTimer) {
-          clearInterval(this.countdownTimer);
-        }
+        this.otpModalOpen = false;
         this.cdr.detectChanges();
       }
     });
@@ -575,10 +537,12 @@ export class RegisterComponent implements OnInit {
     this.authService.sendRegistrationEmailOtp(emailControl.value).then(
       (res: any) => {
         this.sendingOtp = false;
-        this.otpSent = true;
-        this.otpCode = '';
-        this.startOtpCountdown();
-        this.successMessage = res.message || 'Verification code has been sent to your email.';
+        this.otpModalOpen = true;
+        this.startVerifyCooldown();
+        if (res.data?.otp) {
+          console.log(`[Dev OTP] Verification code: ${res.data.otp}`);
+        }
+        this.successMessage = 'Verification code has been sent to your email.';
         this.cdr.detectChanges();
       },
       (err: any) => {
@@ -589,59 +553,25 @@ export class RegisterComponent implements OnInit {
     );
   }
 
-  verifyEmailOtp() {
-    const emailControl = this.registerForm.get('email');
-    if (!emailControl || !this.otpCode || this.otpCode.length !== 6) return;
-
-    this.verifyingOtp = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.authService.verifyRegistrationEmailOtp(emailControl.value, this.otpCode).then(
-      (res: any) => {
-        this.verifyingOtp = false;
-        this.emailVerified = true;
-        this.otpSent = false;
-        if (this.countdownTimer) {
-          clearInterval(this.countdownTimer);
-        }
-        this.successMessage = res.message || 'Email verified successfully!';
-        this.cdr.detectChanges();
-      },
-      (err: any) => {
-        this.verifyingOtp = false;
-        this.errorMessage = err.message || 'Incorrect verification code. Please try again.';
-        this.cdr.detectChanges();
-      }
-    );
-  }
-
-  startOtpCountdown() {
-    if (this.countdownTimer) {
-      clearInterval(this.countdownTimer);
+  startVerifyCooldown() {
+    this.verifyCooldown = 30;
+    if (this.cooldownTimer) {
+      clearInterval(this.cooldownTimer);
     }
-    this.otpCountdownExpired = false;
-    let totalSeconds = 300; // 5 minutes
-    
-    const updateDisplay = () => {
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      this.otpCountdown = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    updateDisplay();
-
-    this.countdownTimer = setInterval(() => {
-      totalSeconds--;
-      if (totalSeconds <= 0) {
-        clearInterval(this.countdownTimer);
-        this.otpCountdown = '00:00';
-        this.otpCountdownExpired = true;
-      } else {
-        updateDisplay();
+    this.cooldownTimer = setInterval(() => {
+      this.verifyCooldown--;
+      if (this.verifyCooldown <= 0) {
+        clearInterval(this.cooldownTimer);
       }
       this.cdr.detectChanges();
     }, 1000);
+  }
+
+  onEmailVerified() {
+    this.emailVerified = true;
+    this.otpModalOpen = false;
+    this.successMessage = 'Email verified successfully!';
+    this.cdr.detectChanges();
   }
 
   prevStep() {
@@ -769,5 +699,11 @@ export class RegisterComponent implements OnInit {
     
     this.loading = false;
     this.cdr.detectChanges(); // Ensure Angular updates the view after async Firebase call
+  }
+
+  ngOnDestroy() {
+    if (this.cooldownTimer) {
+      clearInterval(this.cooldownTimer);
+    }
   }
 }

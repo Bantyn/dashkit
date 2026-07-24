@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -454,10 +455,26 @@ export class LiveMonitoringComponent implements OnInit, OnDestroy {
   }
 
   connectWebSocket() {
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = window.location.hostname;
-    const wsPort = '3003';
-    const wsUrl = `${wsProtocol}//${wsHost}:${wsPort}/live-monitoring`;
+    const apiBaseUrl = environment.publicApiUrl || '';
+    let wsUrl: string;
+
+    if (apiBaseUrl.startsWith('http')) {
+      const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss:' : 'ws:';
+      try {
+        const url = new URL(apiBaseUrl);
+        wsUrl = `${wsProtocol}//${url.host}/live-monitoring`;
+      } catch (e) {
+        // Fallback in case of parsing error
+        const wsHost = window.location.hostname;
+        const wsPort = '3003';
+        wsUrl = `${wsProtocol}//${wsHost}:${wsPort}/live-monitoring`;
+      }
+    } else {
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsHost = window.location.hostname;
+      const wsPort = '3003';
+      wsUrl = `${wsProtocol}//${wsHost}:${wsPort}/live-monitoring`;
+    }
 
     console.log(`Connecting Live Monitoring WS: ${wsUrl}`);
     this.socket = new WebSocket(wsUrl);

@@ -159,6 +159,7 @@ export const sendEmailVerificationOtp = asyncHandler(async (req: Request, res: R
   const otpDoc = await otpDocRef.get();
   
   let resends = 0;
+  const isDev = process.env.NODE_ENV !== "production";
   if (otpDoc.exists) {
     const data = otpDoc.data()!;
     const lastSent = data.updatedAt?.toDate?.() || new Date(data.updatedAt || 0);
@@ -194,15 +195,17 @@ export const sendEmailVerificationOtp = asyncHandler(async (req: Request, res: R
 
   await sendOtpMail(normalizedEmail, otp);
 
-  const isDev = process.env.NODE_ENV !== "production";
+  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || "";
+  const exposeOtp = isDev && !smtpUser;
+
   return sendSuccess(
     res,
     {
       email: normalizedEmail,
       expiresIn: EMAIL_OTP_EXPIRY_MS / 1000,
-      ...(isDev && { otp }),
+      ...(exposeOtp && { otp }),
     },
-    isDev ? `OTP generated (dev mode): ${otp}` : "Verification code has been sent to your email."
+    exposeOtp ? `OTP generated (dev mode): ${otp}` : "Verification code has been sent to your email."
   );
 });
 
