@@ -67,8 +67,15 @@ export class TenantService {
       subdomain = hostname;
     }
 
-    if (subdomain && !this.RESERVED_SUBDOMAINS.includes(subdomain.toLowerCase())) {
-      return subdomain.toLowerCase();
+    if (subdomain) {
+      const subLower = subdomain.toLowerCase();
+      const isReserved = this.RESERVED_SUBDOMAINS.includes(subLower) || 
+                         subLower.includes('dashkit') || 
+                         subLower.includes('storefront') || 
+                         subLower.includes('dashboard');
+      if (!isReserved) {
+        return subLower;
+      }
     }
 
     return null;
