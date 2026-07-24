@@ -102,6 +102,10 @@ export class ShopContextService {
     return plan === 'pro' || plan === 'custom';
   }
 
+  getShop(): ShopConfig | null {
+    return this.shopConfigSubject.value;
+  }
+
   getShopSync(): ShopConfig | null {
     return this.shopConfigSubject.value;
   }
@@ -135,7 +139,7 @@ export class ShopContextService {
     }
 
     const request$ = this.http
-      .get<{ data: ShopConfig }>(`${environment.apiUrl}/website/config`, {
+      .get<{ data: ShopConfig }>(`${environment.publicApiUrl}/website/config`, {
         params: { subdomain: currentSlug },
       })
       .pipe(

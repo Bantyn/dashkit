@@ -29,29 +29,36 @@ echo  [*] Starting Dashkit Microservices...
 echo.
 
 REM --- Start Backend ---
-echo     [1/5] Backend API            (Port 3003)
+echo     [1/6] Backend API            (Port 3003)
 start "Dashkit - Backend API" cmd /k "cd /d %~dp0Server && npm run dev"
 timeout /t 2 /nobreak >nul
 
 REM --- Start Shop Dashboard ---
-echo     [2/5] Shop Dashboard        (Port 4200)
+echo     [2/6] Shop Dashboard        (Port 4200)
 start "Dashkit - Shop Dashboard" cmd /k "cd /d %~dp0Frontend && ng serve --host 0.0.0.0 --port 4200"
 timeout /t 2 /nobreak >nul
 
 REM --- Start Admin Dashboard ---
-echo     [3/5] Admin Dashboard       (Port 4201)
+echo     [3/6] Admin Dashboard       (Port 4201)
 start "Dashkit - Admin Dashboard" cmd /k "cd /d %~dp0Admin && ng serve --host 0.0.0.0 --port 4201"
 timeout /t 2 /nobreak >nul
 
 REM --- Start Showcase ---
-echo     [4/5] Showcase / Storefront  (Port 4202)
+echo     [4/6] Showcase   (Port 4202)
 start "Dashkit - Showcase" cmd /k "cd /d %~dp0Showcase && ng serve --host 0.0.0.0 --port 4202"
 timeout /t 2 /nobreak >nul
 
 REM --- Start Android Expo ---
-echo     [5/5] Android Expo Server    (Port 8081)
+echo     [5/6] Android Expo Server    (Port 8081)
 start "Dashkit - Android App" cmd /k "cd /d %~dp0App && npx expo start"
 timeout /t 2 /nobreak >nul
+
+REM --- Start Android Expo ---
+echo     [6/6] Android Expo Server    (Port 4203)
+start "Dashkit - Storefront" cmd /k "cd /d %~dp0Storefront && ng serve --host 0.0.0.0 --port 4202"
+timeout /t 2 /nobreak >nul
+
+
 
 cls
 echo.

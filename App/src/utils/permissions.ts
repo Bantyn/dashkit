@@ -1,9 +1,17 @@
 import { User, TabKey } from "../types";
 
 export const hasPermission = (user: User | null, permissionPath: string): boolean => {
-  if (!user || !user.permissions) return false;
+  if (!user) return false;
+
+  const roleLower = (user.role || "").toLowerCase().trim();
+
+  // Shop Owner and Platform Admin have 100% full permissions across all modules
+  if (roleLower.includes("owner") || roleLower.includes("admin")) {
+    return true;
+  }
 
   const permissions = user.permissions;
+  if (!permissions) return false;
 
   // Handle Array-based permissions (Calculated Effective Permissions Engine)
   if (Array.isArray(permissions)) {
@@ -19,7 +27,32 @@ export const hasPermission = (user: User | null, permissionPath: string): boolea
       return true;
     }
 
-    // Map common aliases (e.g. invoices.view -> sales.view or invoices.view)
+    // Map common aliases (e.g. analytics.view, returns.view, delivery.view)
+    if (permissionPath === "delivery.view" && (
+      permissions.includes("delivery.*") ||
+      roleLower.includes("delivery")
+    )) {
+      return true;
+    }
+
+    if (permissionPath === "analytics.view" && (
+      permissions.includes("reports.view") || 
+      permissions.includes("reports.*") || 
+      permissions.includes("sales.view") || 
+      permissions.includes("sales.*")
+    )) {
+      return true;
+    }
+
+    if (permissionPath.startsWith("returns.") && (
+      permissions.includes("sales.view") || 
+      permissions.includes("sales.*") || 
+      permissions.includes("invoices.view") || 
+      permissions.includes("invoices.*")
+    )) {
+      return true;
+    }
+
     if (category === "invoices" && (permissions.includes("sales.view") || permissions.includes("sales.*"))) {
       return true;
     }
@@ -40,8 +73,11 @@ export const hasPermission = (user: User | null, permissionPath: string): boolea
 };
 
 export const getAvailableTabs = (user: User): { key: TabKey; label: string }[] => {
+  const isDeliveryStaff = (user.role || "").toLowerCase().includes("delivery");
+
   const allTabs: { key: TabKey; label: string; permission?: string }[] = [
     { key: "dashboard", label: "Home" },
+    { key: "delivery", label: "Route", permission: "delivery.view" },
     { key: "pos", label: "POS", permission: "invoices.view" },
     { key: "orders", label: "Orders", permission: "invoices.view" },
     { key: "products", label: "Products", permission: "products.view" },
@@ -51,7 +87,10 @@ export const getAvailableTabs = (user: User): { key: TabKey; label: string }[] =
   ];
 
   return allTabs.filter((tab) => {
-    // Role-based layout optimization: hide extra tabs for manager templates
+    if (isDeliveryStaff && (tab.key === "pos" || tab.key === "staff" || tab.key === "products")) {
+      return false;
+    }
+
     if ((user.role === "Manager" || user.role === "Store Manager") && (tab.key === "staff" || tab.key === "products")) {
       return false;
     }

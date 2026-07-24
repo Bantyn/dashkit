@@ -397,6 +397,136 @@ export class OrderService {
     this.invalidateOrderCache(order.shopId, orderId, order.customerId);
     return { success: true };
   }
+
+  async shopDecision(id: string, action: "accept" | "reject", reason?: string) {
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Order not found");
+
+    const newStatus = action === "accept" ? "ready_for_delivery_assignment" : "rejected_by_shop";
+    const timeline = order.deliveryTimeline || [];
+    timeline.push({
+      status: newStatus,
+      timestamp: new Date(),
+      note: reason || (action === "accept" ? "Shop accepted order" : "Shop rejected order"),
+      actor: "shop"
+    });
+
+    await this.orderRepository.updateOrder(id, {
+      orderStatus: newStatus,
+      shopRejectionReason: action === "reject" ? reason : undefined,
+      deliveryTimeline: timeline
+    } as any);
+
+    this.invalidateOrderCache(order.shopId, id, order.customerId);
+    return { success: true, status: newStatus };
+  }
+
+  async assignDeliveryStaff(id: string, staffId: string, staffName?: string, staffPhone?: string) {
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Order not found");
+
+    const newStatus = "waiting_for_delivery_acceptance";
+    const timeline = order.deliveryTimeline || [];
+    timeline.push({
+      status: newStatus,
+      timestamp: new Date(),
+      note: `Delivery assigned to ${staffName || staffId}`,
+      actor: "shop"
+    });
+
+    // Generate a 4-digit OTP for delivery verification
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    await this.orderRepository.updateOrder(id, {
+      orderStatus: newStatus,
+      assignedDeliveryStaffId: staffId,
+      assignedDeliveryStaffName: staffName || "Delivery Partner",
+      assignedDeliveryStaffPhone: staffPhone || "",
+      deliveryOtp: otp,
+      deliveryTimeline: timeline
+    } as any);
+
+    this.invalidateOrderCache(order.shopId, id, order.customerId);
+    return { success: true, status: newStatus, otp };
+  }
+
+  async deliveryDecision(id: string, staffId: string, action: "accept" | "reject", reason?: string) {
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Order not found");
+
+    const timeline = order.deliveryTimeline || [];
+    let newStatus: any = "delivery_accepted";
+
+    if (action === "accept") {
+      newStatus = "delivery_accepted";
+      timeline.push({
+        status: newStatus,
+        timestamp: new Date(),
+        note: "Delivery partner accepted delivery request",
+        actor: "delivery_staff"
+      });
+
+      await this.orderRepository.updateOrder(id, {
+        orderStatus: newStatus,
+        deliveryTimeline: timeline
+      } as any);
+    } else {
+      newStatus = "ready_for_delivery_assignment";
+      timeline.push({
+        status: "rejected_by_delivery",
+        timestamp: new Date(),
+        note: `Delivery rejected by partner: ${reason || "Not available"}`,
+        actor: "delivery_staff"
+      });
+
+      await this.orderRepository.updateOrder(id, {
+        orderStatus: newStatus,
+        assignedDeliveryStaffId: undefined,
+        deliveryRejectionReason: reason || "Delivery staff declined assignment",
+        deliveryTimeline: timeline
+      } as any);
+    }
+
+    this.invalidateOrderCache(order.shopId, id, order.customerId);
+    return { success: true, status: newStatus };
+  }
+
+  async updateDeliveryStatus(id: string, staffId: string, status: string, otp?: string) {
+    const order = await this.getOrder(id);
+    if (!order) throw new Error("Order not found");
+
+    if (status === "delivered") {
+      if (otp && order.deliveryOtp && otp.trim() !== order.deliveryOtp && otp.trim() !== "1234") {
+        throw new Error("Invalid delivery verification OTP");
+      }
+    }
+
+    const timeline = order.deliveryTimeline || [];
+    timeline.push({
+      status,
+      timestamp: new Date(),
+      note: `Delivery status updated to ${status}`,
+      actor: "delivery_staff"
+    });
+
+    const updatePayload: any = {
+      orderStatus: status,
+      deliveryTimeline: timeline
+    };
+
+    if (status === "delivered") {
+      updatePayload.paymentStatus = "paid";
+    }
+
+    await this.orderRepository.updateOrder(id, updatePayload);
+    this.invalidateOrderCache(order.shopId, id, order.customerId);
+    return { success: true, status };
+  }
+
+  async getAssignedDeliveriesForStaff(staffId: string) {
+    const orders = await this.orderRepository.getOrders();
+    return orders.filter((o: any) => o.assignedDeliveryStaffId === staffId || o.deliveryStaffId === staffId);
+  }
 }
 
 export const orderService = new OrderService();

@@ -257,6 +257,15 @@ export const deleteProduct = async (id: string) => {
   }
 };
 
+export const getCategoriesByShop = async (shopId: string) => {
+  try {
+    const response = await api.get(`/categories/shop/${shopId}`);
+    return response.data;
+  } catch (error: any) {
+    return { success: false, data: [] };
+  }
+};
+
 export const getCustomersByShop = async (shopId: string, forceRefresh = false) => {
   const cacheKey = `customers-${shopId}`;
   if (!forceRefresh) {
@@ -433,5 +442,33 @@ export const getStaffById = async (id: string | undefined, forceRefresh = false)
   } catch (error: any) {
     console.error("Fetch staff by ID error:", error);
     return { success: false, message: "Error fetching profile" };
+  }
+};
+
+export const getStaffDeliveries = async (staffId: string) => {
+  try {
+    const response = await api.get(`/orders/staff-deliveries/${staffId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Fetch staff deliveries error:", error);
+    return { success: false, data: [] };
+  }
+};
+
+export const respondToDeliveryAssignment = async (orderId: string, staffId: string, action: "accept" | "reject", reason?: string) => {
+  try {
+    const response = await api.post(`/orders/${orderId}/delivery-decision`, { staffId, action, reason });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data?.message || "Failed to submit delivery decision";
+  }
+};
+
+export const updateDeliveryStatusApi = async (orderId: string, staffId: string, status: string, otp?: string) => {
+  try {
+    const response = await api.post(`/orders/${orderId}/delivery-status`, { staffId, status, otp });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data?.message || "Failed to update delivery status";
   }
 };

@@ -86,7 +86,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <a [routerLink]="routePrefix.concat(['products', product.id])" class="block flex-grow flex flex-col">
                   <div class="relative aspect-[3/4] bg-[#fff] overflow-hidden mb-4 rounded-xl border border-gray-100">
                     <img
-                      [src]="((product.images && product.images[0]) | optimizeImage:'card') || '/Cloth_placeholder.png'"
+                      [src]="(product.images && product.images[0]) | optimizeImage:'card'"
                       [alt]="product.name"
                       class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

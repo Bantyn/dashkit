@@ -128,3 +128,37 @@ export const sendOrderWhatsApp = asyncHandler(async (req: any, res: Response) =>
     return sendError(res, err.message || "Failed to send WhatsApp", 400);
   }
 });
+
+export const shopDecision = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { action, reason } = req.body; // action: 'accept' | 'reject'
+  const result = await orderService.shopDecision(String(id), action, reason);
+  return sendSuccess(res, result, `Order ${action}ed by shop`);
+});
+
+export const assignDeliveryStaff = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { staffId, staffName, staffPhone } = req.body;
+  const result = await orderService.assignDeliveryStaff(String(id), staffId, staffName, staffPhone);
+  return sendSuccess(res, result, "Delivery staff assigned successfully");
+});
+
+export const deliveryDecision = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { staffId, action, reason } = req.body;
+  const result = await orderService.deliveryDecision(String(id), staffId, action, reason);
+  return sendSuccess(res, result, `Delivery ${action}ed by staff`);
+});
+
+export const updateDeliveryStatus = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { staffId, status, otp } = req.body;
+  const result = await orderService.updateDeliveryStatus(String(id), staffId, status, otp);
+  return sendSuccess(res, result, "Delivery status updated");
+});
+
+export const getStaffDeliveries = asyncHandler(async (req: Request, res: Response) => {
+  const { staffId } = req.params;
+  const orders = await orderService.getAssignedDeliveriesForStaff(String(staffId));
+  return sendSuccess(res, orders, "Staff deliveries fetched");
+});

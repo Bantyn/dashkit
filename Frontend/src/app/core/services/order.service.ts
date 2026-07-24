@@ -78,4 +78,14 @@ export class OrderService {
     this.requestCache.clear();
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/verify-payment`, paymentDetails);
   }
+
+  shopDecision(id: string, action: 'accept' | 'reject', reason?: string): Observable<ApiResponse<any>> {
+    this.requestCache.clear();
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/shop-decision`, { action, reason });
+  }
+
+  assignDeliveryStaff(id: string, staffId: string, staffName?: string, staffPhone?: string): Observable<ApiResponse<any>> {
+    this.requestCache.clear();
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/assign-delivery`, { staffId, staffName, staffPhone });
+  }
 }

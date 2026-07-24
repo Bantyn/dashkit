@@ -16,6 +16,8 @@ import { forkJoin, map } from 'rxjs';
 import { UiLoadingComponent } from '../../shared/components/ui-loading.component';
 import { UiDropdownComponent } from '../../shared/components/ui-dropdown.component';
 
+import { StaffService, Staff } from '../../core/services/staff.service';
+
 @Component({
   selector: 'app-order-list',
   standalone: true,
@@ -244,6 +246,40 @@ import { UiDropdownComponent } from '../../shared/components/ui-dropdown.compone
                </div>
             </div>
 
+            <!-- Shop Delivery Decision Actions -->
+            <div class="mb-6 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100" *ngIf="!selectedOrder.isInvoice">
+              <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-3">Delivery Workflow Action</h4>
+              
+              <div class="flex gap-2 mb-3">
+                <button
+                  (click)="openShopAcceptModal(selectedOrder)"
+                  [disabled]="selectedOrder.orderStatus !== 'pending_shop_confirmation' && selectedOrder.orderStatus !== 'pending'"
+                  class="flex-1 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 transition disabled:opacity-40"
+                >
+                  <i class="bi bi-check-circle mr-1"></i> Accept Order
+                </button>
+                <button
+                  (click)="openShopRejectModal(selectedOrder)"
+                  [disabled]="selectedOrder.orderStatus !== 'pending_shop_confirmation' && selectedOrder.orderStatus !== 'pending'"
+                  class="flex-1 py-2 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition disabled:opacity-40"
+                >
+                  <i class="bi bi-x-circle mr-1"></i> Reject Order
+                </button>
+              </div>
+
+              <button
+                (click)="openAssignDeliveryModal(selectedOrder)"
+                [disabled]="selectedOrder.orderStatus !== 'ready_for_delivery_assignment' && selectedOrder.orderStatus !== 'rejected_by_delivery'"
+                class="w-full py-2.5 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition disabled:opacity-40 shadow-sm"
+              >
+                <i class="bi bi-person-badge mr-1"></i> Assign Delivery Partner
+              </button>
+              
+              <div *ngIf="selectedOrder.assignedDeliveryStaffName" class="mt-3 p-2 bg-white rounded-lg border border-indigo-100 text-xs text-indigo-800">
+                <i class="bi bi-truck mr-1 text-blue-600"></i> Assigned to: <strong>{{ selectedOrder.assignedDeliveryStaffName }}</strong>
+              </div>
+            </div>
+
             <!-- Items Ordered -->
             <div class="mb-8">
               <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Items Ordered</h4>
@@ -306,7 +342,7 @@ import { UiDropdownComponent } from '../../shared/components/ui-dropdown.compone
                </div>
                
                <div class="mt-8 pt-8 border-t border-gray-100" *ngIf="!selectedOrder.isInvoice">
-              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Manage Order</h4>
+              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Manage Order Status</h4>
               <div class="grid grid-cols-2 gap-2">
                 @for (status of orderStatuses; track status) {
                    <button
@@ -314,22 +350,6 @@ import { UiDropdownComponent } from '../../shared/components/ui-dropdown.compone
                       [disabled]="selectedOrder.orderStatus === status"
                       class="flex items-center justify-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wide rounded-lg border transition-all disabled:opacity-50"
                       [ngClass]="status === selectedOrder.orderStatus ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:text-blue-600'"
-                   >
-                      {{ status }}
-                   </button>
-                }
-              </div>
-            </div>
-
-            <div class="mt-6 pt-6 border-t border-gray-100" *ngIf="!selectedOrder.isInvoice">
-              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Manage Payment</h4>
-              <div class="grid grid-cols-2 gap-2">
-                @for (status of ['pending', 'paid', 'failed', 'refunded']; track status) {
-                   <button
-                      (click)="updatePaymentStatus(status)"
-                      [disabled]="selectedOrder.paymentStatus === status"
-                      class="flex items-center justify-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wide rounded-lg border transition-all disabled:opacity-50"
-                      [ngClass]="status === selectedOrder.paymentStatus ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:text-blue-600'"
                    >
                       {{ status }}
                    </button>
@@ -345,15 +365,11 @@ import { UiDropdownComponent } from '../../shared/components/ui-dropdown.compone
           *ngIf="!selectedOrder"
           class="hidden md:flex flex-col items-center justify-center w-[30%] min-w-[350px] bg-white border-l border-gray-200 text-center p-8 h-full"
         >
-          <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-400">
-             <i class="bi bi-bag text-2xl"></i>
-          </div>
-          <h3 class="text-gray-900 font-medium mb-1">No order selected</h3>
-          <p class="text-gray-500 text-sm">Select an order from the list to view details.</p>
+          <h3 class="text-sm font-semibold text-gray-900 mb-1">No order selected</h3>
+          <p class="text-xs text-gray-500">Select an order from the list to view its complete details</p>
         </div>
       </div>
     </div>
-
 
     <style>
       .custom-scrollbar::-webkit-scrollbar {
@@ -390,10 +406,18 @@ export class OrderListComponent implements OnInit {
   ];
   selectedTimeFilter = '30';
 
+  rejectReason = '';
+  showRejectModal = false;
+  showAssignModal = false;
+  loadingStaff = false;
+  selectedStaffForAssign: any = null;
+  deliveryStaffList: any[] = [];
+
   constructor(
     private orderService: OrderService,
     private invoiceService: InvoiceService,
     private authService: AuthService,
+    private staffService: StaffService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private printService: PrintService,
@@ -496,6 +520,84 @@ export class OrderListComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Failed to update status:', err),
+    });
+  }
+
+  openShopAcceptModal(order: any) {
+    if (!order) return;
+    this.orderService.shopDecision(order.id, 'accept').subscribe({
+      next: () => {
+        order.orderStatus = 'ready_for_delivery_assignment';
+        this.toastService.showSuccess('Order accepted! Ready for delivery assignment.');
+        this.cdr.detectChanges();
+      },
+      error: (err) => this.toastService.showError('Failed to accept order')
+    });
+  }
+
+  openShopRejectModal(order: any) {
+    this.selectedOrder = order;
+    this.rejectReason = '';
+    this.showRejectModal = true;
+  }
+
+  confirmShopReject() {
+    if (!this.selectedOrder || !this.rejectReason.trim()) return;
+    this.orderService.shopDecision(this.selectedOrder.id, 'reject', this.rejectReason).subscribe({
+      next: () => {
+        this.selectedOrder.orderStatus = 'rejected_by_shop';
+        this.showRejectModal = false;
+        this.toastService.showSuccess('Order rejected.');
+        this.cdr.detectChanges();
+      },
+      error: (err) => this.toastService.showError('Failed to reject order')
+    });
+  }
+
+  openAssignDeliveryModal(order: any) {
+    this.selectedOrder = order;
+    this.showAssignModal = true;
+    this.loadingStaff = true;
+    this.selectedStaffForAssign = null;
+    if (!this.shopId) return;
+
+    this.staffService.getStaff(this.shopId).subscribe({
+      next: (res) => {
+        const staff = res.data || [];
+        // Filter for active delivery staff members or any active staff
+        this.deliveryStaffList = staff.filter(s => 
+          s.status === 'Active' && 
+          (s.role.toLowerCase().includes('delivery') || s.role.toLowerCase().includes('staff') || s.role.toLowerCase().includes('manager'))
+        );
+        if (this.deliveryStaffList.length === 0) {
+          this.deliveryStaffList = staff; // Fallback
+        }
+        this.loadingStaff = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingStaff = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  confirmAssignDelivery() {
+    if (!this.selectedOrder || !this.selectedStaffForAssign) return;
+    this.orderService.assignDeliveryStaff(
+      this.selectedOrder.id,
+      this.selectedStaffForAssign.id,
+      this.selectedStaffForAssign.fullName,
+      this.selectedStaffForAssign.phoneNumber
+    ).subscribe({
+      next: () => {
+        this.selectedOrder.orderStatus = 'waiting_for_delivery_acceptance';
+        this.selectedOrder.assignedDeliveryStaffName = this.selectedStaffForAssign?.fullName;
+        this.showAssignModal = false;
+        this.toastService.showSuccess(`Delivery assigned to ${this.selectedStaffForAssign?.fullName}!`);
+        this.cdr.detectChanges();
+      },
+      error: (err) => this.toastService.showError('Failed to assign delivery partner')
     });
   }
 

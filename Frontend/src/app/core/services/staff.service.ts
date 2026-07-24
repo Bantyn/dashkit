@@ -10,7 +10,8 @@ export interface Staff {
   phoneNumber: string;
   email: string;
   password?: string;
-  role: 'Manager' | 'Cashier' | 'Sales Staff' | 'Inventory Staff' | 'Other';
+  role: string;
+  roleId?: string;
   branch: string;
   commissionType: 'None' | 'Percentage' | 'Fixed';
   commissionRate: number;
@@ -23,16 +24,18 @@ export interface Staff {
   efficiency?: number;
   rank?: number;
   permissions?: StaffPermissions;
+  additionalPermissions?: string[];
+  restrictedPermissions?: string[];
 }
 
 export interface StaffPermissions {
-  invoices: PermissionSet;
-  products: PermissionSet;
-  inventory: PermissionSet;
-  customers: PermissionSet;
-  staff: PermissionSet;
-  analytics: { view: boolean };
-  settings: { view: boolean; edit: boolean };
+  invoices?: PermissionSet;
+  products?: PermissionSet;
+  inventory?: PermissionSet;
+  customers?: PermissionSet;
+  staff?: PermissionSet;
+  analytics?: { view: boolean };
+  settings?: { view: boolean; edit: boolean };
 }
 
 export interface PermissionSet {

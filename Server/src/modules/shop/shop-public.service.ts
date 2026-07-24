@@ -22,7 +22,7 @@ export class ShopPublicService {
       slug: shop.subdomain,
       subdomain: shop.subdomain,
       subscriptionPlan: shop.subscriptionPlan,
-      websiteEnabled: shop.websiteEnabled,
+      websiteEnabled: shop.websiteEnabled !== false,
       paymentModes: shop.paymentModes,
       orderAcceptance: shop.orderAcceptance,
       bankDetails: shop.bankDetails,
@@ -56,15 +56,16 @@ export class ShopPublicService {
 
     let query = db
       .collection("products")
-      .where("shopId", "==", shop.id)
-      .where("isActive", "==", true);
+      .where("shopId", "==", shop.id);
 
     if (filters.category) {
       query = query.where("category", "==", filters.category);
     }
 
     const snapshot = await query.get();
-    let products = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
+    let products = snapshot.docs
+      .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }))
+      .filter((p: any) => p.isActive !== false);
 
     if (filters.minPrice || filters.maxPrice || filters.search || filters.collection) {
       products = products.filter((product: any) => {
@@ -190,15 +191,14 @@ export class ShopPublicService {
     const snapshot = await db
       .collection("products")
       .where("shopId", "==", shop.id)
-      .where("isActive", "==", true)
-      .select("category")
       .get();
 
     const categories = Array.from(
       new Set(
         snapshot.docs
-          .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => doc.get("category"))
-          .filter((category: unknown): category is string => typeof category === "string" && category.trim().length > 0),
+          .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => doc.data())
+          .filter((docData: any) => docData.isActive !== false && typeof docData.category === "string" && docData.category.trim().length > 0)
+          .map((docData: any) => docData.category),
       ),
     );
 
@@ -214,22 +214,19 @@ export class ShopPublicService {
 
     let query = db
       .collection("products")
-      .where("shopId", "==", shop.id)
-      .where("isActive", "==", true);
+      .where("shopId", "==", shop.id);
 
     if (category) {
       query = query.where("category", "==", category);
     }
 
-    const snapshot = await query.select("subcategory").get();
+    const snapshot = await query.get();
     const subcategories = Array.from(
       new Set(
         snapshot.docs
-          .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => doc.get("subcategory"))
-          .filter(
-            (subcategory: unknown): subcategory is string =>
-              typeof subcategory === "string" && subcategory.trim().length > 0,
-          ),
+          .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => doc.data())
+          .filter((docData: any) => docData.isActive !== false && typeof docData.subcategory === "string" && docData.subcategory.trim().length > 0)
+          .map((docData: any) => docData.subcategory),
       ),
     );
 

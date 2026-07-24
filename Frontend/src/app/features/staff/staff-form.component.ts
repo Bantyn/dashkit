@@ -7,7 +7,6 @@ import { StaffService } from '../../core/services/staff.service';
 import { UiInputComponent } from '../../shared/components/ui-input.component';
 import { UiDropdownComponent } from '../../shared/components/ui-dropdown.component';
 import { UiDatePickerComponent } from '../../shared/components/ui-date-picker.component';
-import { CheckboxComponent } from '../../shared/components/ui/checkbox.component';
 
 export interface PermissionCategory {
   key: string;
@@ -15,10 +14,28 @@ export interface PermissionCategory {
   actions: string[];
 }
 
+const ROLE_RECOMMENDED_PERMISSIONS: Record<string, string[]> = {
+  owner: ['sales.view', 'sales.create', 'sales.edit', 'sales.delete', 'sales.print', 'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.delete', 'inventory.manage', 'products.view', 'products.create', 'products.edit', 'products.delete', 'products.export', 'customers.view', 'customers.create', 'customers.edit', 'customers.delete', 'purchases.view', 'purchases.create', 'purchases.edit', 'purchases.delete', 'purchases.approve', 'accounting.view', 'accounting.create', 'accounting.edit', 'accounting.delete', 'accounting.export', 'reports.view', 'reports.export', 'website.view', 'website.edit', 'website.manage', 'staff.view', 'staff.create', 'staff.edit', 'staff.delete', 'branches.view', 'branches.edit', 'branches.manage', 'settings.view', 'settings.edit', 'returns.view', 'returns.create', 'analytics.view'],
+  store_manager: ['sales.view', 'sales.create', 'sales.edit', 'sales.delete', 'sales.print', 'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.delete', 'inventory.manage', 'products.view', 'products.create', 'products.edit', 'products.delete', 'customers.view', 'customers.create', 'customers.edit', 'purchases.view', 'purchases.create', 'reports.view', 'reports.export', 'staff.view', 'branches.view', 'returns.view', 'returns.create', 'analytics.view'],
+  manager: ['sales.view', 'sales.create', 'sales.edit', 'sales.delete', 'sales.print', 'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.delete', 'inventory.manage', 'products.view', 'products.create', 'products.edit', 'products.delete', 'customers.view', 'customers.create', 'customers.edit', 'purchases.view', 'purchases.create', 'reports.view', 'reports.export', 'staff.view', 'branches.view', 'returns.view', 'returns.create', 'analytics.view'],
+  cashier: ['sales.view', 'sales.create', 'sales.print', 'customers.view', 'customers.create', 'returns.view', 'returns.create', 'analytics.view'],
+  sales_executive: ['sales.view', 'sales.create', 'products.view', 'customers.view', 'customers.create', 'returns.view', 'analytics.view'],
+  inventory_manager: ['inventory.view', 'inventory.create', 'inventory.edit', 'inventory.delete', 'inventory.manage', 'products.view', 'products.create', 'products.edit', 'products.delete', 'products.export'],
+  purchase_manager: ['purchases.view', 'purchases.create', 'purchases.edit', 'purchases.delete', 'purchases.approve', 'inventory.view', 'products.view'],
+  accountant: ['accounting.view', 'accounting.create', 'accounting.edit', 'accounting.delete', 'accounting.export', 'reports.view', 'reports.export'],
+  crm_executive: ['customers.view', 'customers.create', 'customers.edit', 'customers.delete'],
+  marketing_executive: ['website.view', 'website.edit', 'reports.view'],
+  website_manager: ['website.view', 'website.edit', 'website.manage', 'products.view'],
+  tailor: ['sales.view'],
+  delivery_staff: ['sales.view'],
+  branch_manager: ['branches.view', 'branches.edit', 'sales.view', 'inventory.view', 'staff.view'],
+  auditor: ['sales.view', 'inventory.view', 'products.view', 'customers.view', 'purchases.view', 'accounting.view', 'reports.view', 'reports.export', 'analytics.view'],
+};
+
 @Component({
   selector: 'app-staff-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, UiInputComponent, UiDropdownComponent, UiDatePickerComponent, CheckboxComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, UiInputComponent, UiDropdownComponent, UiDatePickerComponent],
   template: `
     <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
       <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col">
@@ -26,7 +43,7 @@ export interface PermissionCategory {
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <div>
             <h2 class="text-xl font-bold text-gray-900">{{ isEdit ? 'Edit Staff Member' : 'Add New Staff Member' }}</h2>
-            <p class="text-xs text-gray-500">Configure role assignment, custom grants, and restrictions</p>
+            <p class="text-xs text-gray-500">Configure role assignment, recommended permission highlights, and restrictions</p>
           </div>
           <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
             <i class="bi bi-x-lg text-xl"></i>
@@ -70,14 +87,14 @@ export interface PermissionCategory {
               </div>
             </div>
 
-            <!-- 3. Permission Architecture: Category Grid -->
+            <!-- 3. Permission Architecture: Category Grid & Recommended Highlighting -->
             <div>
               <div class="flex justify-between items-center mb-4">
                 <div>
                   <h3 class="text-xs font-bold text-primary-600 uppercase tracking-widest flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-primary-500"></span> Effective Permission Matrix
                   </h3>
-                  <p class="text-xs text-gray-500 mt-0.5">Role Template Default + Extra Grants − Restricted Revokes</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Permissions highlighted with ⭐ are recommended for {{ currentRoleLabel }}</p>
                 </div>
 
                 <div class="flex gap-2">
@@ -99,8 +116,11 @@ export interface PermissionCategory {
                   </div>
 
                   <div class="space-y-2">
-                    <div *ngFor="let act of category.actions" class="flex justify-between items-center text-xs">
-                      <span class="font-medium text-gray-700 capitalize">{{ act }}</span>
+                    <div *ngFor="let act of category.actions" class="flex justify-between items-center text-xs p-1 rounded hover:bg-white transition" [class.bg-amber-50]="isRecommended(category.key + '.' + act)" [class.border-l-2]="isRecommended(category.key + '.' + act)" [class.border-amber-400]="isRecommended(category.key + '.' + act)">
+                      <div class="flex items-center gap-1.5">
+                        <span *ngIf="isRecommended(category.key + '.' + act)" class="text-amber-500 font-bold" title="Recommended permission for {{ currentRoleLabel }}"><i class="bi bi-star-fill"></i></span>
+                        <span class="font-medium text-gray-700 capitalize" [class.text-amber-900]="isRecommended(category.key + '.' + act)">{{ act }}</span>
+                      </div>
                       
                       <div class="flex items-center gap-2">
                         <!-- Grant Toggle -->
@@ -161,6 +181,8 @@ export class StaffFormComponent implements OnInit {
 
   additionalPermissions: string[] = [];
   restrictedPermissions: string[] = [];
+  recommendedPermissions: string[] = [];
+  currentRoleLabel = 'Store Manager';
 
   roleOptions = [
     { label: 'Shop Owner', value: 'owner' },
@@ -214,7 +236,7 @@ export class StaffFormComponent implements OnInit {
       phoneNumber: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
-      role: ['sales_executive', Validators.required],
+      role: ['store_manager', Validators.required],
       branch: ['Main Branch', Validators.required],
       status: ['Active'],
       joiningDate: [getLocalISODate(), Validators.required],
@@ -229,11 +251,27 @@ export class StaffFormComponent implements OnInit {
     if (this.staffId) {
       this.isEdit = true;
       this.loadStaff();
+    } else {
+      this.onRoleChange('store_manager');
     }
   }
 
   onRoleChange(roleVal: string) {
-    // Role selection provides baseline permission set
+    const roleKey = roleVal?.toLowerCase().replace(/\s+/g, '_') || 'store_manager';
+    const selectedOption = this.roleOptions.find(o => o.value === roleVal || o.value === roleKey);
+    this.currentRoleLabel = selectedOption?.label || roleVal;
+
+    this.recommendedPermissions = ROLE_RECOMMENDED_PERMISSIONS[roleKey] || ROLE_RECOMMENDED_PERMISSIONS['store_manager'] || [];
+
+    // Automatically auto-populate recommended grants when role is chosen
+    if (!this.isEdit) {
+      this.additionalPermissions = Array.from(new Set([...this.recommendedPermissions]));
+      this.restrictedPermissions = [];
+    }
+  }
+
+  isRecommended(permission: string): boolean {
+    return this.recommendedPermissions.includes(permission);
   }
 
   toggleGrant(permission: string) {
@@ -269,6 +307,7 @@ export class StaffFormComponent implements OnInit {
         this.staffForm.patchValue(res.data);
         this.additionalPermissions = res.data.additionalPermissions || [];
         this.restrictedPermissions = res.data.restrictedPermissions || [];
+        this.onRoleChange(res.data.roleId || res.data.role || 'store_manager');
       }
       this.loading = false;
     });

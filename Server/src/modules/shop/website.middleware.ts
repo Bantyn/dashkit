@@ -131,13 +131,15 @@ export const resolveShopMiddleware = async (
       return res.status(404).json({ message: "Shop not found" });
     }
 
-    if (!shop.websiteEnabled) {
+    req.shop = shop;
+
+    const isWebsiteDisabled = shop.websiteEnabled === false;
+    if (isWebsiteDisabled && !req.path.endsWith("/config")) {
       return res
         .status(403)
         .json({ message: "This shop's website is currently disabled." });
     }
 
-    req.shop = shop;
     next();
   } catch (error) {
     console.error("Error resolving shop:", error);

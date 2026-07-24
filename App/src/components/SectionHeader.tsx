@@ -34,9 +34,10 @@ export function SectionHeader({
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "flex-end"
+    alignItems: "flex-start",
+    marginVertical: 12,
   },
   title: {
     fontSize: 22,

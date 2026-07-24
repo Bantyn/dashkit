@@ -13,7 +13,7 @@ export class TenantService {
   // Reserved subdomains that are NOT shops
   private readonly RESERVED_SUBDOMAINS = [
     'www', 'admin', 'api', 'auth', 'clothify', 'app',
-    'dashkit', 'dashkiiit', 'dashkit-server', 'dashkit-admin'
+    'dashkit', 'dashkiiit', 'dashkiit', 'dashkit-server', 'dashkit-admin'
   ];
 
   constructor(

@@ -23,6 +23,32 @@ import type { User } from "../types";
 
 const { width } = Dimensions.get("window");
 
+export function getRoleRingColor(role?: string): { color: string; label: string } {
+  const normalized = (role || "").toLowerCase();
+  if (normalized.includes("owner")) {
+    return { color: "#FFD700", label: "Gold Business Ring" };
+  }
+  if (normalized.includes("manager")) {
+    return { color: "#3B82F6", label: "Blue Management Ring" };
+  }
+  if (normalized.includes("cashier")) {
+    return { color: "#10B981", label: "Emerald Operations Ring" };
+  }
+  if (normalized.includes("inventory")) {
+    return { color: "#F59E0B", label: "Amber Warehouse Ring" };
+  }
+  if (normalized.includes("delivery")) {
+    return { color: "#8B5CF6", label: "Purple Route Ring" };
+  }
+  if (normalized.includes("tailor")) {
+    return { color: "#EC4899", label: "Pink Production Ring" };
+  }
+  if (normalized.includes("accountant")) {
+    return { color: "#14B8A6", label: "Teal Finance Ring" };
+  }
+  return { color: "#8E94F2", label: "Standard Staff Ring" };
+}
+
 export function ProfileScreen({ user, onLogout, onUpdateUser, refreshSignal, onRefreshComplete }: { user: User, onLogout: () => void, onUpdateUser: (user: User) => void, refreshSignal?: number, onRefreshComplete?: () => void }) {
   const { colors, theme, toggleTheme } = useTheme();
   const [userData, setUserData] = useState<User>(user);
@@ -411,11 +437,11 @@ export function ProfileScreen({ user, onLogout, onUpdateUser, refreshSignal, onR
           ]}
         >
           <View style={dynamicStyles.avatarContainer}>
-            <View style={dynamicStyles.avatarPlaceholder}>
+            <View style={[dynamicStyles.avatarPlaceholder, { borderColor: getRoleRingColor(userData?.role).color, borderWidth: 4 }]}>
                 <Text style={dynamicStyles.avatarText}>{initials}</Text>
             </View>
             <View style={dynamicStyles.editIconContainer}>
-                <Ionicons name="pencil" size={16} color={colors.brand} />
+                <Ionicons name="shield-checkmark" size={16} color={getRoleRingColor(userData?.role).color} />
             </View>
           </View>
 
@@ -426,13 +452,16 @@ export function ProfileScreen({ user, onLogout, onUpdateUser, refreshSignal, onR
           ) : null}
 
           <View style={dynamicStyles.badgeRow}>
-              <View style={[dynamicStyles.badge, { backgroundColor: colors.brand }]}>
+              <View style={[dynamicStyles.badge, { backgroundColor: getRoleRingColor(userData?.role).color }]}>
                   <Text style={[dynamicStyles.badgeText, { color: colors.white }]}>★ {userData?.role?.toUpperCase() || "STAFF"}</Text>
               </View>
               <View style={[dynamicStyles.badge, { backgroundColor: colors.surfaceMuted }]}>
-                  <Text style={[dynamicStyles.badgeText, { color: colors.brand }]}>{userData?.branch?.toUpperCase() || "MAIN"}</Text>
+                  <Text style={[dynamicStyles.badgeText, { color: colors.brand }]}>{userData?.branch?.toUpperCase() || "MAIN BRANCH"}</Text>
               </View>
           </View>
+          <Text style={{ fontSize: 11, fontWeight: "700", color: getRoleRingColor(userData?.role).color, marginTop: 6 }}>
+            {getRoleRingColor(userData?.role).label}
+          </Text>
         </Animated.View>
 
         {/* Complete Profile Section - Conditional Rendering */}

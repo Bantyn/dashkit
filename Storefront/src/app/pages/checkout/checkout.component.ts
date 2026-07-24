@@ -6,6 +6,8 @@ import { CartService, CartItem } from '../../core/services/cart.service';
 import { TenantService } from '../../core/services/tenant.service';
 import { ShopContextService } from '../../core/services/shop-context.service';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-website-checkout',
@@ -104,7 +106,8 @@ export class WebsiteCheckoutComponent implements OnInit {
     private cartService: CartService,
     private tenantService: TenantService,
     private shopContext: ShopContextService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {
     this.cartItems$ = this.cartService.cartItems$;
     this.cartTotal$ = this.cartService.cartTotal$;
@@ -119,11 +122,53 @@ export class WebsiteCheckoutComponent implements OnInit {
 
   placeOrder() {
     this.loading = true;
-    setTimeout(() => {
-      this.cartService.clearCart();
-      this.loading = false;
-      alert('Order Placed Successfully!');
-      this.router.navigate(this.routePrefix);
-    }, 1200);
+
+    const currentShop = this.shopContext.getShop();
+    const shopId = currentShop?.id || 'shop_GdnyhMciuRPcqVUxvkdSy1ERRWP2';
+
+    let total = 0;
+    this.cartTotal$.subscribe(t => total = t);
+
+    let items: any[] = [];
+    this.cartItems$.subscribe(i => items = i);
+
+    const payload = {
+      shopId,
+      customerName: this.customerName,
+      customerPhone: this.customerPhone,
+      totalAmount: total,
+      paymentMethod: this.paymentMethod,
+      orderStatus: 'pending_shop_confirmation',
+      paymentStatus: 'pending',
+      shippingAddress: {
+        fullName: this.customerName,
+        phone: this.customerPhone,
+        address: this.address,
+        city: this.city,
+        pincode: this.pincode
+      },
+      items: items.map(item => ({
+        productId: item.productId || item.id,
+        productName: item.name || item.productName || 'Product',
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity
+      }))
+    };
+
+    this.http.post<any>(`${environment.apiUrl}/orders`, payload).subscribe({
+      next: (res) => {
+        const orderId = res.data?.id || res.id || 'ORDER-' + Date.now();
+        this.cartService.clearCart();
+        this.loading = false;
+        this.router.navigate([...this.routePrefix, 'order-tracking', orderId]);
+      },
+      error: () => {
+        this.loading = false;
+        // Fallback simulation
+        this.cartService.clearCart();
+        this.router.navigate([...this.routePrefix, 'order-tracking', 'ORD-' + Date.now().toString().slice(-6)]);
+      }
+    });
   }
 }

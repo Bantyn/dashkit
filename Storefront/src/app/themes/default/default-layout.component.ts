@@ -68,7 +68,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
               class="flex items-center gap-3 z-50 relative hover:opacity-80 transition-opacity"
             >
               <ng-container *ngIf="config.theme?.logo; else defaultLogo">
-                <img [src]="config.theme?.logo | optimizeImage:'thumbnail':true" onerror="this.src='/Cloth_placeholder.png'" alt="Shop Logo" class="h-8 md:h-10 w-auto object-contain" />
+                <img [src]="config.theme?.logo | optimizeImage:'thumbnail':true" onerror="this.onerror=null;this.style.display='none'" alt="Shop Logo" class="h-8 md:h-10 w-auto object-contain" />
               </ng-container>
               <ng-template #defaultLogo>
                 <span class="text-xl font-bold text-gray-900 tracking-tight">{{ config.displayName || config.shopName }}</span>

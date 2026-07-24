@@ -6,6 +6,7 @@ import { WebsiteProductDetailComponent } from './pages/product-detail/product-de
 import { WebsiteCartComponent } from './pages/cart/cart.component';
 import { WebsiteCheckoutComponent } from './pages/checkout/checkout.component';
 import { WebsiteOffersComponent } from './pages/offers/offers.component';
+import { WebsiteOrderTrackingComponent } from './pages/order-tracking/order-tracking.component';
 
 export const routes: Routes = [
   // Subdomain / Custom Domain Root Mode
@@ -19,6 +20,7 @@ export const routes: Routes = [
       { path: 'cart', component: WebsiteCartComponent },
       { path: 'checkout', component: WebsiteCheckoutComponent },
       { path: 'offers', component: WebsiteOffersComponent },
+      { path: 'order-tracking/:id', component: WebsiteOrderTrackingComponent },
     ]
   },
 
@@ -33,6 +35,7 @@ export const routes: Routes = [
       { path: 'cart', component: WebsiteCartComponent },
       { path: 'checkout', component: WebsiteCheckoutComponent },
       { path: 'offers', component: WebsiteOffersComponent },
+      { path: 'order-tracking/:id', component: WebsiteOrderTrackingComponent },
     ]
   },
 

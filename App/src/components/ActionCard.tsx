@@ -1,24 +1,31 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-
+import { Pressable, StyleSheet, Text, View, DimensionValue } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { radius } from "../theme";
 import { useTheme } from "../ThemeContext";
+
+interface ActionCardProps {
+  title: string;
+  caption: string;
+  onPress: () => void;
+  iconName?: any;
+  width?: DimensionValue;
+}
 
 export function ActionCard({
   title,
   caption,
-  onPress
-}: {
-  title: string;
-  caption: string;
-  onPress: () => void;
-}) {
+  onPress,
+  iconName = "arrow-forward-circle",
+  width = "100%",
+}: ActionCardProps) {
   const { colors } = useTheme();
 
   const dynamicStyles = StyleSheet.create({
     card: {
       backgroundColor: colors.surface,
       borderColor: colors.border,
+      width: width,
     },
     title: {
       color: colors.textPrimary,
@@ -27,19 +34,20 @@ export function ActionCard({
       color: colors.textSecondary,
     },
     iconWrap: {
-      backgroundColor: colors.brandStrong,
-    }
+      backgroundColor: colors.brand + "15",
+    },
   });
 
   return (
     <Pressable style={[styles.card, dynamicStyles.card]} onPress={onPress}>
-      <View style={styles.content}>
-        <Text style={[styles.title, dynamicStyles.title]}>{title}</Text>
-        <Text style={[styles.caption, dynamicStyles.caption]}>{caption}</Text>
-      </View>
       <View style={[styles.iconWrap, dynamicStyles.iconWrap]}>
-        <Text style={styles.icon}>+</Text>
+        <Ionicons name={iconName} size={22} color={colors.brand} />
       </View>
+      <View style={styles.content}>
+        <Text style={[styles.title, dynamicStyles.title]} numberOfLines={1}>{title}</Text>
+        <Text style={[styles.caption, dynamicStyles.caption]} numberOfLines={2}>{caption}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
     </Pressable>
   );
 }
@@ -47,35 +55,35 @@ export function ActionCard({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: 18,
+    borderRadius: radius.md,
+    padding: 14,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    gap: 12
+    gap: 12,
+    marginBottom: 10,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
   },
   content: {
-    flex: 1
+    flex: 1,
   },
   title: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "700",
-    marginBottom: 5
+    marginBottom: 2,
   },
   caption: {
-    fontSize: 13,
-    lineHeight: 18
+    fontSize: 12,
+    lineHeight: 16,
   },
   iconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
-  icon: {
-    color: "#ffffff",
-    fontSize: 24,
-    lineHeight: 24
-  }
 });

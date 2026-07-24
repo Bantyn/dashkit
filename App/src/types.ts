@@ -1,4 +1,4 @@
-export type TabKey = "dashboard" | "pos" | "orders" | "products" | "inventory" | "customers" | "profile" | "analytics" | "staff";
+export type TabKey = "dashboard" | "pos" | "orders" | "products" | "inventory" | "customers" | "profile" | "analytics" | "staff" | "delivery";
 
 export interface PermissionActions {
   view: boolean;
@@ -58,9 +58,13 @@ export type Product = {
 export type Customer = {
   id: string;
   name: string;
-  phone: string;
-  tier: string;
-  openInvoices: number;
+  phone?: string;
+  phoneNumber?: string;
+  email?: string;
+  tier?: string;
+  openInvoices?: number;
+  totalOrders?: number;
+  totalSpent?: number;
 };
 
 export type QuickAction = {

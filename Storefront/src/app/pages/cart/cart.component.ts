@@ -20,7 +20,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
           <div *ngIf="items.length > 0; else emptyCart" class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="md:col-span-2 space-y-4">
               <div *ngFor="let item of items; let idx = index" class="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 items-center">
-                <img [src]="((item.product.images && item.product.images[0]) || '/Cloth_placeholder.png') | optimizeImage:'thumbnail'" class="w-20 h-20 object-cover rounded-xl bg-gray-50" />
+                <img [src]="(item.product.images && item.product.images[0]) | optimizeImage:'thumbnail'" class="w-20 h-20 object-cover rounded-xl bg-gray-50" />
                 <div class="flex-1">
                   <h3 class="font-bold text-gray-900 text-sm">{{ item.product.name }}</h3>
                   <p class="text-xs text-gray-500 mt-0.5">Price: ₹{{ item.variant?.price || item.product.variants[0]?.price }}</p>

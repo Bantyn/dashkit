@@ -20,6 +20,7 @@ import { InventoryScreen } from "./screens/InventoryScreen";
 import { CustomersScreen } from "./screens/CustomersScreen";
 import { ProductsScreen } from "./screens/ProductsScreen";
 import { StaffManagementScreen } from "./screens/StaffManagementScreen";
+import { DeliveryScreen } from "./screens/DeliveryScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { GettingStartedScreen } from "./screens/GettingStartedScreen";
@@ -34,6 +35,7 @@ const { width, height } = Dimensions.get("window");
 const getIconName = (key: TabKey): any => {
   switch (key) {
     case "dashboard": return "home";
+    case "delivery": return "map";
     case "orders": return "receipt";
     case "products": return "shirt";
     case "inventory": return "cube";
@@ -127,6 +129,12 @@ export function StaffApp() {
     switch (activeTab) {
       case "dashboard":
         return <DashboardScreen onJump={setActiveTab} user={user} refreshSignal={refreshSignal} onRefreshComplete={() => setRefreshing(false)} />;
+      case "delivery":
+        return (
+          <ProtectedScreen user={user} permission="delivery.view">
+            <DeliveryScreen user={user} />
+          </ProtectedScreen>
+        );
       case "pos":
         return (
           <ProtectedScreen user={user} permission="invoices.view">
@@ -325,7 +333,7 @@ export function StaffApp() {
               </Pressable>
             )}
             <View>
-              <Text style={dynamicStyles.title}>{user?.shopName || "Clothify"}</Text>
+              <Text style={dynamicStyles.title}>{user?.shopName || "Dashkit"}</Text>
               <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: "600" }}>{user?.branch ? `${user.branch}` : "Operations Management"}</Text>
             </View>
           </View>

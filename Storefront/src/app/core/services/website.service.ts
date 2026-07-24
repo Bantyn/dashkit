@@ -12,7 +12,7 @@ import { RequestCache } from '../utils/request-cache.util';
   providedIn: 'root',
 })
 export class WebsiteService {
-  private apiUrl = `${environment.apiUrl}/website`;
+  private apiUrl = `${environment.publicApiUrl}/website`;
   private readonly requestCache = new RequestCache<unknown>();
   private readonly productsTtlMs = 2 * 60 * 1000;
   private readonly productTtlMs = 2 * 60 * 1000;
@@ -139,7 +139,7 @@ export class WebsiteService {
       key,
       () =>
         this.http
-          .get<{ data: any[] }>(`${environment.apiUrl}/reviews/${productId}`, { params })
+          .get<{ data: any[] }>(`${environment.publicApiUrl}/reviews/${productId}`, { params })
           .pipe(map((res) => res.data)),
       this.reviewsTtlMs,
     ) as Observable<any[]>;
@@ -149,7 +149,7 @@ export class WebsiteService {
     const params = this.getParams();
     this.requestCache.invalidateByPrefix(`reviews:${this.getTenantKey()}:${reviewData.productId}:`);
     return this.http
-      .post<{ data: any }>(`${environment.apiUrl}/reviews`, reviewData, { params })
+      .post<{ data: any }>(`${environment.publicApiUrl}/reviews`, reviewData, { params })
       .pipe(map((res) => res.data));
   }
 

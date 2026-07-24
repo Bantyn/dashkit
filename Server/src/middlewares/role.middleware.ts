@@ -38,12 +38,37 @@ function resolveRequestedShopId(req: AuthRequest) {
 }
 
 function hasPermission(permissions: string[], requiredPermission: string) {
-  if (permissions.includes("*") || permissions.includes(requiredPermission)) {
+  if (permissions.includes("*") || permissions.includes("admin.access") || permissions.includes(requiredPermission)) {
     return true;
   }
 
   const [resource] = requiredPermission.split(".");
-  return permissions.includes(`${resource}.*`);
+  if (permissions.includes(`${resource}.*`)) {
+    return true;
+  }
+
+  // Fallback mappings to prevent 403 errors on mobile dashboard & returns
+  if (requiredPermission === "analytics.view" && (
+    permissions.includes("reports.view") || 
+    permissions.includes("reports.*") || 
+    permissions.includes("sales.view") || 
+    permissions.includes("sales.*") ||
+    permissions.includes("admin.access")
+  )) {
+    return true;
+  }
+
+  if (requiredPermission.startsWith("returns.") && (
+    permissions.includes("sales.view") || 
+    permissions.includes("sales.*") || 
+    permissions.includes("invoices.view") || 
+    permissions.includes("invoices.*") ||
+    permissions.includes("admin.access")
+  )) {
+    return true;
+  }
+
+  return false;
 }
 
 async function populateBranchContext(req: AuthRequest) {
