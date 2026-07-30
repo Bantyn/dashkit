@@ -177,7 +177,6 @@ export class MediaService {
     const imageRef = db.collection("uploaded_images").doc(imageDocId);
     const shopRef = db.collection("shops").doc(shopId);
     const usageDocRef = db.collection("usage").doc("storage").collection("shops").doc(shopId);
-    const legacyStorageRef = db.collection("storage_usage").doc(shopId);
 
     await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
       // ═══════════════════════════════════════════════
@@ -291,14 +290,6 @@ export class MediaService {
         lastUpload: new Date(),
         shopId
       }, { merge: true });
-
-      transaction.set(legacyStorageRef, {
-        shopId,
-        usedBytes: newBytes,
-        limitBytes: totalAllowed,
-        percentage: Number(percentage.toFixed(2)),
-        lastCalculated: new Date()
-      }, { merge: true });
     });
 
     if (deferredNotifications.length > 0) {
@@ -314,7 +305,6 @@ export class MediaService {
     const imageRef = db.collection("uploaded_images").doc(imageDocId);
     const shopRef = db.collection("shops").doc(shopId);
     const usageDocRef = db.collection("usage").doc("storage").collection("shops").doc(shopId);
-    const legacyStorageRef = db.collection("storage_usage").doc(shopId);
 
     await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
       // ═══════════════════════════════════════════════
@@ -380,14 +370,6 @@ export class MediaService {
         lastScan: new Date(),
         lastDelete: new Date(),
         shopId
-      }, { merge: true });
-
-      transaction.set(legacyStorageRef, {
-        shopId,
-        usedBytes: newBytes,
-        limitBytes: totalAllowed,
-        percentage: Number(percentage.toFixed(2)),
-        lastCalculated: new Date()
       }, { merge: true });
     });
 

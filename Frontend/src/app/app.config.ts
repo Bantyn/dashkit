@@ -31,6 +31,8 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  Terminal,
+  CheckSquare
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -38,6 +40,7 @@ import { environment } from '../environments/environment';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { branchInterceptor } from './core/interceptors/branch.interceptor';
 import { enforcementInterceptor } from './core/interceptors/enforcement.interceptor';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -78,6 +81,8 @@ export const appConfig: ApplicationConfig = {
       Calendar,
       ChevronLeft,
       ChevronRight,
+      Terminal,
+      CheckSquare
     }).providers || []),
   ],
 };

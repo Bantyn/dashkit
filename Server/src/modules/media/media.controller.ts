@@ -61,3 +61,28 @@ export const deleteMedia = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+export const scanOrphanMedia = async (req: AuthRequest, res: Response) => {
+  try {
+    const { orphanCleanerService } = await import("./orphan-cleaner.service");
+    const dryRun = req.body?.dryRun !== false; // Default to dryRun: true for safety
+    const shopId = req.body?.shopId || req.shopId;
+
+    const report = await orphanCleanerService.scanAndClean({
+      dryRun,
+      shopId: shopId ? String(shopId) : undefined,
+      batchSize: req.body?.batchSize,
+    });
+
+    return res.status(200).json({
+      message: `Orphan media scan completed (${dryRun ? "Dry-Run" : "Live"})`,
+      data: report,
+    });
+  } catch (err: any) {
+    console.error("scanOrphanMedia error:", err);
+    const status = err.statusCode || 500;
+    return res.status(status).json({
+      message: err.message || "Failed to scan orphan media",
+    });
+  }
+};

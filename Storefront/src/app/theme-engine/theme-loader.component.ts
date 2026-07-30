@@ -18,9 +18,9 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div *ngIf="loading" class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div *ngIf="loading" class="min-h-screen flex items-center justify-center bg-primary-50">
       <div class="flex flex-col items-center gap-3">
-        <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
         <span class="text-xs font-semibold text-gray-500">Loading storefront...</span>
       </div>
     </div>

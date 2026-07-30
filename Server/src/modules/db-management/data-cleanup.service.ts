@@ -33,12 +33,11 @@ const MODULE_TO_COLLECTION: Record<string, string> = {
   payments: "supplier_payments",
   staff: "staff",
   notifications: "notifications",
-  activity_logs: "activity_logs",
-  usage_tracking: "api_usage",
+  usage_tracking: "api_usage_aggregation",
   reports: "reports",
-  temporary_cache: "temporary_cache",
-  session_data: "sessions",
   analytics: "analytics_cache",
+  tailoring: "tailoring_jobs",
+  tailor_job_cards: "tailoring_jobs",
 };
 
 // Modules that can be cleaned in Firestore (all records deleted but collection remains)

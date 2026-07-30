@@ -20,6 +20,7 @@ import {
   previewCleanup,
   cleanupDatabase,
   getCleanupReport,
+  runCleanupWorker,
 } from "../../../modules/db-management/db-management.controller";
 import { checkPermission } from "../../../middlewares/role.middleware";
 
@@ -47,6 +48,7 @@ router.get("/maintenance/seed-report", checkPermission("platform.gst.manage"), g
 router.post("/maintenance/preview-cleanup", checkPermission("platform.gst.manage"), previewCleanup);
 router.post("/maintenance/cleanup", checkPermission("platform.gst.manage"), cleanupDatabase);
 router.get("/maintenance/cleanup-report", checkPermission("platform.gst.manage"), getCleanupReport);
+router.post("/maintenance/cleanup-worker/run", checkPermission("platform.gst.manage"), runCleanupWorker);
 
 export default router;
 

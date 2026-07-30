@@ -20,7 +20,7 @@ interface PageConfig {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="flex-1 overflow-y-auto bg-gray-50 h-full">
+    <div class="flex-1 overflow-y-auto bg-primary-50 h-full">
       <main class="p-6 md:p-8 max-w-full mx-auto space-y-6">
         <div class="flex items-center justify-between">
           <div>
@@ -80,7 +80,7 @@ interface PageConfig {
                             [formControlName]="page.key + 'Content'" 
                             rows="6" 
                             placeholder="Enter your custom policy content here... Leave empty to display default {{ shopName }} premium template." 
-                            class="w-full text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-xl p-4 focus:outline-none focus:border-primary-400 focus:bg-white transition-all resize-y"
+                            class="w-full text-xs text-gray-700 bg-primary-50 border border-gray-200 rounded-xl p-4 focus:outline-none focus:border-primary-400 focus:bg-white transition-all resize-y"
                           ></textarea>
                           <p class="text-[10px] text-gray-400 mt-1.5 flex items-center gap-1.5">
                             <i class="bi bi-info-circle"></i> Supports paragraph text. If left blank, it will reset back to the default beautiful template design.
@@ -114,7 +114,7 @@ interface PageConfig {
                     </div>
 
                     <!-- Mockup Content -->
-                    <div class="flex-1 bg-gray-50 flex flex-col justify-between overflow-y-auto relative">
+                    <div class="flex-1 bg-primary-50 flex flex-col justify-between overflow-y-auto relative">
                       
                       <!-- Header/Nav Mockup -->
                       <div class="bg-white border-b border-gray-100 p-4 shadow-sm flex items-center justify-between sticky top-0 z-10 shrink-0">

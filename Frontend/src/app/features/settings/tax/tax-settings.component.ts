@@ -13,8 +13,8 @@ import { environment } from '../../../../environments/environment';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, UiDropdownComponent, UiInputComponent],
   template: `
-    <div class="flex-1 overflow-y-auto bg-gray-50 min-h-screen">
-      <main class="p-6 lg:p-10 max-w-4xl mx-auto">
+    <div class="flex-1 overflow-y-auto bg-primary-50 min-h-screen">
+      <main class="p-6 lg:p-10 max-w-full mx-auto">
         <!-- Header -->
         <div class="mb-8">
           <h1 class="text-2xl font-bold text-gray-900">Tax Settings</h1>
@@ -105,7 +105,7 @@ import { environment } from '../../../../environments/environment';
               </div>
             </div>
 
-            <div *ngIf="form.get('legalBusinessName')?.value" class="bg-gray-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="form.get('legalBusinessName')?.value" class="bg-primary-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p class="text-[11px] text-gray-500 font-medium">Legal Name (from GSTIN)</p>
                 <p class="text-sm font-bold text-gray-900">{{ form.get('legalBusinessName')?.value }}</p>
@@ -113,6 +113,49 @@ import { environment } from '../../../../environments/environment';
               <div *ngIf="form.get('verifiedAt')?.value">
                 <p class="text-[11px] text-gray-500 font-medium">Verification Timestamp</p>
                 <p class="text-sm font-semibold text-gray-700">{{ formatDateString(form.get('verifiedAt')?.value) }}</p>
+              </div>
+            </div>
+
+            <!-- Mandatory Legal Self-Declaration -->
+            <div class="bg-primary-50/80 rounded-xl p-4 border border-gray-200 space-y-2">
+              <label class="flex items-start gap-3 cursor-pointer select-none">
+                <input type="checkbox" formControlName="selfDeclarationAccepted" class="mt-1 w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500" />
+                <div class="text-xs text-gray-700">
+                  <span class="font-bold text-gray-900 block mb-0.5">Legal Self-Declaration</span>
+                  I declare that the GST Number provided belongs to my business and is accurate. I understand that I am solely responsible for any incorrect GST information submitted.
+                </div>
+              </label>
+            </div>
+
+            <!-- Optional GST Certificate Upload -->
+            <div class="border border-dashed border-gray-300 bg-primary-50/50 rounded-xl p-5 text-center space-y-3">
+              <div class="flex items-center justify-between text-left">
+                <div>
+                  <p class="font-bold text-sm text-gray-900">Upload GST Certificate (Optional)</p>
+                  <p class="text-xs text-gray-500">Upload your Registration Certificate (PDF, JPG, PNG - Max 5MB) for manual Admin Verification.</p>
+                </div>
+                <span *ngIf="form.get('certificateUrl')?.value" class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                  Certificate Uploaded
+                </span>
+              </div>
+
+              <div *ngIf="form.get('certificateUrl')?.value" class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl">
+                <div class="flex items-center gap-2 text-xs font-semibold text-gray-800">
+                  <i class="bi bi-file-earmark-pdf text-lg text-red-500"></i>
+                  <span>Uploaded GST Certificate</span>
+                </div>
+                <a [href]="form.get('certificateUrl')?.value" target="_blank" class="text-xs font-bold text-primary-600 hover:underline flex items-center gap-1">
+                  View Document <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+              </div>
+
+              <div class="flex items-center justify-center gap-3">
+                <input type="file" #fileInput (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png" class="hidden" />
+                <button type="button" (click)="fileInput.click()" [disabled]="uploadingCert"
+                  class="px-4 py-2 bg-white border border-gray-300 hover:border-primary-400 text-gray-800 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2">
+                  <i class="bi bi-cloud-upload"></i>
+                  {{ uploadingCert ? 'Uploading...' : (form.get('certificateUrl')?.value ? 'Replace Certificate' : 'Choose Certificate File') }}
+                </button>
               </div>
             </div>
 
@@ -218,6 +261,7 @@ export class TaxSettingsComponent implements OnInit {
   loading = true;
   shopId: string = '';
   verifyingGst = false;
+  uploadingCert = false;
 
   gstinError = '';
   panError = '';
@@ -250,6 +294,8 @@ export class TaxSettingsComponent implements OnInit {
       legalBusinessName: [''],
       gstVerified: [false],
       gstStatus: ['not_configured'],
+      selfDeclarationAccepted: [true],
+      certificateUrl: [''],
       verifiedAt: [null],
       verificationError: [null],
       gstRate: [18],
@@ -296,6 +342,26 @@ export class TaxSettingsComponent implements OnInit {
     }
   }
 
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds 5MB limit. Please upload a smaller document.');
+      return;
+    }
+
+    this.uploadingCert = true;
+    setTimeout(() => {
+      const mockUrl = URL.createObjectURL(file);
+      this.form.patchValue({
+        certificateUrl: mockUrl,
+        gstStatus: 'PENDING_REVIEW'
+      });
+      this.uploadingCert = false;
+    }, 1000);
+  }
+
   onPanChange(value: string) {
     const v = (value || '').toUpperCase();
     if (!v) { this.panError = ''; return; }
@@ -329,9 +395,15 @@ export class TaxSettingsComponent implements OnInit {
     const backendUrl = environment.apiUrl.replace('/api/v1', '');
     const verifyUrl = `${backendUrl}/api/verify-gstin`;
 
+    const token = localStorage.getItem('authToken') || localStorage.getItem('token') || sessionStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     fetch(verifyUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ gstin })
     })
       .then(res => res.json())

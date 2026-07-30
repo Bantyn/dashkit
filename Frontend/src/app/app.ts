@@ -13,7 +13,16 @@ import { ReadOnlyDialogComponent } from './shared/components/read-only-dialog.co
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SidebarComponent, HeaderComponent, ToastComponent, ConfirmationModalComponent, PrintPreviewModalComponent, CommonModule, ReadOnlyDialogComponent],
+  imports: [
+    RouterOutlet,
+    SidebarComponent,
+    HeaderComponent,
+    ToastComponent,
+    ConfirmationModalComponent,
+    PrintPreviewModalComponent,
+    CommonModule,
+    ReadOnlyDialogComponent,
+  ],
   template: `
     @if (currentUser && !isAuthPage && !isPublicSite) {
       <div class="flex h-screen bg-white">
@@ -21,7 +30,7 @@ import { ReadOnlyDialogComponent } from './shared/components/read-only-dialog.co
         <div class="flex-1 ml-64 flex flex-col min-h-screen bg-white">
           <app-header />
           <div
-            class="flex-1 overflow-y-auto bg-primary-50 rounded-tl-[3rem] border border-gray-100 border-b-0 border-r-0 shadow-inner"
+            class="flex-1 overflow-y-auto bg-white rounded-tl-[3rem] border border-gray-100 border-b-0 border-r-0 shadow-inner"
           >
             <router-outlet />
           </div>

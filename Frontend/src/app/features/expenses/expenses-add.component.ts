@@ -16,7 +16,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
   standalone: true,
   imports: [CommonModule, FormsModule, UiDropdownComponent, UiDatePickerComponent, UiInputComponent, UiLoadingComponent],
   template: `
-    <div class="h-full bg-[#f5f7fa] overflow-y-auto">
+    <div class="h-full bg-primary-50 overflow-y-auto">
       <!-- Header -->
       <div class="bg-white border-b border-gray-200 px-6 py-5 flex items-center justify-between sticky top-0 z-10">
         <div>
@@ -26,13 +26,13 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
         <div class="flex items-center gap-3">
           <button
             (click)="router.navigate(['/' + shopId + '/expenses/reports'])"
-            class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2"
+            class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:bg-primary-50 transition-all flex items-center gap-2"
           >
             <i class="bi bi-bar-chart"></i> View Reports
           </button>
           <button
             (click)="router.navigate(['/' + shopId + '/expenses/categories'])"
-            class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2"
+            class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:bg-primary-50 transition-all flex items-center gap-2"
           >
             <i class="bi bi-tags"></i> Categories
           </button>
@@ -92,7 +92,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all"
+                  class="w-full pl-8 pr-3 py-2.5 bg-primary-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all"
                 />
               </div>
             </div>
@@ -116,7 +116,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     class="py-2 px-3 rounded-xl text-xs font-medium border transition-all"
                     [class]="form.paymentMethod === method.value
                       ? 'bg-primary-600 text-white border-primary-600 shadow-sm'
-                      : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-primary-300'"
+                      : 'bg-primary-50 text-gray-600 border-gray-200 hover:border-primary-300'"
                   >
                     <i [class]="'bi ' + method.icon + ' mr-1'"></i>
                     {{ method.label }}
@@ -133,7 +133,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                 name="description"
                 rows="2"
                 placeholder="Optional notes..."
-                class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all resize-none"
+                class="w-full px-3 py-2.5 bg-primary-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all resize-none"
               ></textarea>
             </div>
 
@@ -177,7 +177,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
           } @else {
             <div class="space-y-3 overflow-y-auto max-h-[450px]">
               @for (exp of expenses.slice(0, 15); track exp.id) {
-                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 group transition-colors">
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary-50 group transition-colors">
                   <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
                     <i class="bi bi-arrow-down-circle text-red-500"></i>
                   </div>

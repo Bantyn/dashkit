@@ -1,6 +1,7 @@
 import { db } from "../../config/firebase.config";
 import { Shop } from "./shop.model";
 import { shopPublicCacheService } from "./shop-public-cache.service";
+import { RepositoryFactory } from "../../application/repositories/factories/repository.factory";
 
 export class ShopPublicService {
   getShopConfig(shop: Shop) {
@@ -54,18 +55,14 @@ export class ShopPublicService {
     const cached = shopPublicCacheService.get<any[]>(shop.id, "products", cacheSuffix);
     if (cached) return cached;
 
-    let query = db
-      .collection("products")
-      .where("shopId", "==", shop.id);
+    const productRepo = RepositoryFactory.getProductRepository();
+    const allProducts = await productRepo.getProductsByShop(shop.id);
+
+    let products = (allProducts || []).filter((p: any) => p.isActive !== false);
 
     if (filters.category) {
-      query = query.where("category", "==", filters.category);
+      products = products.filter((p: any) => p.category === filters.category);
     }
-
-    const snapshot = await query.get();
-    let products = snapshot.docs
-      .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }))
-      .filter((p: any) => p.isActive !== false);
 
     if (filters.minPrice || filters.maxPrice || filters.search || filters.collection) {
       products = products.filter((product: any) => {
@@ -188,17 +185,14 @@ export class ShopPublicService {
     const cached = shopPublicCacheService.get<string[]>(shop.id, "categories");
     if (cached) return cached;
 
-    const snapshot = await db
-      .collection("products")
-      .where("shopId", "==", shop.id)
-      .get();
+    const productRepo = RepositoryFactory.getProductRepository();
+    const allProducts = await productRepo.getProductsByShop(shop.id);
 
     const categories = Array.from(
       new Set(
-        snapshot.docs
-          .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => doc.data())
-          .filter((docData: any) => docData.isActive !== false && typeof docData.category === "string" && docData.category.trim().length > 0)
-          .map((docData: any) => docData.category),
+        (allProducts || [])
+          .filter((p: any) => p.isActive !== false && typeof p.category === "string" && p.category.trim().length > 0)
+          .map((p: any) => p.category),
       ),
     );
 
@@ -212,21 +206,20 @@ export class ShopPublicService {
     const cached = shopPublicCacheService.get<string[]>(shop.id, "subcategories", cacheSuffix);
     if (cached) return cached;
 
-    let query = db
-      .collection("products")
-      .where("shopId", "==", shop.id);
+    const productRepo = RepositoryFactory.getProductRepository();
+    const allProducts = await productRepo.getProductsByShop(shop.id);
 
-    if (category) {
-      query = query.where("category", "==", category);
-    }
-
-    const snapshot = await query.get();
     const subcategories = Array.from(
       new Set(
-        snapshot.docs
-          .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => doc.data())
-          .filter((docData: any) => docData.isActive !== false && typeof docData.subcategory === "string" && docData.subcategory.trim().length > 0)
-          .map((docData: any) => docData.subcategory),
+        (allProducts || [])
+          .filter(
+            (p: any) =>
+              p.isActive !== false &&
+              typeof p.subcategory === "string" &&
+              p.subcategory.trim().length > 0 &&
+              (!category || p.category === category),
+          )
+          .map((p: any) => p.subcategory),
       ),
     );
 
@@ -279,21 +272,18 @@ export class ShopPublicService {
     const cached = shopPublicCacheService.get<any>(shop.id, "product", id);
     if (cached) return cached;
 
-    const doc = await db.collection("products").doc(id).get();
-    if (!doc.exists) return null;
+    const productRepo = RepositoryFactory.getProductRepository();
+    const product = await productRepo.getProduct(id) as any;
+    if (!product) return null;
 
-    const product = { id: doc.id, ...doc.data() } as any;
-    if (product.shopId !== shop.id || !product.isActive) {
+    if (product.shopId !== shop.id || product.isActive === false) {
       return null;
     }
 
-    // Increment views
-    const currentViews = product.viewCount || 0;
-    await db.collection("products").doc(id).update({
-      viewCount: currentViews + 1,
-      updatedAt: new Date(),
-    });
-    product.viewCount = currentViews + 1;
+    // Increment views if supported
+    if (productRepo.incrementViewCount) {
+      void productRepo.incrementViewCount(id);
+    }
 
     return shopPublicCacheService.set(shop.id, "product", product, {
       suffix: id,

@@ -1,3 +1,4 @@
+import { db } from "../../config/firebase.config";
 import { CacheService } from "../../infrastructure/cache/cache.service";
 import { Order } from "./order.model";
 import { inventoryService } from "../inventory/inventory.service";
@@ -524,8 +525,36 @@ export class OrderService {
   }
 
   async getAssignedDeliveriesForStaff(staffId: string) {
+    if (!staffId) return [];
+
+    let staffDocId = staffId;
+    let staffUid = staffId;
+    let staffPhone = "";
+
+    try {
+      const staffDoc = await db.collection("staff").doc(staffId).get();
+      if (staffDoc.exists) {
+        const sd = staffDoc.data();
+        staffUid = sd?.uid || sd?.userId || staffId;
+        staffPhone = sd?.phoneNumber || sd?.phone || "";
+      } else {
+        const snap = await db.collection("staff").where("uid", "==", staffId).limit(1).get();
+        if (!snap.empty) {
+          const sd = snap.docs[0].data();
+          staffDocId = snap.docs[0].id;
+          staffPhone = sd?.phoneNumber || sd?.phone || "";
+        }
+      }
+    } catch (e) {
+      console.error("Error resolving staff entity for delivery filter:", e);
+    }
+
     const orders = await this.orderRepository.getOrders();
-    return orders.filter((o: any) => o.assignedDeliveryStaffId === staffId || o.deliveryStaffId === staffId);
+    return orders.filter((o: any) => {
+      const assigned = o.assignedDeliveryStaffId || o.deliveryStaffId;
+      const phoneMatch = staffPhone && (o.assignedDeliveryStaffPhone === staffPhone);
+      return assigned === staffDocId || assigned === staffUid || phoneMatch;
+    });
   }
 }
 

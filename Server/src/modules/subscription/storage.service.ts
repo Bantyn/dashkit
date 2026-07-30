@@ -163,15 +163,6 @@ export class StorageService {
       shopId
     }, { merge: true });
 
-    const legacyStorageRef = db.collection("storage_usage").doc(shopId);
-    batch.set(legacyStorageRef, {
-      shopId,
-      usedBytes: totalBytes,
-      limitBytes: totalAllowedBytes,
-      percentage: Number(percentage.toFixed(2)),
-      lastCalculated: new Date()
-    }, { merge: true });
-
     await batch.commit();
 
     return {

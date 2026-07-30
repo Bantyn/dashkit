@@ -4,6 +4,7 @@ import { billingCronService } from "./modules/subscription/billing-cron.service"
 import { costAnalyticsWorker } from "./modules/cost-analytics/cost-analytics.worker";
 import { campaignWorkerService } from "./modules/promotions/campaign-worker.service";
 import { DatabaseConfigService } from "./modules/db-management/db-config.service";
+import { initQueueSubsystem, shutdownQueueSubsystem } from "./infrastructure/queue";
 import * as os from "os";
 
 const PORT = APP_CONFIG.PORT;
@@ -22,13 +23,20 @@ function getLanIp(): string {
 }
 
 import { liveMonitoringService } from "./modules/observability/live-monitoring.service";
+import { tailoringMigrationService } from "./modules/tailoring/tailoring-migration.service";
 
 const server = app.listen(Number(PORT), "0.0.0.0", async () => {
   const activeProvider = await DatabaseConfigService.getActiveProvider();
 
+  // Initialize event-driven queue subsystem
+  await initQueueSubsystem();
+
+  // Execute automatic database migrations
+  await tailoringMigrationService.migrateJobCardsToTailoringJobs().catch(e => console.error("Tailoring migration failed:", e));
+
   // Start background services & workers
-  billingCronService.start();
-  costAnalyticsWorker.start();
+  await billingCronService.start();
+  await costAnalyticsWorker.start();
   campaignWorkerService.start();
   liveMonitoringService.init(server, PORT);
 
@@ -52,32 +60,42 @@ const server = app.listen(Number(PORT), "0.0.0.0", async () => {
   console.log(`╠${thinLine}╣`);
   console.log(`║  🗄️  DB Provider:  ${activeProvider.toUpperCase().padEnd(27)}║`);
   console.log(`║  ⚙️  Environment:  ${APP_CONFIG.NODE_ENV.padEnd(27)}║`);
-  console.log(`║  ⚡ Background:   Billing Cron | Workers Active  ║`);
+  console.log(`║  ⚡ Background:   BullMQ Queues | Event Active    ║`);
   console.log(`╚${line}╝`);
   console.log("");
 });
 
 // Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("👋 SIGTERM received. Shutting down gracefully...");
+const handleShutdown = async (signal: string) => {
+  console.log(`\n👋 ${signal} received. Shutting down gracefully...`);
   billingCronService.stop();
   costAnalyticsWorker.stop();
   campaignWorkerService.stop();
+  await shutdownQueueSubsystem();
   server.close(() => {
     console.log("✅ Server closed");
     process.exit(0);
   });
+};
+
+// Global process safety handlers for network/gRPC disconnect resilience
+process.on("unhandledRejection", (reason: any) => {
+  if (reason?.message?.includes("UNAVAILABLE") || reason?.message?.includes("Name resolution failed") || reason?.code === 14) {
+    console.warn("⚠️ [Network Warning] Temporary database connection drop (gRPC/DNS):", reason.message || reason);
+    return;
+  }
+  console.error("⚠️ [Unhandled Rejection]:", reason);
 });
 
-process.on("SIGINT", () => {
-  console.log("\n👋 SIGINT received. Shutting down gracefully...");
-  billingCronService.stop();
-  costAnalyticsWorker.stop();
-  campaignWorkerService.stop();
-  server.close(() => {
-    console.log("✅ Server closed");
-    process.exit(0);
-  });
+process.on("uncaughtException", (error: Error) => {
+  if (error?.message?.includes("UNAVAILABLE") || error?.message?.includes("Name resolution failed")) {
+    console.warn("⚠️ [Network Warning] Temporary database connection drop (gRPC/DNS):", error.message);
+    return;
+  }
+  console.error("❌ [Uncaught Exception]:", error);
 });
+
+process.on("SIGTERM", () => void handleShutdown("SIGTERM"));
+process.on("SIGINT", () => void handleShutdown("SIGINT"));
 
 export default server;

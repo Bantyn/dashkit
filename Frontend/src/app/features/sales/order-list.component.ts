@@ -269,7 +269,7 @@ import { StaffService, Staff } from '../../core/services/staff.service';
 
               <button
                 (click)="openAssignDeliveryModal(selectedOrder)"
-                [disabled]="selectedOrder.orderStatus !== 'ready_for_delivery_assignment' && selectedOrder.orderStatus !== 'rejected_by_delivery'"
+                [disabled]="selectedOrder.orderStatus === 'cancelled' || selectedOrder.orderStatus === 'delivered' || selectedOrder.orderStatus === 'rejected_by_shop'"
                 class="w-full py-2.5 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition disabled:opacity-40 shadow-sm"
               >
                 <i class="bi bi-person-badge mr-1"></i> Assign Delivery Partner
@@ -368,8 +368,98 @@ import { StaffService, Staff } from '../../core/services/staff.service';
           <h3 class="text-sm font-semibold text-gray-900 mb-1">No order selected</h3>
           <p class="text-xs text-gray-500">Select an order from the list to view its complete details</p>
         </div>
+    <!-- Assign Delivery Partner Modal -->
+    <div *ngIf="showAssignModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-scale-in">
+        <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+              <i class="bi bi-truck text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Assign Delivery Partner</h3>
+              <p class="text-xs text-gray-400">Select a delivery staff member for order #{{ selectedOrder?.displayId }}</p>
+            </div>
+          </div>
+          <button (click)="showAssignModal = false" class="text-gray-400 hover:text-gray-600 text-lg">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div *ngIf="loadingStaff" class="py-8 text-center text-gray-400 text-xs">
+          <i class="bi bi-arrow-repeat animate-spin text-xl block mb-2 text-blue-500"></i>
+          Loading delivery staff...
+        </div>
+
+        <div *ngIf="!loadingStaff && deliveryStaffList.length === 0" class="py-8 text-center text-gray-400 text-xs">
+          <i class="bi bi-person-x text-2xl block mb-2"></i>
+          No active staff members found. Please add staff in Staff Management.
+        </div>
+
+        <div *ngIf="!loadingStaff && deliveryStaffList.length > 0" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Delivery Staff Members</label>
+          <div *ngFor="let member of deliveryStaffList" 
+               (click)="selectedStaffForAssign = member"
+               [class.bg-blue-50]="selectedStaffForAssign?.id === member.id"
+               [class.border-blue-500]="selectedStaffForAssign?.id === member.id"
+               [class.border-gray-200]="selectedStaffForAssign?.id !== member.id"
+               class="p-3 rounded-xl border cursor-pointer hover:border-blue-300 transition flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                {{ member.fullName ? member.fullName.charAt(0).toUpperCase() : 'S' }}
+              </div>
+              <div>
+                <div class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                  {{ member.fullName }}
+                  <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] uppercase font-bold border border-blue-100">
+                    {{ member.role }}
+                  </span>
+                </div>
+                <div class="text-xs text-gray-400 font-mono mt-0.5">
+                  {{ member.phoneNumber || member.phone || 'No Phone' }}
+                </div>
+              </div>
+            </div>
+            <input type="radio" [checked]="selectedStaffForAssign?.id === member.id" class="text-blue-600 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button (click)="showAssignModal = false" class="flex-1 py-2.5 border border-gray-200 hover:bg-gray-50 rounded-xl text-xs font-bold transition">
+            Cancel
+          </button>
+          <button (click)="confirmAssignDelivery()" [disabled]="!selectedStaffForAssign" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <i class="bi bi-check2-circle"></i> Confirm Assignment
+          </button>
+        </div>
       </div>
     </div>
+
+    <!-- Reject Order Modal -->
+    <div *ngIf="showRejectModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-scale-in">
+        <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+          <h3 class="text-base font-bold text-gray-900">Reject Order</h3>
+          <button (click)="showRejectModal = false" class="text-gray-400 hover:text-gray-600 text-lg">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Rejection Reason</label>
+          <textarea [(ngModel)]="rejectReason" rows="3" class="w-full p-3 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-rose-500" placeholder="e.g. Out of stock, item unavailable"></textarea>
+        </div>
+        <div class="flex gap-3">
+          <button (click)="showRejectModal = false" class="flex-1 py-2.5 border border-gray-200 hover:bg-gray-50 rounded-xl text-xs font-bold transition">
+            Cancel
+          </button>
+          <button (click)="confirmShopReject()" [disabled]="!rejectReason.trim()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white rounded-xl text-xs font-bold transition">
+            Confirm Rejection
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
 
     <style>
       .custom-scrollbar::-webkit-scrollbar {
@@ -564,14 +654,25 @@ export class OrderListComponent implements OnInit {
     this.staffService.getStaff(this.shopId).subscribe({
       next: (res) => {
         const staff = res.data || [];
-        // Filter for active delivery staff members or any active staff
-        this.deliveryStaffList = staff.filter(s => 
-          s.status === 'Active' && 
-          (s.role.toLowerCase().includes('delivery') || s.role.toLowerCase().includes('staff') || s.role.toLowerCase().includes('manager'))
-        );
-        if (this.deliveryStaffList.length === 0) {
-          this.deliveryStaffList = staff; // Fallback
+        const isDeliveryRole = (role: string) => {
+          const r = (role || '').toLowerCase();
+          return r.includes('delivery') || r.includes('driver') || r.includes('rider') || r.includes('courier') || r.includes('logistics');
+        };
+
+        const activeStaff = staff.filter((s: any) => s.status === 'Active' || s.status === 'active' || (s as any).isActive !== false);
+        const deliverySpecific = activeStaff.filter((s: any) => isDeliveryRole(s.role));
+        
+        if (deliverySpecific.length > 0) {
+          const others = activeStaff.filter((s: any) => !isDeliveryRole(s.role));
+          this.deliveryStaffList = [...deliverySpecific, ...others];
+        } else {
+          this.deliveryStaffList = activeStaff;
         }
+
+        if (this.deliveryStaffList.length > 0) {
+          this.selectedStaffForAssign = this.deliveryStaffList[0];
+        }
+
         this.loadingStaff = false;
         this.cdr.detectChanges();
       },

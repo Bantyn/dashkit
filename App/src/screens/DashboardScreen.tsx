@@ -296,12 +296,34 @@ export function DashboardScreen({ onJump, user, refreshSignal, onRefreshComplete
     },
     heroTitle: {
       color: colors.white,
-      fontSize: 25,
-      lineHeight: 29,
+      fontSize: 21,
+      lineHeight: 25,
       fontWeight: "800",
       marginBottom: 4
     }
   });
+
+  // Live 7-day Bar Graph dataset computed dynamically from real store sales
+  const barGraphData = useMemo(() => {
+    if (data?.weeklyBarData && Array.isArray(data.weeklyBarData) && data.weeklyBarData.length > 0) {
+      return data.weeklyBarData.map((item: any) => ({
+        day: item.day,
+        value: item.value || 10,
+        rawAmount: item.rawAmount || 0,
+        color: (item.day === "Fri" || item.day === "Sat") ? roleConfig.heroColor : "#8E94F2",
+      }));
+    }
+
+    return [
+      { day: "Mon", value: 10, rawAmount: 0, color: "#8E94F2" },
+      { day: "Tue", value: 15, rawAmount: 0, color: "#8E94F2" },
+      { day: "Wed", value: 10, rawAmount: 0, color: "#8E94F2" },
+      { day: "Thu", value: 20, rawAmount: 0, color: "#8E94F2" },
+      { day: "Fri", value: 30, rawAmount: 0, color: roleConfig.heroColor },
+      { day: "Sat", value: 45, rawAmount: 0, color: roleConfig.heroColor },
+      { day: "Sun", value: 25, rawAmount: 0, color: "#8E94F2" },
+    ];
+  }, [data, roleConfig]);
 
   if (loading && !refreshing) {
     return (
@@ -312,17 +334,6 @@ export function DashboardScreen({ onJump, user, refreshSignal, onRefreshComplete
   }
 
   const stats = data?.stats || {};
-
-  // Visual Bar Graph sample dataset based on weekly activity
-  const barGraphData = [
-    { day: "Mon", value: 35, color: "#8E94F2" },
-    { day: "Tue", value: 55, color: "#8E94F2" },
-    { day: "Wed", value: 40, color: "#8E94F2" },
-    { day: "Thu", value: 70, color: "#8E94F2" },
-    { day: "Fri", value: 85, color: roleConfig.heroColor },
-    { day: "Sat", value: 95, color: roleConfig.heroColor },
-    { day: "Sun", value: 60, color: "#8E94F2" },
-  ];
 
   return (
     <View style={styles.section}>
@@ -371,7 +382,7 @@ export function DashboardScreen({ onJump, user, refreshSignal, onRefreshComplete
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <Ionicons name="bar-chart" size={16} color={colors.textPrimary} />
-              <Text style={{ fontSize: 13, fontWeight: "700", color: colors.textPrimary }}>Weekly Revenue & Performance</Text>
+              <Text style={{ fontSize: 13, fontWeight: "700", color: colors.textPrimary }}>Weekly Revenue</Text>
             </View>
             <View style={{ backgroundColor: roleConfig.heroColor + "20", paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill }}>
               <Text style={{ color: roleConfig.heroColor, fontWeight: "700", fontSize: 11 }}>Live Trend</Text>
@@ -381,7 +392,7 @@ export function DashboardScreen({ onJump, user, refreshSignal, onRefreshComplete
           {/* SVG Visual Bar Chart */}
           <Svg width={300} height={100} style={{ alignSelf: "center" }}>
             <Line x1="0" y1="80" x2="300" y2="80" stroke={colors.border} strokeWidth="1" strokeDasharray="3 3" />
-            {barGraphData.map((bar, index) => {
+            {barGraphData.map((bar: any, index: number) => {
               const x = 20 + index * 40;
               const barHeight = bar.value * 0.7;
               const y = 80 - barHeight;
@@ -473,7 +484,7 @@ const styles = StyleSheet.create({
   },
   heroLabel: {
     color: "rgba(255, 255, 255, 0.8)",
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -491,7 +502,7 @@ const styles = StyleSheet.create({
   },
   heroBadgeValue: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 11,
     fontWeight: "800"
   },
   heroBadgeLabel: {

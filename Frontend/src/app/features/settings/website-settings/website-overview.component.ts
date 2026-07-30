@@ -11,7 +11,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   template: `
-    <div class="flex-1 overflow-y-auto bg-gray-50 h-full">
+    <div class="flex-1 overflow-y-auto bg-primary-50 h-full">
       <main class="p-6 md:p-8 max-w-full mx-auto space-y-6">
         <!-- Header -->
         <div class="flex items-center justify-between">

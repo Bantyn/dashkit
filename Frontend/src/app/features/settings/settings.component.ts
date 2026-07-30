@@ -14,7 +14,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, UiInputComponent, UiLoadingComponent],
   template: `
-    <div class="h-full bg-gray-50 flex flex-col overflow-hidden">
+    <div class="h-full bg-primary-50 flex flex-col overflow-hidden">
       <!-- Header -->
       <div class="px-6 py-5 border-b border-gray-200 bg-white flex justify-between items-center shrink-0">
         <h2 class="text-xl font-bold text-gray-900">Settings</h2>
@@ -168,7 +168,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <!-- Staff Count -->
-                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-primary-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Staff Members</h4>
@@ -189,7 +189,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
 
                     <!-- Branch Count -->
-                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-primary-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Branches Active</h4>
@@ -210,7 +210,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
 
                     <!-- Products Count -->
-                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-primary-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Products Count</h4>
@@ -231,7 +231,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
 
                     <!-- Invoices Count -->
-                    <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
+                    <div class="border border-gray-200 rounded-xl p-5 bg-primary-50/50 flex flex-col justify-between hover:border-gray-200 transition-all">
                       <div>
                         <div class="flex justify-between items-center mb-1">
                           <h4 class="font-normal text-gray-800 text-sm">Invoices / Month</h4>
@@ -259,7 +259,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
               <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                 <h3 class="text-lg font-bold text-gray-900 mb-6">Preferences</h3>
                 <div class="space-y-4">
-                  <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div class="flex items-center justify-between p-4 bg-primary-50 rounded-xl">
                     <div class="flex gap-4 items-center">
                       <div
                         class="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"
@@ -278,7 +278,7 @@ import { UiLoadingComponent } from '../../shared/components/ui-loading.component
                     </div>
                   </div>
 
-                  <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div class="flex items-center justify-between p-4 bg-primary-50 rounded-xl">
                     <div class="flex gap-4 items-center">
                       <div
                         class="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"

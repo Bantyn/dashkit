@@ -12,7 +12,7 @@ export interface ShopConfig {
   displayName: string;
   slug: string;
   subdomainEnabled: boolean;
-  subscriptionPlan: 'free' | 'plus' | 'pro' | 'custom';
+  subscriptionPlan: 'free' | 'plus' | 'pro' | 'custom' | 'enterprise';
   cartEnabled?: boolean;
   description: string;
   theme?: {
@@ -99,7 +99,7 @@ export class ShopContextService {
       return config.cartEnabled;
     }
     const plan = config?.subscriptionPlan;
-    return plan === 'pro' || plan === 'custom';
+    return plan === 'pro' || plan === 'custom' || plan === 'enterprise';
   }
 
   getShop(): ShopConfig | null {
@@ -127,11 +127,23 @@ export class ShopContextService {
     });
   }
 
-  loadShopConfig(slug?: string): Observable<ShopConfig | null> {
+  clearCache(slug?: string) {
+    if (slug) {
+      this.configRequestCache.delete(slug);
+    } else {
+      this.configRequestCache.clear();
+    }
+  }
+
+  loadShopConfig(slug?: string, forceRefresh: boolean = false): Observable<ShopConfig | null> {
     const currentSlug =
       slug || this.tenantService.getSubdomainSlug() || this.tenantService.getPathSlug();
 
     if (!currentSlug) return of(null);
+
+    if (forceRefresh) {
+      this.configRequestCache.delete(currentSlug);
+    }
 
     const cached = this.configRequestCache.get(currentSlug);
     if (cached) {
@@ -147,7 +159,7 @@ export class ShopContextService {
           const config = res.data;
           if (config.subdomainEnabled === undefined && (config as any).subscriptionPlan) {
             const plan = (config as any).subscriptionPlan;
-            config.subdomainEnabled = plan === 'pro' || plan === 'custom';
+            config.subdomainEnabled = plan === 'pro' || plan === 'custom' || plan === 'enterprise';
           }
           return config;
         }),
@@ -164,7 +176,7 @@ export class ShopContextService {
           this.shopConfigSubject.next(null);
           return of(null);
         }),
-        shareReplay({ bufferSize: 1, refCount: false, windowTime: 300_000 }),
+        shareReplay({ bufferSize: 1, refCount: false, windowTime: 30_000 }),
       );
 
     this.configRequestCache.set(currentSlug, request$);
@@ -195,17 +207,36 @@ export class ShopContextService {
         );
       };
 
-      root.style.setProperty('--color-primary', hex);
-      root.style.setProperty('--color-primary-600', hex);
-      root.style.setProperty('--color-primary-700', adjustColor(hex, -20));
-      root.style.setProperty('--color-primary-800', adjustColor(hex, -40));
-      root.style.setProperty('--color-primary-900', adjustColor(hex, -60));
-      root.style.setProperty('--color-primary-500', adjustColor(hex, 20));
-      root.style.setProperty('--color-primary-400', adjustColor(hex, 40));
-      root.style.setProperty('--color-primary-300', adjustColor(hex, 60));
-      root.style.setProperty('--color-primary-200', adjustColor(hex, 80));
-      root.style.setProperty('--color-primary-100', adjustColor(hex, 160));
-      root.style.setProperty('--color-primary-50', adjustColor(hex, 200));
+      const hexToRgb = (hexColor: string): string => {
+        const cleanHex = hexColor.replace(/^#/, '');
+        let num = parseInt(cleanHex, 16);
+        if (cleanHex.length === 3) {
+          num = parseInt(cleanHex.split('').map((c) => c + c).join(''), 16);
+        }
+        const r = (num >> 16) & 255;
+        const g = (num >> 8) & 255;
+        const b = num & 255;
+        return `${r} ${g} ${b}`;
+      };
+
+      const shades: { [key: string]: string } = {
+        '--color-primary': hex,
+        '--color-primary-600': hex,
+        '--color-primary-700': adjustColor(hex, -20),
+        '--color-primary-800': adjustColor(hex, -40),
+        '--color-primary-900': adjustColor(hex, -60),
+        '--color-primary-500': adjustColor(hex, 20),
+        '--color-primary-400': adjustColor(hex, 40),
+        '--color-primary-300': adjustColor(hex, 60),
+        '--color-primary-200': adjustColor(hex, 80),
+        '--color-primary-100': adjustColor(hex, 160),
+        '--color-primary-50': adjustColor(hex, 200),
+      };
+
+      Object.entries(shades).forEach(([prop, hexValue]) => {
+        root.style.setProperty(prop, hexValue);
+        root.style.setProperty(`${prop}-rgb`, hexToRgb(hexValue));
+      });
     }
   }
 }

@@ -27,13 +27,13 @@ export const getShopConfig = asyncHandler(async (req: Request, res: Response) =>
         cartEnabled = features.includes("sell_checkout");
         subdomainEnabled = features.includes("custom_domain") || features.includes("custom_subdomain") || features.includes("domain");
       } else {
-        cartEnabled = ['pro', 'custom', 'trial', 'plus'].includes(req.shop.subscriptionPlan);
-        subdomainEnabled = ['pro', 'custom'].includes(req.shop.subscriptionPlan);
+        cartEnabled = ['pro', 'custom', 'trial', 'plus', 'enterprise'].includes(req.shop.subscriptionPlan);
+        subdomainEnabled = ['pro', 'custom', 'enterprise'].includes(req.shop.subscriptionPlan);
       }
     } catch (e) {
       console.error("Failed to fetch subscription plan for shop config:", e);
-      cartEnabled = ['pro', 'custom', 'trial', 'plus'].includes(req.shop.subscriptionPlan);
-      subdomainEnabled = ['pro', 'custom'].includes(req.shop.subscriptionPlan);
+      cartEnabled = ['pro', 'custom', 'trial', 'plus', 'enterprise'].includes(req.shop.subscriptionPlan);
+      subdomainEnabled = ['pro', 'custom', 'enterprise'].includes(req.shop.subscriptionPlan);
     }
   } 
 

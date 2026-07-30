@@ -71,6 +71,7 @@ app.get("/health", (req, res) => {
       shopDashboard: 4200,
       adminDashboard: 4201,
       showcase: 4202,
+      storefront: 4203,
     },
   });
 });
@@ -462,8 +463,8 @@ app.get("/api/v1", (req, res) => {
 });
 
 registerPublicApiRoutes(app);
-registerAdminApiRoutes(app);
 registerInternalRoutes(app);
+registerAdminApiRoutes(app);
 
 // 404 Handler
 app.use(notFoundHandler);

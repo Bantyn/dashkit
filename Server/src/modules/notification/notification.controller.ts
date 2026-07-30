@@ -323,7 +323,7 @@ export const sendTestNotification = asyncHandler(async (req: Request, res: Respo
     if (success) {
       return sendSuccess(res, null, "Test notification sent successfully");
     } else {
-      return sendError(res, "Failed to send test notification", 500);
+      return sendError(res, "Failed to send test notification. Please check your credentials or credits.", 400);
     }
   } catch (err: any) {
     await db.collection("notification_logs").add({
@@ -336,6 +336,6 @@ export const sendTestNotification = asyncHandler(async (req: Request, res: Respo
       error: err.message,
       createdAt: new Date(),
     });
-    return sendError(res, `Failed to send: ${err.message}`, 500);
+    return sendError(res, err.message || "Failed to send test notification", 400);
   }
 });

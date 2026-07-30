@@ -168,6 +168,7 @@ export interface RazorpayConfig {
   keyId: string;
   keySecret?: string;
   connected: boolean;
+  merchantVpa?: string;
 }
 
 export interface Integrations {

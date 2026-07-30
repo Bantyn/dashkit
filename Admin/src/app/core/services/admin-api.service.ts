@@ -316,6 +316,31 @@ export type PlatformGstStatus =
   | 'failed'
   | 'suspended';
 
+export type GstVerificationStatus = 'SELF_DECLARED' | 'PENDING_REVIEW' | 'VERIFIED' | 'REJECTED';
+export type GstVerificationMode = 'LOCAL_CHECKSUM' | 'SELF_DECLARATION' | 'MANUAL_ADMIN' | 'SANDBOX_API' | 'LIVE_API';
+export type GstProviderType = 'LOCAL_CHECKSUM' | 'SANDBOX' | 'SUREPASS' | 'ZOOP' | 'DECENTRO' | 'MASTERS_INDIA';
+
+export type ShopGstProfile = {
+  shopId: string;
+  shopName: string;
+  isGstRegistered: boolean;
+  gstin: string;
+  legalName: string;
+  tradeName?: string;
+  businessType?: string;
+  compositionScheme?: boolean;
+  verificationStatus: GstVerificationStatus;
+  verificationMode: GstVerificationMode;
+  verificationProvider: GstProviderType;
+  verifiedAt?: any | null;
+  verifiedBy?: string | null;
+  certificateUrl?: string | null;
+  certificateUploadedAt?: any | null;
+  rejectionReason?: string | null;
+  selfDeclarationAccepted: boolean;
+  selfDeclarationAcceptedAt?: any | null;
+};
+
 export type PlatformGstSettings = {
   gstNumber: string;
   legalBusinessName: string;
@@ -324,6 +349,14 @@ export type PlatformGstSettings = {
   gstStatus: PlatformGstStatus;
   gstVerified: boolean;
   gstCollectionEnabled: boolean;
+  verificationStatus?: GstVerificationStatus;
+  verificationMode?: GstVerificationMode;
+  verificationProvider?: GstProviderType;
+  selfDeclarationAccepted?: boolean;
+  selfDeclarationAcceptedAt?: any | null;
+  certificateUrl?: string | null;
+  certificateUploadedAt?: any | null;
+  rejectionReason?: string | null;
   verifiedAt: any | null;
   verifiedBy: string | null;
   lastVerificationAttempt: any | null;
@@ -735,6 +768,21 @@ export class AdminApiService {
   updatePlatformTelemetrySettings(payload: any): Observable<ApiResponse<any>> {
     this.invalidateKeys('platform:telemetry');
     return this.http.put<ApiResponse<any>>(`${this.apiUrl}/platform/telemetry`, payload);
+  }
+
+  // ── Admin Shop GST Verification Management ─────────────────────────────────────
+
+  getShopGstProfiles(status?: string): Observable<ApiResponse<ShopGstProfile[]>> {
+    const url = status ? `${this.apiUrl}/admin/gst/shops?status=${status}` : `${this.apiUrl}/admin/gst/shops`;
+    return this.http.get<ApiResponse<ShopGstProfile[]>>(url);
+  }
+
+  approveShopGst(shopId: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/admin/gst/shops/${shopId}/approve`, {});
+  }
+
+  rejectShopGst(shopId: string, reason: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/admin/gst/shops/${shopId}/reject`, { reason });
   }
 
   // ── Platform General Settings ──────────────────────────────────────────────────────

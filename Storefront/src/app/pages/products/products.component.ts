@@ -28,7 +28,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
   template: `
     <div class="min-h-screen pt-4 pb-20 bg-white">
       <div class="container mx-auto px-4 max-w-7xl pt-8 pb-4">
-        <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-6">
+        <h1 class="text-3xl font-black text-primary-900 tracking-tight mb-6">
           {{ (currentCollection$ | async) ? (currentCollection$ | async) : 'Shop Collection' }}
         </h1>
 
@@ -39,11 +39,11 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
               *ngFor="let cat of categories$ | async"
               (click)="setCategory(cat)"
               class="px-5 py-2.5 rounded-full border text-sm font-semibold transition-all duration-200 cursor-pointer"
-              [class.bg-black]="(currentCategory$ | async) === (cat === 'all' ? '' : cat)"
+              [class.bg-primary-900]="(currentCategory$ | async) === (cat === 'all' ? '' : cat)"
               [class.text-white]="(currentCategory$ | async) === (cat === 'all' ? '' : cat)"
-              [class.border-black]="(currentCategory$ | async) === (cat === 'all' ? '' : cat)"
+              [class.border-primary-900]="(currentCategory$ | async) === (cat === 'all' ? '' : cat)"
               [class.bg-white]="(currentCategory$ | async) !== (cat === 'all' ? '' : cat)"
-              [class.text-gray-600]="(currentCategory$ | async) !== (cat === 'all' ? '' : cat)"
+              [class.text-primary-600]="(currentCategory$ | async) !== (cat === 'all' ? '' : cat)"
               [class.border-gray-200]="(currentCategory$ | async) !== (cat === 'all' ? '' : cat)"
             >
               {{ cat === 'all' ? 'All Pieces' : (cat | titlecase) }}
@@ -65,7 +65,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
             <button
               (click)="toggleMobileFilters()"
-              class="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-2"
+              class="text-sm font-bold text-primary-900 hover:text-primary-600 transition-colors flex items-center gap-2"
             >
               Filter
             </button>
@@ -77,14 +77,14 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
           <ng-container *ngIf="products$ | async as products; else loading">
             <div class="flex items-center justify-between mb-8">
               <p class="text-gray-500 font-medium text-xs tracking-wider uppercase">
-                Showing <span class="text-gray-900 font-bold">{{ products.length }}</span> items
+                Showing <span class="text-primary-900 font-bold">{{ products.length }}</span> items
               </p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
               <div *ngFor="let product of products" class="group relative flex flex-col h-full cursor-pointer">
-                <a [routerLink]="routePrefix.concat(['products', product.id])" class="block flex-grow flex flex-col">
-                  <div class="relative aspect-[3/4] bg-[#fff] overflow-hidden mb-4 rounded-xl border border-gray-100">
+                <a [routerLink]="routePrefix.concat(['products', product.id])" class="block flex-grow flex-col">
+                  <div class="relative aspect-[3/4] bg-primary/10 overflow-hidden mb-4 rounded-xl border border-gray-100">
                     <img
                       [src]="(product.images && product.images[0]) | optimizeImage:'card'"
                       [alt]="product.name"
@@ -94,7 +94,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
                     <div
                       *ngIf="isOutOfStock(product)"
-                      class="absolute top-4 left-4 bg-white/90 backdrop-blur text-gray-900 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-sm shadow-sm"
+                      class="absolute top-4 left-4 bg-white/90 backdrop-blur text-primary-900 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-sm shadow-sm"
                     >
                       Out of Stock
                     </div>
@@ -102,17 +102,17 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                     <button
                       *ngIf="cartEnabled && !isOutOfStock(product)"
                       (click)="quickAdd($event, product)"
-                      class="absolute bottom-4 right-4 w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all shadow-md"
+                      class="absolute bottom-4 right-4 w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-800 hover:text-white transition-all shadow-md"
                     >
                       <i class="bi bi-plus text-xl"></i>
                     </button>
                   </div>
 
                   <div class="flex flex-col text-left">
-                    <h3 class="text-sm font-semibold text-gray-900 mt-1 mb-1 leading-tight group-hover:underline">
+                    <h3 class="text-sm font-semibold text-primary-900 mt-1 mb-1 leading-tight group-hover:underline">
                       {{ product.name }}
                     </h3>
-                    <p class="text-sm text-gray-900 font-bold">
+                    <p class="text-sm text-primary-900 font-bold">
                       ₹{{ product.variants[0]?.price }}
                     </p>
                   </div>
@@ -125,10 +125,10 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
               class="text-center py-24 bg-white rounded-3xl border border-gray-100 mt-4"
             >
               <i class="bi bi-search text-5xl text-gray-300 mb-6 inline-block"></i>
-              <h3 class="text-2xl font-black text-gray-900 mb-2">No matching items found</h3>
+              <h3 class="text-2xl font-black text-primary-900 mb-2">No matching items found</h3>
               <button
                 (click)="resetFilters()"
-                class="bg-black text-white px-8 py-3 rounded-full font-bold hover:opacity-90 transition-opacity shadow-lg"
+                class="bg-primary-900 text-white px-8 py-3 rounded-full font-bold hover:opacity-90 transition-opacity shadow-lg"
               >
                 Clear All Filters
               </button>

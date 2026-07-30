@@ -596,8 +596,10 @@ export class CostAnalyticsService {
   private readonly SHOPS_TTL_MS = 5 * 60 * 1000;             // 5 minutes
   private readonly SNAPSHOT_TTL_MS = 5 * 60 * 1000;          // 5 minutes
 
-  // Snapshot rebuild guard — prevents concurrent background rebuilds
+  // Snapshot rebuild guard & cooldown — prevents concurrent & duplicate background rebuilds
   private isRefreshing = false;
+  private lastSnapshotGeneratedAt = 0;
+  public readonly SNAPSHOT_REBUILD_COOLDOWN_MS = 30000; // 30 seconds cooldown
 
   // ─────────────────────────────────────────────────────────────────────────────
   // SECTION 1: SNAPSHOT ENGINE — Primary Report Path
@@ -633,7 +635,7 @@ export class CostAnalyticsService {
 
       // Non-blocking background refresh for stale snapshots
       if (isStale && !this.isRefreshing) {
-        this.refreshSnapshotAsync();
+        this.refreshSnapshotAsync("cache_expired");
       }
 
       return snapshot;
@@ -647,20 +649,43 @@ export class CostAnalyticsService {
   }
 
   /**
-   * Trigger a background snapshot refresh (fire-and-forget).
-   * Safe to call multiple times — guarded by isRefreshing flag.
+   * Check if a snapshot rebuild is currently on cooldown.
    */
-  refreshSnapshotAsync(): void {
-    if (this.isRefreshing) return;
+  isCooldownActive(): boolean {
+    if (this.isRefreshing) return true;
+    if (this.lastSnapshotGeneratedAt === 0) return false;
+    return (Date.now() - this.lastSnapshotGeneratedAt) < this.SNAPSHOT_REBUILD_COOLDOWN_MS;
+  }
+
+  /**
+   * Trigger a background snapshot refresh (fire-and-forget).
+   * Safe to call multiple times — guarded by isRefreshing flag and 30s cooldown.
+   */
+  refreshSnapshotAsync(reason: string = "unknown"): void {
+    const now = Date.now();
+    const elapsedSinceLast = now - this.lastSnapshotGeneratedAt;
+
+    if (this.isRefreshing) {
+      console.log(`[Analytics Snapshot] Skipped. Reason: Refresh Already Running (trigger: ${reason})`);
+      return;
+    }
+
+    if (this.lastSnapshotGeneratedAt > 0 && elapsedSinceLast < this.SNAPSHOT_REBUILD_COOLDOWN_MS) {
+      const remainingSec = Math.ceil((this.SNAPSHOT_REBUILD_COOLDOWN_MS - elapsedSinceLast) / 1000);
+      console.log(`[Analytics Snapshot] Skipped. Reason: Cooldown Active (${remainingSec}s remaining, trigger: ${reason})`);
+      return;
+    }
+
     this.isRefreshing = true;
 
     setImmediate(async () => {
       try {
-        // console.log("[CostAnalytics] Background snapshot refresh started.");
+        console.log(`[Analytics Snapshot] Triggered. Reason: ${reason}`);
         await this.buildAndSaveSnapshot();
-        // console.log("[CostAnalytics] Background snapshot refresh completed.");
+        this.lastSnapshotGeneratedAt = Date.now();
+        console.log(`[Analytics Snapshot] Generated Successfully (reason: ${reason})`);
       } catch (err) {
-        console.error("[CostAnalytics] Background snapshot refresh failed:", err);
+        console.error("[Analytics Snapshot] Background snapshot refresh failed:", err);
       } finally {
         this.isRefreshing = false;
       }
@@ -751,27 +776,19 @@ export class CostAnalyticsService {
     const startStr = start.toISOString().split("T")[0];
     const endStr = end.toISOString().split("T")[0];
 
-    const [storageUsageSnap, apiAggSnap, opsSnap, allCounters] = await Promise.all([
-      // 4. Storage usage (N shop docs)
-      db.collection("storage_usage").get(),
-      // 5. API usage aggregation (N shop docs)
+    const [apiAggSnap, opsSnap, allCounters] = await Promise.all([
+      // 4. API usage aggregation (N shop docs)
       db.collection("api_usage_aggregation").get(),
-      // 6. Firestore ops metrics for date range
+      // 5. Firestore ops metrics for date range
       db.collection("firestore_operations_metrics")
         .where("date", ">=", startStr)
         .where("date", "<=", endStr)
         .get(),
-      // 7. Shop counters — replaces 6 full collection scans (600+ reads → N reads)
+      // 6. Shop counters — replaces 6 full collection scans (600+ reads → N reads)
       shopCountersService.getAllCounters(),
     ]);
 
     // Build lookup maps from parallel reads
-    const storageMap = new Map<string, number>(
-      storageUsageSnap.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => [
-        doc.id,
-        Number(doc.data()?.usedBytes || 0),
-      ])
-    );
 
     const apiAggMap = new Map<string, number>(
       apiAggSnap.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => [
@@ -836,8 +853,22 @@ export class CostAnalyticsService {
       const shopId = shop.id;
       const shopName = shop.shopName || shop.displayName || "Untitled Shop";
       const planCode = String(shop.subscriptionPlan || "free").toLowerCase();
+      const payStatus = String((shop as any).paymentStatus || "").toLowerCase();
+      const subStatus = String((shop as any).subscriptionStatus || "").toLowerCase();
+
+      // Financial Accounting Rule: Free Trial, pending payment, expired trial, free plan, or unpaid status = ₹0 revenue
+      const isPaidSubscriber =
+        planCode !== "free" &&
+        planCode !== "trial" &&
+        payStatus !== "trial" &&
+        payStatus !== "pending" &&
+        payStatus !== "expired" &&
+        payStatus !== "past_due" &&
+        payStatus !== "failed" &&
+        (payStatus === "active" || payStatus === "paid" || subStatus === "active" || subStatus === "paid");
+
       const plan = planMap.get(planCode);
-      const subscriptionRevenue = Number(plan?.monthlyPrice ?? plan?.price ?? 0);
+      const subscriptionRevenue = isPaidSubscriber ? Number(plan?.monthlyPrice ?? plan?.price ?? 0) : 0;
       totalPlatformRevenue += subscriptionRevenue;
 
       // ── Replace 6 full collection scans with O(1) counter lookups ──
@@ -898,7 +929,7 @@ export class CostAnalyticsService {
 
       // Cloud storage (actual or fallback estimate)
       const storageBytes =
-        storageMap.get(shopId) || shopProductsLifetime * 0.5 * 1024 * 1024;
+        Number((shop as any).currentStorageBytes || 0) || shopProductsLifetime * 0.5 * 1024 * 1024;
       const assetsStorageGB = storageBytes / (1024 * 1024 * 1024);
 
       const reads = shopOps.reads;
@@ -1304,7 +1335,8 @@ export class CostAnalyticsService {
 
     // Persist snapshot (1 write)
     await db.collection(SNAPSHOT_COLLECTION).doc(SNAPSHOT_ID).set(snapshot);
-    // Update memory cache
+    // Update memory cache and last generated timestamp
+    this.lastSnapshotGeneratedAt = Date.now();
     this.cache.set("analytics:snapshot:latest", snapshot, this.SNAPSHOT_TTL_MS);
     this.cache.delete("costAnalytics:isStale");
 

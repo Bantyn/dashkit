@@ -1005,12 +1005,27 @@ export class SubscriptionService {
     const gst = gstInfo.enabled ? Math.round(subtotal * (gstRate / 100) * 100) / 100 : 0;
     const total = Math.round((subtotal + gst) * 100) / 100;
 
-    // Next billing date from shop record
+    // Next billing date from shop record (with fallback)
     let nextBillingDate: Date | null = null;
-    if (shop.nextBillingDate) {
-      nextBillingDate = shop.nextBillingDate.toDate
-        ? shop.nextBillingDate.toDate()
-        : new Date(shop.nextBillingDate);
+    const rawNextBilling = (shop as any).nextBillingDate || (shop as any).trialExpiresAt || (shop as any).renewDate;
+    if (rawNextBilling) {
+      const parsed = typeof rawNextBilling.toDate === "function" ? rawNextBilling.toDate() : new Date(rawNextBilling);
+      if (!isNaN(parsed.getTime())) {
+        nextBillingDate = parsed;
+      }
+    }
+
+    if (!nextBillingDate) {
+      const createdRaw = (shop as any).createdAt;
+      const created = createdRaw ? (typeof createdRaw.toDate === "function" ? createdRaw.toDate() : new Date(createdRaw)) : new Date();
+      const baseDate = !isNaN(created.getTime()) ? created : new Date();
+      const fallback = new Date(baseDate);
+      fallback.setMonth(fallback.getMonth() + 1);
+      const now = new Date();
+      while (fallback < now) {
+        fallback.setMonth(fallback.getMonth() + 1);
+      }
+      nextBillingDate = fallback;
     }
 
     return {
@@ -1020,6 +1035,7 @@ export class SubscriptionService {
       addons: addonLines,
       subtotal,
       gst,
+      gstRate,
       total,
       currency: access.plan.currency || "INR",
     };

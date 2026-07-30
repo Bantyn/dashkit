@@ -355,10 +355,11 @@ export class WebsiteImagesComponent implements OnInit {
         this.shop = res?.data || null;
         if (this.shop) {
           const theme: any = this.shop.theme || {};
-          this.settings = theme.homepageSettings || {
-            categoryBanners: {},
-            editorials: {},
-            instagramImages: [],
+          const hp = theme.homepageSettings || {};
+          this.settings = {
+            categoryBanners: hp.categoryBanners || {},
+            editorials: hp.editorials || {},
+            instagramImages: hp.instagramImages || [],
           };
         }
         this.loading = false;
@@ -398,16 +399,22 @@ export class WebsiteImagesComponent implements OnInit {
     if (!this.shop) return;
     this.saving = true;
     
-    // We use dot notation to update only the specific field without overwriting the rest of the theme
-    const payload = { "theme.homepageSettings": this.settings } as any;
+    const existingTheme = this.shop.theme || { primaryColor: '#000', secondaryColor: '#fff', fontFamily: 'Inter' };
+    const updatedTheme = {
+      ...existingTheme,
+      homepageSettings: this.settings,
+    };
+
+    const payload = { theme: updatedTheme };
 
     this.shopService.updateShop(this.shopId, payload).subscribe({
       next: () => {
         this.saving = false;
         this.saveSuccess = true;
-        if (this.shop) this.shop.theme = { ...this.shop.theme, homepageSettings: this.settings };
+        if (this.shop) {
+          this.shop.theme = updatedTheme;
+        }
         setTimeout(() => (this.saveSuccess = false), 3000);
-        // Clear caches
         this.shopService['shopCache'].delete(this.shopId);
       },
       error: () => {

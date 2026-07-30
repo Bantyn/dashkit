@@ -44,12 +44,20 @@ export class TenantService {
       this.currentSlugSubject.next(subdomainSlug);
     } else {
       // 2. Fallback to Route Path (Plus Plan)
+      // Emit immediately if the router already has a path slug (e.g. direct navigation to /shop/:slug/products)
+      const initialPathSlug = this.getPathSlug();
+      if (initialPathSlug) {
+        this.currentSlugSubject.next(initialPathSlug);
+      }
+
       this.router.events
         .pipe(filter((event) => event instanceof NavigationEnd))
         .subscribe(() => {
           const pathSlug = this.getPathSlug();
           if (!subdomainSlug && pathSlug) {
             this.currentSlugSubject.next(pathSlug);
+          } else if (!subdomainSlug && !pathSlug) {
+            this.currentSlugSubject.next(null);
           }
         });
     }
@@ -72,8 +80,8 @@ export class TenantService {
       }
     } else if (
       hostname.includes("vercel.app") ||
-      hostname.includes("clothify.com") ||
-      hostname.includes("clothify.in") ||
+      hostname.includes("dashkit.com") ||
+      hostname.includes("dashkit.in") ||
       hostname.includes("dashkit.com")
     ) {
       // Platform domains (e.g. shop.dashkiiit.vercel.app or zara.dashkit.com)

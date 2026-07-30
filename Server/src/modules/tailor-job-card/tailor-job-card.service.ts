@@ -2,7 +2,7 @@ import { db } from "../../config/firebase.config";
 import { CacheService } from "../../infrastructure/cache/cache.service";
 import { TailorJobCard } from "./tailor-job-card.model";
 
-const COLLECTION = "tailor_job_cards";
+const COLLECTION = "tailoring_jobs";
 
 export class TailorJobCardService {
   private readonly cache = new CacheService();

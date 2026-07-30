@@ -13,7 +13,7 @@ import { ImageUploaderComponent } from '../../../shared/components/image-uploade
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, UiDropdownComponent, ImageUploaderComponent],
   template: `
-    <div class="flex-1 overflow-y-auto bg-gray-50 h-full">
+    <div class="flex-1 overflow-y-auto bg-primary-50 h-full">
       <main class="p-6 md:p-8 max-w-full mx-auto space-y-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -184,7 +184,7 @@ import { ImageUploaderComponent } from '../../../shared/components/image-uploade
                   </div>
 
                   <!-- Mockup Content -->
-                  <div class="relative bg-gray-50 h-[500px] overflow-y-auto">
+                  <div class="relative bg-primary-50 h-[500px] overflow-y-auto">
                     
                     <!-- Banner -->
                     <div class="h-32 w-full bg-gray-200 relative">

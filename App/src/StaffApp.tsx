@@ -8,6 +8,7 @@ import {
   StatusBar,
   Animated,
   RefreshControl,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -29,6 +30,7 @@ import { useTheme } from "./ThemeContext";
 import { getAvailableTabs } from "./utils/permissions";
 import { ProtectedScreen } from "./components/ProtectedScreen";
 import { setApiStaffId, setApiToken } from "./api";
+import { radius } from "./theme";
 
 const { width, height } = Dimensions.get("window");
 
@@ -178,10 +180,11 @@ export function StaffApp() {
     }
   };
 
+  const isIOS = Platform.OS === "ios";
   const BAR_WIDTH = width * 0.94;
   const TAB_WIDTH = BAR_WIDTH / availableTabs.length;
-  const CURVE_WIDTH = 90; // Adjusted for smaller circle
-  const CURVE_DEPTH = 35; // Adjusted depth for smaller circle
+  const CURVE_WIDTH = Math.min(76, TAB_WIDTH + 16);
+  const CURVE_DEPTH = 26;
 
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -193,30 +196,30 @@ export function StaffApp() {
       top: 0,
       left: 0,
       right: 0,
-      height: 320,
+      height: isIOS ? 260 : 230,
       backgroundColor: colors.brandStrong,
-      borderBottomLeftRadius: 100,
-      borderBottomRightRadius: 100,
+      borderBottomLeftRadius: radius.xxl,
+      borderBottomRightRadius: radius.xxl,
       zIndex: 0,
     },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 24,
-      paddingTop: 50,
-      paddingBottom: 20,
+      paddingHorizontal: 20,
+      paddingTop: isIOS ? 56 : (StatusBar.currentHeight ? StatusBar.currentHeight + 14 : 44),
+      paddingBottom: 14,
       zIndex: 2
     },
     title: {
       color: colors.white,
-      fontSize: 22,
+      fontSize: 21,
       fontWeight: "800",
     },
     avatar: {
-      width: 52,
-      height: 52,
-      borderRadius: 25,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: "rgba(255,255,255,0.25)",
       alignItems: "center",
       justifyContent: "center",
@@ -226,20 +229,20 @@ export function StaffApp() {
     avatarText: {
       color: colors.white,
       fontWeight: "800",
-      fontSize: 18
+      fontSize: 16
     },
     content: {
       flex: 1,
       zIndex: 1
     },
     contentScroll: {
-      paddingHorizontal: 20,
-      paddingTop: 10,
-      paddingBottom: 140
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: isIOS ? 140 : 120
     },
     bottomBarContainer: {
       position: "absolute",
-      bottom: 25,
+      bottom: isIOS ? 28 : 16,
       left: 0,
       right: 0,
       alignItems: "center",
@@ -247,7 +250,7 @@ export function StaffApp() {
     },
     bottomBar: {
       width: BAR_WIDTH,
-      height: 70,
+      height: 65,
       backgroundColor: "transparent",
     },
     tabItem: {
@@ -255,17 +258,19 @@ export function StaffApp() {
       alignItems: "center",
       justifyContent: "center",
       height: "100%",
+      paddingHorizontal: 2,
     },
     tabText: {
-      fontSize: 11,
+      fontSize: 10,
       fontWeight: "700",
+      textAlign: "center",
     },
     floatingCircle: {
       position: "absolute",
-      top: -28,
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+      top: -24,
+      width: 52,
+      height: 52,
+      borderRadius: 26,
       backgroundColor: "transparent",
       alignItems: "center",
       justifyContent: "center",
@@ -275,9 +280,9 @@ export function StaffApp() {
       overflow: "hidden"
     },
     circleInner: {
-      width: 40,
-      height: 44,
-      borderRadius: 20,
+      width: 38,
+      height: 40,
+      borderRadius: 19,
       backgroundColor: "transparent",
       alignItems: "center",
       justifyContent: "center",
@@ -403,10 +408,14 @@ export function StaffApp() {
               return (
                 <Pressable key={tab.key} onPress={() => setActiveTab(tab.key as TabKey)} style={dynamicStyles.tabItem}>
                   {!isActive && <Ionicons name={(getIconName(tab.key as TabKey) + "-outline") as any} size={24} color={colors.textMuted} />}
-                  <Text style={[
-                    dynamicStyles.tabText,
-                    { color: isActive ? colors.brand : colors.textMuted, marginTop: isActive ? 42 : 4 }
-                  ]}>
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={[
+                      dynamicStyles.tabText,
+                      { color: isActive ? colors.brand : colors.textMuted, marginTop: isActive ? 42 : 4 }
+                    ]}
+                  >
                     {tab.label}
                   </Text>
                 </Pressable>

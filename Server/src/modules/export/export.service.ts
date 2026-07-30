@@ -17,7 +17,7 @@ export class ExportService {
     
     const record: ExportHistoryRecord = {
       id: exportId,
-      name: `${parsed.module}_${Date.now()}.${parsed.format}`,
+      name: parsed.name || `${parsed.module}_${Date.now()}.${parsed.format}`,
       module: parsed.module,
       format: parsed.format,
       requestedBy: userId,

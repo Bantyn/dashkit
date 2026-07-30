@@ -78,8 +78,20 @@ export class AuditLogService {
       query = query.where("email", "==", email.toLowerCase().trim());
     }
 
-    const snapshot = await query.orderBy("timestamp", "desc").limit(limit).get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as AuditLog));
+    try {
+      const snapshot = await query.orderBy("timestamp", "desc").limit(limit).get();
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as AuditLog));
+    } catch (err: any) {
+      console.warn(`[AuditLogService] Fallback sorting in-memory for audit_logs query (shopId: ${shopId}, email: ${email}):`, err.message);
+      try {
+        const fallbackSnap = await query.limit(limit).get();
+        const logs = fallbackSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as AuditLog));
+        return logs.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
+      } catch (fallbackErr: any) {
+        console.error("[AuditLogService] Failed to fetch audit logs:", fallbackErr.message);
+        return [];
+      }
+    }
   }
 }
 

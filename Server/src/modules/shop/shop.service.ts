@@ -4,6 +4,7 @@ import { Shop } from "./shop.model";
 import { subscriptionService } from "../subscription/subscription.service";
 import { LIMIT_KEYS } from "../subscription/subscription.constants";
 import { tenantCacheService } from "../../infrastructure/cache/tenant-cache.service";
+import { shopPublicCacheService } from "./shop-public-cache.service";
 
 const COLLECTION = "shops";
 
@@ -58,6 +59,7 @@ export class ShopService {
   private invalidateShopCache(id?: string, subdomain?: string, customDomain?: string) {
     if (id) {
       this.cache.delete(this.getShopKey(id));
+      shopPublicCacheService.clear(id);
     }
 
     if (subdomain) {
@@ -137,6 +139,18 @@ export class ShopService {
     if (subdomain) {
       this.cache.set(this.getSubdomainKey(subdomain), newShop, this.shopCacheTtlMs);
     }
+
+    // Trigger Real-time Admin Notification
+    try {
+      const { createAdminNotification } = require("../admin-notification/admin-notification.controller");
+      createAdminNotification({
+        title: `New Shop Registered: ${newShop.shopName || shopId}`,
+        message: `A new shop '${newShop.shopName || shopId}' has been registered with subdomain '${subdomain || "default"}'.`,
+        category: "shops",
+        actionLink: `/shops`,
+        metadata: { shopId, subdomain: newShop.subdomain },
+      }).catch(() => {});
+    } catch (e) {}
     return { conflict: false as const, shop: newShop };
   }
 
@@ -193,12 +207,32 @@ export class ShopService {
     // Resolve dynamic subscription context
     const subContext = await subscriptionService.resolveAccessContext({ shopId: id, shop: fullShopData });
     
+    const rawNextBilling = (shopData as any)?.nextBillingDate || (shopData as any)?.trialExpiresAt || (shopData as any)?.renewDate;
+    let nextBillingDate: Date | null = null;
+    if (rawNextBilling) {
+      const parsed = typeof rawNextBilling?.toDate === "function" ? rawNextBilling.toDate() : new Date(rawNextBilling);
+      if (!isNaN(parsed.getTime())) nextBillingDate = parsed;
+    }
+    if (!nextBillingDate) {
+      const createdRaw = (shopData as any)?.createdAt;
+      const created = createdRaw ? (typeof createdRaw.toDate === "function" ? createdRaw.toDate() : new Date(createdRaw)) : new Date();
+      const baseDate = !isNaN(created.getTime()) ? created : new Date();
+      const fallback = new Date(baseDate);
+      fallback.setMonth(fallback.getMonth() + 1);
+      const now = new Date();
+      while (fallback < now) {
+        fallback.setMonth(fallback.getMonth() + 1);
+      }
+      nextBillingDate = fallback;
+    }
+
     const shop = {
       id: docSnap.id,
       ...shopData,
       slug: shopData?.slug || shopData?.subdomain || "",
       subdomain: shopData?.subdomain || shopData?.slug || "",
       subscriptionPlan: subContext.plan.code || subContext.plan.id || (shopData as any)?.subscriptionPlan || 'free',
+      nextBillingDate,
       features: subContext.features || []
     };
 
@@ -234,11 +268,39 @@ export class ShopService {
       }
     }
 
-    await db.collection(COLLECTION).doc(id).update({
-      ...cleanPayload,
-      ...(subdomain ? { subdomain, slug: subdomain, websiteEnabled: true } : {}),
-      updatedAt: new Date(),
-    });
+function unflattenObject(obj: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const key in obj) {
+    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+    if (key.includes(".")) {
+      const keys = key.split(".");
+      let current = result;
+      for (let i = 0; i < keys.length; i++) {
+        const subKey = keys[i];
+        if (i === keys.length - 1) {
+          current[subKey] = obj[key];
+        } else {
+          current[subKey] = current[subKey] || {};
+          current = current[subKey];
+        }
+      }
+    } else {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
+
+    const unflattenedPayload = unflattenObject(cleanPayload);
+
+    await db.collection(COLLECTION).doc(id).set(
+      {
+        ...unflattenedPayload,
+        ...(subdomain ? { subdomain, slug: subdomain, websiteEnabled: true } : {}),
+        updatedAt: new Date(),
+      },
+      { merge: true }
+    );
 
     // Handle Subscription Plan Switch if specified
     if (payload.subscriptionPlan && payload.subscriptionPlan !== existingShop?.subscriptionPlan) {
@@ -261,9 +323,12 @@ export class ShopService {
     }
 
     // Invalidate caches to reflect changes immediately
-    this.invalidateShopCache(id, (existingShop as any)?.subdomain, payload.customDomain || (existingShop as any)?.customDomain);
-    if (subdomain) {
-      this.cache.delete(this.getSubdomainKey(subdomain));
+    const targetSubdomain = subdomain || (existingShop as any)?.subdomain || (existingShop as any)?.slug;
+    const targetCustomDomain = payload.customDomain || (existingShop as any)?.customDomain;
+    this.invalidateShopCache(id, targetSubdomain, targetCustomDomain);
+    if (targetSubdomain) {
+      this.cache.delete(this.getSubdomainKey(targetSubdomain));
+      tenantCacheService.invalidateShopSlug(targetSubdomain);
     }
     
     // Crucial: Invalidate subscription access cache so resolveAccessContext fetches fresh data
@@ -411,7 +476,6 @@ export class ShopService {
       usersSnap,
       activitySnap,
       subContext,
-      storageSnap,
       apiUsageSnap,
     ] = await Promise.all([
       db.collection("branches").where("shopId", "==", shopId).get(),
@@ -420,7 +484,6 @@ export class ShopService {
       db.collection("users").where("shopId", "==", shopId).get(),
       db.collection("audit_logs").where("shopId", "==", shopId).limit(20).get().catch(() => null),
       subscriptionService.resolveAccessContext({ shopId, shop }),
-      db.collection("storage_usage").doc(shopId).get(),
       db.collection("api_usage_aggregation").doc(shopId).get(),
     ]);
 
@@ -486,12 +549,16 @@ export class ShopService {
     const customersCount = counters ? (counters.customers || 0) : 0;
     const totalRevenue = invoices.reduce((sum: number, inv: { status: string; amount: number }) => sum + (inv.status === "paid" || inv.status === "Completed" ? inv.amount : 0), 0);
 
-    const storageUsage: any = (storageSnap.exists ? storageSnap.data() : null) || {
+    const usedBytes = (shop as any).currentStorageBytes || 0;
+    const limitBytes = (shop as any).includedStorageBytes || ((subContext.limits?.storage || 100) * 1024 * 1024);
+    const percentage = limitBytes > 0 ? Number(((usedBytes / limitBytes) * 100).toFixed(2)) : 0;
+
+    const storageUsage: any = {
       shopId,
-      usedBytes: 0,
-      limitBytes: (subContext.limits?.storage || 100) * 1024 * 1024,
-      percentage: 0,
-      lastCalculated: new Date()
+      usedBytes,
+      limitBytes,
+      percentage,
+      lastCalculated: (shop as any).lastStorageCalculation ? toDate((shop as any).lastStorageCalculation) : new Date()
     };
 
     const apiUsage: any = (apiUsageSnap.exists ? apiUsageSnap.data() : null) || {

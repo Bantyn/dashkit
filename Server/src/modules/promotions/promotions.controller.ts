@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler, sendSuccess, sendError } from "../../shared/utils/response";
 import { db } from "../../config/firebase.config";
 import { Promotion } from "./promotion.model";
+import { campaignWorkerService } from "./campaign-worker.service";
 
 const COLLECTION = "promotions";
 
@@ -71,18 +72,37 @@ export const activateCampaign = asyncHandler(async (req: Request, res: Response)
   if (!audience.length) return sendError(res, "Audience is empty", 400);
 
   const batch = db.batch();
-  
+
+  const queueItems: Array<{
+    msgId: string;
+    campaignId: string;
+    shopId: string;
+    type: string;
+    recipient: string;
+    content: string;
+  }> = [];
+
   for (const phone of audience) {
     const msgRef = db.collection("campaign_messages").doc();
+    const content = req.body.templateContent || campaign.description || "";
     batch.set(msgRef, {
       id: msgRef.id,
       campaignId: campaign.id,
       shopId: campaign.shopId,
       type: campaign.type,
       recipient: phone,
-      content: req.body.templateContent || campaign.description,
+      content,
       status: "pending",
       createdAt: new Date()
+    });
+
+    queueItems.push({
+      msgId: msgRef.id,
+      campaignId: campaign.id,
+      shopId: campaign.shopId,
+      type: campaign.type,
+      recipient: phone,
+      content
     });
   }
 
@@ -93,6 +113,9 @@ export const activateCampaign = asyncHandler(async (req: Request, res: Response)
   });
   
   await batch.commit();
+
+  // Enqueue to event queue for immediate async background delivery without polling
+  await campaignWorkerService.enqueueBatch(queueItems);
 
   return sendSuccess(res, { queuedCount: audience.length }, "Campaign activated and messages queued");
 });

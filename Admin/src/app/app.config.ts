@@ -9,7 +9,7 @@ import { environment } from '../environments/environment';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { costProtectionInterceptor } from './core/interceptors/cost-protection.interceptor';
 import { importProvidersFrom } from '@angular/core';
-import { LucideAngularModule, Database, ChevronDown, ChevronLeft, ChevronRight, Calendar } from 'lucide-angular';
+import { LucideAngularModule, Database, ChevronDown, ChevronLeft, ChevronRight, Calendar, Terminal, CheckSquare } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +19,6 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideAnimations(),
-    importProvidersFrom(LucideAngularModule.pick({ Database, ChevronDown, ChevronLeft, ChevronRight, Calendar }))
+    importProvidersFrom(LucideAngularModule.pick({ Database, ChevronDown, ChevronLeft, ChevronRight, Calendar, Terminal, CheckSquare }))
   ],
 };

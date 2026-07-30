@@ -68,6 +68,10 @@ export class ObservabilityService {
   private lastFirestoreMetrics: any = null;
   private lastFirestoreFetchTime = 0;
 
+  // In-memory telemetry ring buffer (0 DB writes, 0 DB cost)
+  private inMemorySnapshots: any[] = [];
+  private readonly MAX_SNAPSHOTS = 288; // Keeps 24 hours of 5-minute snapshots in RAM
+
   // Infrastructure metrics (calculated in background)
   private cpuPercent = 0;
   private eventLoopDelayMs = 0;
@@ -206,10 +210,10 @@ export class ObservabilityService {
     }, 1000).unref();
   }
 
-  // ── Snapshots Persistence (Data Retention Policy) ──────────────────────────
+  // ── Snapshots Persistence (In-Memory Ring Buffer - 0 DB Cost) ─────────────────
 
   private startPeriodicSnapshot() {
-    // Save snapshot to Firestore every 5 minutes
+    // Generate snapshot in Server RAM every 5 minutes (0 DB writes)
     setInterval(async () => {
       try {
         const { platformSettingsService } = require("../platform-settings/platform-settings.service");
@@ -218,30 +222,17 @@ export class ObservabilityService {
           return;
         }
 
-        const metrics = this.getLiveMetrics();
-        const docId = `snapshot_${Date.now()}`;
-        
-        await rawDb.collection("platform_observability_snapshots").doc(docId).set({
+        const metrics = await this.getLiveMetrics();
+        this.inMemorySnapshots.push({
           ...metrics,
           createdAt: new Date(),
         });
 
-        // Retention Policy: Delete snapshots older than 7 days
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-        const oldSnapshots = await rawDb
-          .collection("platform_observability_snapshots")
-          .where("createdAt", "<", sevenDaysAgo)
-          .get();
-
-        if (!oldSnapshots.empty) {
-          const batch = rawDb.batch();
-          oldSnapshots.docs.forEach((doc: any) => batch.delete(doc.ref));
-          await batch.commit();
+        if (this.inMemorySnapshots.length > this.MAX_SNAPSHOTS) {
+          this.inMemorySnapshots.shift();
         }
       } catch (err) {
-        console.error("[ObservabilityService] Failed to generate/save snapshot:", err);
+        console.error("[ObservabilityService] Failed to generate in-memory snapshot:", err);
       }
     }, 5 * 60 * 1000).unref();
   }
@@ -421,12 +412,12 @@ export class ObservabilityService {
   }
 
   async getHistoricalSnapshots() {
-    const snapshot = await rawDb
-      .collection("platform_observability_snapshots")
-      .orderBy("createdAt", "asc")
-      .get();
-      
-    return snapshot.docs.map((doc: any) => doc.data());
+    if (this.inMemorySnapshots.length === 0) {
+      // Seed initial snapshot on boot
+      const currentMetrics = await this.getLiveMetrics();
+      this.inMemorySnapshots.push({ ...currentMetrics, createdAt: new Date() });
+    }
+    return this.inMemorySnapshots;
   }
 
   // ── Private Utility Helpers ────────────────────────────────────────────────

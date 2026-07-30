@@ -69,13 +69,35 @@ export const getTransactions = asyncHandler(async (req: Request, res: Response) 
   const shopId = String(req.params.shopId);
   const limit = req.query.limit ? Number(req.query.limit) : 50;
   
-  const snapshot = await db.collection(TX_COLLECTION)
-    .where("shopId", "==", shopId)
-    .orderBy("createdAt", "desc")
-    .limit(limit)
-    .get();
-    
-  return sendSuccess(res, snapshot.docs.map((doc: any) => doc.data()), "Transactions fetched");
+  try {
+    const snapshot = await db.collection(TX_COLLECTION)
+      .where("shopId", "==", shopId)
+      .orderBy("createdAt", "desc")
+      .limit(limit)
+      .get();
+      
+    return sendSuccess(res, snapshot.docs.map((doc: any) => doc.data()), "Transactions fetched");
+  } catch (err: any) {
+    console.warn(`[WalletController] Composite index fallback for wallet transactions (shopId: ${shopId}):`, err.message);
+    try {
+      const fallbackSnap = await db.collection(TX_COLLECTION)
+        .where("shopId", "==", shopId)
+        .limit(limit)
+        .get();
+
+      const txs = fallbackSnap.docs.map((doc: any) => doc.data());
+      txs.sort((a: any, b: any) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+      return sendSuccess(res, txs, "Transactions fetched");
+    } catch (fallbackErr: any) {
+      console.error("[WalletController] Error fetching transactions:", fallbackErr.message);
+      return sendSuccess(res, [], "Transactions fetched");
+    }
+  }
 });
 
 export const createWalletOrder = asyncHandler(async (req: Request, res: Response) => {

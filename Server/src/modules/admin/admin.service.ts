@@ -201,9 +201,23 @@ export class AdminService {
       const revenueRows: ShopRevenueRow[] = raw.eligibleShops
         .map((shop: any): ShopRevenueRow => {
           const planCode = String(shop.subscriptionPlan || "free").toLowerCase();
+          const payStatus = String(shop.paymentStatus || "").toLowerCase();
+          const subStatus = String(shop.subscriptionStatus || "").toLowerCase();
           const plan = normalizedPlans.get(planCode);
-          const monthlyRevenue = Number(plan?.monthlyPrice ?? plan?.price ?? 0);
-          const yearlyRevenue = Number(plan?.yearlyPrice ?? monthlyRevenue * 12);
+
+          // Financial Accounting Rule: Free Trial, pending payment, expired trial, free plan, or unpaid status = ₹0 revenue
+          const isPaidSubscriber =
+            planCode !== "free" &&
+            planCode !== "trial" &&
+            payStatus !== "trial" &&
+            payStatus !== "pending" &&
+            payStatus !== "expired" &&
+            payStatus !== "past_due" &&
+            payStatus !== "failed" &&
+            (payStatus === "active" || payStatus === "paid" || subStatus === "active" || subStatus === "paid");
+
+          const monthlyRevenue = isPaidSubscriber ? Number(plan?.monthlyPrice ?? plan?.price ?? 0) : 0;
+          const yearlyRevenue = isPaidSubscriber ? Number(plan?.yearlyPrice ?? monthlyRevenue * 12) : 0;
 
           return {
             id: shop.id,
@@ -221,7 +235,7 @@ export class AdminService {
             b.monthlyRevenue - a.monthlyRevenue || a.shopName.localeCompare(b.shopName),
         );
 
-      const freePlanShops = revenueRows.filter((shop: ShopRevenueRow) => shop.subscriptionPlan === "free").length;
+      const freePlanShops = revenueRows.filter((shop: ShopRevenueRow) => shop.monthlyRevenue === 0).length;
       const paidShops = revenueRows.filter((shop: ShopRevenueRow) => shop.monthlyRevenue > 0).length;
       const activeRevenueRows = revenueRows.filter((shop: ShopRevenueRow) => shop.status === "active");
       const monthlyRecurringRevenue = activeRevenueRows.reduce(
@@ -327,6 +341,9 @@ export class AdminService {
           raw.recentTransactions.forEach((tx: any) => {
             const createdAt = toDate(tx.createdAt);
             if (!createdAt) return;
+            const status = String(tx.status || tx.paymentStatus || "").toLowerCase();
+            // Accounting Rule: Only include successful/paid subscription transactions
+            if (status !== "success" && status !== "completed" && status !== "paid") return;
             const amount = Number(tx.amount || 0);
             for (let i = 0; i < 10; i++) {
               const dayStart = last10Days[i];

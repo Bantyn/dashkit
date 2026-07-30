@@ -7,7 +7,7 @@ const getApiUrl = (): string => {
 
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.endsWith('.localhost')) {
       return 'https://dashkit-server.onrender.com/api/v1';
     }
   }
@@ -22,7 +22,7 @@ const getAdminUrl = (): string => {
 
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.endsWith('.localhost')) {
       return 'https://admin.dashkit.vercel.app';
     }
   }
@@ -37,7 +37,7 @@ const getDashboardUrl = (): string => {
 
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.endsWith('.localhost')) {
       return 'https://dashkiiit.vercel.app';
     }
   }

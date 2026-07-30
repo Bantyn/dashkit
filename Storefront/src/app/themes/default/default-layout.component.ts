@@ -140,7 +140,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
           <!-- Actions -->
           <div class="flex items-center gap-5">
             <!-- Search Icon (Desktop Toggle) -->
-            <button class="hidden md:block p-2 text-gray-600 hover:text-primary-600 transition-colors focus:outline-none" (click)="toggleDesktopSearch()">
+            <button class="hidden md:block p-2 text-primary-600 hover:text-primary-600 transition-colors focus:outline-none" (click)="toggleDesktopSearch()">
               <i class="bi bi-search text-xl"></i>
             </button>
 
@@ -152,14 +152,14 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
               <ng-container *ngIf="currentUser$ | async as user; else guestUser">
                 <div class="relative" #profileDropdownRef>
                   <button class="flex items-center gap-2 hover-lift focus:outline-none" (click)="toggleProfileDropdown($event)" aria-haspopup="true" [attr.aria-expanded]="showProfileDropdown">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-100 to-indigo-50 flex items-center justify-center text-primary-700 font-bold border border-gray-200 shadow-sm ring-2 transition-all duration-300" [class.ring-primary-300]="showProfileDropdown" [class.ring-transparent]="!showProfileDropdown">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-100 to-primary-50 flex items-center justify-center text-primary-700 font-bold border border-gray-200 shadow-sm ring-2 transition-all duration-300" [class.ring-primary-300]="showProfileDropdown" [class.ring-transparent]="!showProfileDropdown">
                       {{ (user['displayName'] || 'U').charAt(0).toUpperCase() }}
                     </div>
                   </button>
                   <div *ngIf="showProfileDropdown" class="absolute right-0 mt-3 w-56 glass-panel rounded-2xl shadow-xl py-2 border border-white/60 z-50 animate-fade-in">
                     <div class="px-5 py-4 border-b border-gray-100 mb-2 bg-white/40">
-                      <p class="text-sm font-bold text-gray-900 truncate">{{ user['displayName'] || 'User' }}</p>
-                      <p class="text-xs text-gray-500 truncate mt-0.5">{{ user.email || user.mobile }}</p>
+                      <p class="text-sm font-bold text-primary-900 truncate">{{ user['displayName'] || 'User' }}</p>
+                      <p class="text-xs text-primary-500 truncate mt-0.5">{{ user.email || user.mobile }}</p>
                     </div>
                     <a [routerLink]="routePrefix.concat(['account'])" (click)="closeProfileDropdown()" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 font-medium transition-colors"><i class="bi bi-person opacity-50"></i> My Account</a>
                     <a [routerLink]="routePrefix.concat(['order-history'])" (click)="closeProfileDropdown()" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 font-medium transition-colors"><i class="bi bi-bag opacity-50"></i> Order History</a>
@@ -170,35 +170,35 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 </div>
               </ng-container>
               <ng-template #guestUser>
-                <a [routerLink]="routePrefix.concat(['auth', 'login'])" class="p-2 text-gray-600 hover:text-primary-600 transition-colors focus:outline-none"><i class="bi bi-person text-xl"></i></a>
+                <a [routerLink]="routePrefix.concat(['auth', 'login'])" class="p-2 text-primary-600 hover:text-primary-600 transition-colors focus:outline-none"><i class="bi bi-person text-xl"></i></a>
               </ng-template>
             </div>
 
             <!-- Wishlist Heart Icon (Desktop) -->
-            <button [routerLink]="routePrefix.concat(['account'])" [queryParams]="{tab: 'wishlist'}" class="hidden md:flex relative p-2 text-gray-600 hover:text-primary-600 transition-colors hover-lift focus:outline-none">
+            <button [routerLink]="routePrefix.concat(['account'])" [queryParams]="{tab: 'wishlist'}" class="hidden md:flex relative p-2 text-primary-600 hover:text-primary-600 transition-colors hover-lift focus:outline-none">
               <i class="bi bi-heart text-xl"></i>
-              <span *ngIf="(currentUser$ | async) as user" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-gray-900 rounded-full border-2 border-white shadow-sm">
+              <span *ngIf="(currentUser$ | async) as user" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-primary-900 rounded-full border-2 border-white shadow-sm">
                 {{ user?.wishlist?.length || 0 }}
               </span>
-              <span *ngIf="!(currentUser$ | async)" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-gray-900 rounded-full border-2 border-white shadow-sm">
+              <span *ngIf="!(currentUser$ | async)" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-primary-900 rounded-full border-2 border-white shadow-sm">
                 0
               </span>
             </button>
 
             <!-- Cart Bag Icon -->
-            <button (click)="toggleShoppingBag()" class="relative p-2 text-gray-600 hover:text-primary-600 transition-colors hover-lift focus:outline-none">
+            <button (click)="toggleShoppingBag()" class="relative p-2 text-primary-600 hover:text-primary-600 transition-colors hover-lift focus:outline-none">
               <i class="bi bi-bag text-xl"></i>
-              <span *ngIf="cartCount$ | async as count" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-gray-900 rounded-full border-2 border-white animate-bounce-short shadow-sm">{{ count }}</span>
+              <span *ngIf="cartCount$ | async as count" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-primary-900 rounded-full border-2 border-white animate-bounce-short shadow-sm">{{ count }}</span>
             </button>
 
             <!-- Mobile Search Toggle -->
-            <button class="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-colors focus:outline-none" (click)="toggleMobileSearch()">
+            <button class="md:hidden p-2 text-primary-600 hover:text-primary-600 transition-colors focus:outline-none" (click)="toggleMobileSearch()">
               <i class="bi bi-search text-xl"></i>
             </button>
 
 <!-- Mobile Menu Toggle Button -->
             <button
-              class="md:hidden p-2 text-gray-600 hover:text-primary-600 z-50 relative transition-colors focus:outline-none"
+              class="md:hidden p-2 text-primary-600 hover:text-primary-600 z-50 relative transition-colors focus:outline-none"
               (click)="toggleMobileMenu()"
             >
               <div class="w-6 h-5 relative flex flex-col justify-between">
@@ -233,11 +233,11 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 [(ngModel)]="searchQuery"
                 (keyup.enter)="onSearch()"
                 placeholder="Search products..."
-                class="w-full pl-6 pr-14 py-4 text-base bg-[#F8F9FA] border border-gray-100 text-gray-900 rounded-full focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-50 transition-all"
+                class="w-full pl-6 pr-14 py-4 text-base bg-[#F8F9FA] border border-gray-100 text-primary-900 rounded-full focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-50 transition-all"
               />
               <button
                 (click)="onSearch()"
-                class="absolute right-2 top-2 bottom-2 px-4 text-gray-500 hover:text-primary-600 rounded-full transition-colors flex items-center justify-center"
+                class="absolute right-2 top-2 bottom-2 px-4 text-primary-500 hover:text-primary-600 rounded-full transition-colors flex items-center justify-center"
               >
                 <i class="bi bi-search text-lg"></i>
               </button>
@@ -261,7 +261,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                   <a [routerLink]="routePrefix.concat(['products'])" 
                      [queryParams]="cat === 'all' ? {} : {category: cat}" 
                      (click)="closeShopDropdown()" 
-                     class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm capitalize">
+                     class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm capitalize">
                     {{ cat === 'all' ? 'Shop All' : cat }}
                   </a>
                 </li>
@@ -271,28 +271,28 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
             <div>
               <h4 class="font-bold text-gray-400 text-xs tracking-wider uppercase mb-5">Featured</h4>
               <ul class="space-y-3">
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'newest'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">New Arrivals</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'bestsellers'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Bestsellers</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'trending'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Trending Now</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{subcategory: 'loungewear'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Loungewear</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'newest'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">New Arrivals</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'bestsellers'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Bestsellers</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'trending'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Trending Now</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{subcategory: 'loungewear'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Loungewear</a></li>
               </ul>
             </div>
             <!-- Collections Column -->
             <div>
               <h4 class="font-bold text-gray-400 text-xs tracking-wider uppercase mb-5">Collections</h4>
               <ul class="space-y-3">
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Party and events'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Party and events</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Office looks'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Office looks</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Selection'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Selection</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Online Exclusive'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Online Exclusive</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Knitwear'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Knitwear</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Total Look'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Total Look</a></li>
-                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Basics'}" (click)="closeShopDropdown()" class="block text-gray-900 font-medium hover:text-primary-600 transition-colors text-sm">Basics</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Party and events'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Party and events</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Office looks'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Office looks</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Selection'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Selection</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Online Exclusive'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Online Exclusive</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Knitwear'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Knitwear</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Total Look'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Total Look</a></li>
+                <li><a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Basics'}" (click)="closeShopDropdown()" class="block text-primary-900 font-medium hover:text-primary-600 transition-colors text-sm">Basics</a></li>
               </ul>
             </div>
             <!-- Model Banner visual Column -->
             <div class="relative h-[280px] rounded-2xl overflow-hidden shadow-md group/img">
-              <img src="assets/dropdown-model.png" alt="Featured Knitwear" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80" alt="Featured Knitwear" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end p-5">
                 <span class="text-white font-bold text-sm">New Knitwear Collection</span>
               </div>
@@ -313,11 +313,11 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
               [(ngModel)]="searchQuery"
               (keyup.enter)="onSearch()"
               placeholder="Search products..."
-              class="w-full pl-5 pr-12 py-3.5 text-sm bg-[#F8F9FA] border border-gray-100 rounded-full focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-50 transition-all text-gray-900"
+              class="w-full pl-5 pr-12 py-3.5 text-sm bg-[#F8F9FA] border border-gray-100 rounded-full focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-50 transition-all text-primary-900"
             />
             <button
               (click)="onSearch()"
-              class="absolute right-1 top-1 bottom-1 px-3 text-gray-500 hover:text-primary-600 flex items-center justify-center rounded-full m-1 transition-colors"
+              class="absolute right-1 top-1 bottom-1 px-3 text-primary-500 hover:text-primary-600 flex items-center justify-center rounded-full m-1 transition-colors"
             >
               <i class="bi bi-search text-base"></i>
             </button>
@@ -334,7 +334,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
       >
         <!-- Backdrop -->
         <div
-          class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity animate-fade-in"
+          class="fixed inset-0 bg-primary-900/60 backdrop-blur-sm transition-opacity animate-fade-in"
           (click)="toggleMobileMenu()"
         ></div>
 
@@ -348,9 +348,9 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
               <img [src]="config.theme?.logo | optimizeImage:'thumbnail':true" alt="Shop Logo" class="h-8 w-auto object-contain" />
             </ng-container>
             <ng-template #mobileTextLogo>
-              <span class="font-black text-xl text-gray-900">{{ config.displayName || config.shopName || 'Shop' }}</span>
+              <span class="font-black text-xl text-primary-900">{{ config.displayName || config.shopName || 'Shop' }}</span>
             </ng-template>
-            <button (click)="toggleMobileMenu()" class="p-2 text-gray-600 hover:text-gray-900">
+            <button (click)="toggleMobileMenu()" class="p-2 text-primary-600 hover:text-primary-900">
               <i class="bi bi-x-lg text-xl"></i>
             </button>
           </div>
@@ -360,7 +360,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
             <div class="space-y-4">
               <!-- Shop Accordion -->
               <div class="border-b border-gray-100 pb-4" *ngIf="config.pages.products">
-                <button (click)="toggleMobileShop()" class="flex items-center justify-between w-full py-2 text-left font-bold text-lg text-gray-900 focus:outline-none">
+                <button (click)="toggleMobileShop()" class="flex items-center justify-between w-full py-2 text-left font-bold text-lg text-primary-900 focus:outline-none">
                   <span>Shop</span>
                   <i class="bi text-sm" [class.bi-dash-lg]="mobileShopOpen" [class.bi-plus-lg]="!mobileShopOpen"></i>
                 </button>
@@ -377,7 +377,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                          [routerLink]="routePrefix.concat(['products'])" 
                          [queryParams]="cat === 'all' ? {} : {category: cat}" 
                          (click)="toggleMobileMenu()" 
-                         class="block text-gray-600 hover:text-primary-600 text-sm py-1 capitalize">
+                         class="block text-primary-600 hover:text-primary-600 text-sm py-1 capitalize">
                         {{ cat === 'all' ? 'Shop All' : cat }}
                       </a>
                     </div>
@@ -390,10 +390,10 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                       <i class="bi text-xs" [class.bi-dash]="mobileFeaturedOpen" [class.bi-plus]="!mobileFeaturedOpen"></i>
                     </button>
                     <div *ngIf="mobileFeaturedOpen" class="pl-4 mt-1.5 space-y-2 border-l border-gray-100 animate-fade-in">
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'newest'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">New Arrivals</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'bestsellers'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Bestsellers</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'trending'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Trending Now</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{subcategory: 'loungewear'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Loungewear</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'newest'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">New Arrivals</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'bestsellers'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Bestsellers</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{sort: 'trending'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Trending Now</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{subcategory: 'loungewear'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Loungewear</a>
                     </div>
                   </div>
 
@@ -404,13 +404,13 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                       <i class="bi text-xs" [class.bi-dash]="mobileCollectionsOpen" [class.bi-plus]="!mobileCollectionsOpen"></i>
                     </button>
                     <div *ngIf="mobileCollectionsOpen" class="pl-4 mt-1.5 space-y-2 border-l border-gray-100 animate-fade-in">
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Party and events'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Party and events</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Office looks'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Office looks</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Selection'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Selection</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Online Exclusive'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Online Exclusive</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Knitwear'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Knitwear</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Total Look'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Total Look</a>
-                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Basics'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Basics</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Party and events'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Party and events</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Office looks'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Office looks</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Selection'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Selection</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Online Exclusive'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Online Exclusive</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Knitwear'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Knitwear</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Total Look'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Total Look</a>
+                      <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{collection: 'Basics'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Basics</a>
                     </div>
                   </div>
                 </div>
@@ -418,26 +418,26 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
               <!-- New Arrivals Accordion -->
               <div class="border-b border-gray-100 pb-4" *ngIf="config.pages.products">
-                <button (click)="toggleMobileNewArrivals()" class="flex items-center justify-between w-full py-2 text-left font-bold text-lg text-gray-900 focus:outline-none">
+                <button (click)="toggleMobileNewArrivals()" class="flex items-center justify-between w-full py-2 text-left font-bold text-lg text-primary-900 focus:outline-none">
                   <span>New Arrivals</span>
                   <i class="bi text-sm" [class.bi-dash-lg]="mobileNewArrivalsOpen" [class.bi-plus-lg]="!mobileNewArrivalsOpen"></i>
                 </button>
                 <div *ngIf="mobileNewArrivalsOpen" class="pl-4 mt-2 space-y-2 border-l border-gray-100 animate-fade-in">
-                  <a [routerLink]="routePrefix.concat(['products'])" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">All New Arrivals</a>
-                  <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{category: 'men'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">New in Men</a>
-                  <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{category: 'women'}" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">New in Women</a>
+                  <a [routerLink]="routePrefix.concat(['products'])" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">All New Arrivals</a>
+                  <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{category: 'men'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">New in Men</a>
+                  <a [routerLink]="routePrefix.concat(['products'])" [queryParams]="{category: 'women'}" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">New in Women</a>
                 </div>
               </div>
 
               <!-- Sales Accordion -->
               <div class="border-b border-gray-100 pb-4" *ngIf="config.pages.offers">
-                <button (click)="toggleMobileSales()" class="flex items-center justify-between w-full py-2 text-left font-bold text-lg text-gray-900 focus:outline-none">
+                <button (click)="toggleMobileSales()" class="flex items-center justify-between w-full py-2 text-left font-bold text-lg text-primary-900 focus:outline-none">
                   <span>Sales</span>
                   <i class="bi text-sm" [class.bi-dash-lg]="mobileSalesOpen" [class.bi-plus-lg]="!mobileSalesOpen"></i>
                 </button>
                 <div *ngIf="mobileSalesOpen" class="pl-4 mt-2 space-y-2 border-l border-gray-100 animate-fade-in">
-                  <a [routerLink]="routePrefix.concat(['offers'])" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Active Offers</a>
-                  <a [routerLink]="routePrefix.concat(['offers'])" (click)="toggleMobileMenu()" class="block text-gray-600 hover:text-primary-600 text-sm py-1">Clearance Sale</a>
+                  <a [routerLink]="routePrefix.concat(['offers'])" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Active Offers</a>
+                  <a [routerLink]="routePrefix.concat(['offers'])" (click)="toggleMobileMenu()" class="block text-primary-600 hover:text-primary-600 text-sm py-1">Clearance Sale</a>
                 </div>
               </div>
 
@@ -462,9 +462,9 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
         <ng-template #pageOffline>
           <div class="flex-grow flex flex-col items-center justify-center py-32 px-6 text-center" style="min-height: 60vh;">
             <i class="bi bi-cone-striped text-5xl text-gray-300 mb-4 block"></i>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Page Unavailable</h2>
-            <p class="text-gray-500 max-w-md mx-auto">Storefront page is not online currently. The shop owner has temporarily disabled this section.</p>
-            <button [routerLink]="routePrefix" class="mt-6 px-6 py-2.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-colors">
+            <h2 class="text-2xl font-bold text-primary-900 mb-2">Page Unavailable</h2>
+            <p class="text-primary-500 max-w-md mx-auto">Storefront page is not online currently. The shop owner has temporarily disabled this section.</p>
+            <button [routerLink]="routePrefix" class="mt-6 px-6 py-2.5 bg-primary-900 text-white font-medium rounded-full hover:bg-gray-800 transition-colors">
               Return Home
             </button>
           </div>
@@ -484,8 +484,8 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <i class="bi bi-shield-check text-3xl"></i>
               </div>
               <div>
-                <h5 class="font-bold text-gray-900 text-lg">Secure Payments</h5>
-                <p class="text-sm text-gray-500 mt-1">100% Secure SSL encrypted</p>
+                <h5 class="font-bold text-primary-900 text-lg">Secure Payments</h5>
+                <p class="text-sm text-primary-500 mt-1">100% Secure SSL encrypted</p>
               </div>
             </div>
             <div
@@ -497,8 +497,8 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <i class="bi bi-box-seam text-3xl"></i>
               </div>
               <div>
-                <h5 class="font-bold text-gray-900 text-lg">Free Shipping</h5>
-                <p class="text-sm text-gray-500 mt-1">On premium orders</p>
+                <h5 class="font-bold text-primary-900 text-lg">Free Shipping</h5>
+                <p class="text-sm text-primary-500 mt-1">On premium orders</p>
               </div>
             </div>
             <div
@@ -510,8 +510,8 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <i class="bi bi-arrow-return-left text-3xl"></i>
               </div>
               <div>
-                <h5 class="font-bold text-gray-900 text-lg">Easy Returns</h5>
-                <p class="text-sm text-gray-500 mt-1">30-day money back guarantee</p>
+                <h5 class="font-bold text-primary-900 text-lg">Easy Returns</h5>
+                <p class="text-sm text-primary-500 mt-1">30-day money back guarantee</p>
               </div>
             </div>
             <div
@@ -523,8 +523,8 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <i class="bi bi-headset text-3xl"></i>
               </div>
               <div>
-                <h5 class="font-bold text-gray-900 text-lg">24/7 Support</h5>
-                <p class="text-sm text-gray-500 mt-1">Always here to help you</p>
+                <h5 class="font-bold text-primary-900 text-lg">24/7 Support</h5>
+                <p class="text-sm text-primary-500 mt-1">Always here to help you</p>
               </div>
             </div>
           </div>
@@ -533,26 +533,10 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
       <!-- Dynamic Theme Footer -->
       <footer
-        class="text-white pt-24 pb-12 border-t relative overflow-hidden"
-        [style.background-color]="config.theme?.secondaryColor || '#030712'"
-        [style.border-color]="
-          config.theme?.primaryColor
-            ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.15)
-            : 'rgba(255,255,255,0.08)'
-        "
+        class="bg-primary-900 text-white pt-24 pb-12 border-t border-primary-800/30 relative overflow-hidden"
       >
-        <!-- Subtle background glow using theme colors -->
-        <div
-          class="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none opacity-20"
-          [style.background-color]="config.theme?.primaryColor || '#4c1d95'"
-        ></div>
-        <div
-          class="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none opacity-10"
-          [style.background-color]="config.theme?.primaryColor || '#6d28d9'"
-        ></div>
-
-        <div class="container mx-auto px-4 max-w-7xl relative z-10">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 mb-20">
+        <div class="container mx-auto max-w-8xl relative z-10 bg-primary-50/10 p-20 rounded-3xl">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-12 max-w-7xl lg:gap-16 mb-20 px-20">
             <div class="md:col-span-4 space-y-6">
               <a
                 [routerLink]="routePrefix"
@@ -569,10 +553,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 }}</span>
               </a>
               <p
-                class="text-base leading-relaxed max-w-sm opacity-60"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
+                class="text-base leading-relaxed max-w-sm text-white/60"
               >
                 {{
                   config.description ||
@@ -607,25 +588,18 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
             <div class="md:col-span-2 md:col-start-7">
               <h4
                 class="font-bold mb-8 text-white tracking-widest uppercase text-xs"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
               >
                 Shop
               </h4>
               <ul
-                class="space-y-4 text-base opacity-60 hover:opacity-100 transition-opacity duration-300"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
+                class="space-y-4 text-base text-white/60 hover:opacity-100 transition-opacity duration-300"
               >
                 <li *ngIf="config.pages.home">
                   <a
                     [routerLink]="routePrefix"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     Home</a
                   >
@@ -635,8 +609,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                     [routerLink]="routePrefix.concat(['products'])"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     Collection</a
                   >
@@ -646,8 +619,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                     [routerLink]="routePrefix.concat(['offers'])"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     Offers</a
                   >
@@ -657,26 +629,19 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
             <div class="md:col-span-2">
               <h4
-                class="font-bold mb-8 tracking-widest uppercase text-xs"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
+                class="font-bold mb-8 text-white tracking-widest uppercase text-xs"
               >
                 Support
               </h4>
               <ul
-                class="space-y-4 text-base opacity-60 hover:opacity-100 transition-opacity duration-300"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
+                class="space-y-4 text-base text-white/60 hover:opacity-100 transition-opacity duration-300"
               >
                 <li>
                   <a
                     href="#"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     FAQ</a
                   >
@@ -686,8 +651,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                     [routerLink]="routePrefix.concat(['contact'])"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     Contact Us</a
                   >
@@ -697,8 +661,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                     [routerLink]="routePrefix.concat(['shipping-policy'])"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     Shipping Policy</a
                   >
@@ -708,8 +671,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                     [routerLink]="routePrefix.concat(['return-policy'])"
                     class="hover:text-white transition-colors flex items-center gap-3 group"
                     ><span
-                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                      [style.background-color]="config.theme?.primaryColor || '#7c3aed'"
+                      class="w-1.5 h-1.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-primary-400"
                     ></span>
                     Returns &amp; Refunds</a
                   >
@@ -719,23 +681,16 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
             <div class="md:col-span-2">
               <h4
-                class="font-bold mb-8 tracking-widest uppercase text-xs"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
+                class="font-bold mb-8 text-white tracking-widest uppercase text-xs"
               >
                 Contact
               </h4>
               <ul
-                class="space-y-5 text-base opacity-60 hover:opacity-100 transition-opacity duration-300"
-                [style.color]="
-                  config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-                "
+                class="space-y-5 text-base text-white/60 hover:opacity-100 transition-opacity duration-300"
               >
                 <li *ngIf="config.address" class="flex items-start gap-4">
                   <div
-                    class="mt-1 p-2 rounded-lg bg-white/5"
-                    [style.color]="config.theme?.primaryColor || '#a78bfa'"
+                    class="mt-1 p-2 rounded-lg bg-white/5 text-primary-300"
                   >
                     <i class="bi bi-geo-alt"></i>
                   </div>
@@ -743,8 +698,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 </li>
                 <li *ngIf="config.contactEmail" class="flex items-center gap-4">
                   <div
-                    class="p-2 rounded-lg bg-white/5"
-                    [style.color]="config.theme?.primaryColor || '#a78bfa'"
+                    class="p-2 rounded-lg bg-white/5 text-primary-300"
                   >
                     <i class="bi bi-envelope"></i>
                   </div>
@@ -756,8 +710,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 </li>
                 <li *ngIf="config.contactPhone" class="flex items-center gap-4">
                   <div
-                    class="p-2 rounded-lg bg-white/5"
-                    [style.color]="config.theme?.primaryColor || '#a78bfa'"
+                    class="p-2 rounded-lg bg-white/5 text-primary-300"
                   >
                     <i class="bi bi-telephone"></i>
                   </div>
@@ -772,17 +725,9 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
           </div>
 
           <div
-            class="border-t pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-sm opacity-60"
-            [style.border-color]="
-              config.theme?.primaryColor
-                ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.12)
-                : 'rgba(255,255,255,0.08)'
-            "
-            [style.color]="
-              config.theme?.primaryColor ? hexToRgba(config.theme?.primaryColor || '#ffffff', 0.9) : 'white'
-            "
+            class="border-t border-primary-800/30 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-white/60"
           >
-            <p>&copy; {{ year }} {{ config.displayName }}. Powered by Clothify.</p>
+            <p>&copy; {{ year }} {{ config.displayName }}. Powered by DashKit.</p>
             <div class="flex gap-8">
               <a *ngIf="config.pages.privacyPolicy" [routerLink]="routePrefix.concat(['privacy-policy'])" class="hover:text-white transition-colors">Privacy Policy</a>
               <a *ngIf="config.pages.termsAndConditions" [routerLink]="routePrefix.concat(['terms-and-conditions'])" class="hover:text-white transition-colors">Terms of Service</a>
@@ -806,8 +751,8 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
       >
         <!-- Drawer Header -->
         <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <h2 class="text-lg font-black tracking-tight text-gray-900">Shopping Bag</h2>
-          <button (click)="closeShoppingBag()" class="text-gray-500 hover:text-black focus:outline-none">
+          <h2 class="text-lg font-black tracking-tight text-primary-900">Shopping Bag</h2>
+          <button (click)="closeShoppingBag()" class="text-primary-500 hover:text-black focus:outline-none">
             <i class="bi bi-x-lg text-lg"></i>
           </button>
         </div>
@@ -817,7 +762,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
           <ng-container *ngIf="cartItems$ | async as items">
             <div *ngIf="items.length === 0" class="h-full flex flex-col items-center justify-center py-20 text-center">
               <i class="bi bi-bag-x text-4xl text-gray-300 mb-4 animate-pulse"></i>
-              <p class="text-sm font-semibold text-gray-900 mb-1">Your bag is empty</p>
+              <p class="text-sm font-semibold text-primary-900 mb-1">Your bag is empty</p>
               <p class="text-xs text-gray-400">Discover our collections and add items.</p>
             </div>
 
@@ -848,7 +793,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                   <h4 
                     [routerLink]="routePrefix.concat(['products', item.product.id])" 
                     (click)="closeShoppingBag()"
-                    class="text-xs font-bold text-gray-900 leading-tight hover:underline cursor-pointer"
+                    class="text-xs font-bold text-primary-900 leading-tight hover:underline cursor-pointer"
                   >
                     {{ item.product.name }}
                   </h4>
@@ -860,7 +805,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 </div>
 
                 <div class="flex items-center justify-between mt-4">
-                  <span class="text-xs font-black text-gray-900">
+                  <span class="text-xs font-black text-primary-900">
                     {{ item.variant?.price || item.product.variants[0]?.price | currency: 'INR' }}
                   </span>
 
@@ -868,17 +813,17 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                   <div class="flex items-center border border-gray-200 rounded-full overflow-hidden h-7 bg-white">
                     <button 
                       (click)="updateQuantity(i, item.quantity - 1)" 
-                      class="w-6 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-colors focus:outline-none"
+                      class="w-6 h-full flex items-center justify-center text-primary-500 hover:text-black hover:bg-gray-50 transition-colors focus:outline-none"
                       [disabled]="item.quantity <= 1"
                     >
                       <i class="bi bi-dash text-xs"></i>
                     </button>
-                    <span class="px-2 text-center font-bold text-[10px] text-gray-900 select-none">
+                    <span class="px-2 text-center font-bold text-[10px] text-primary-900 select-none">
                       {{ item.quantity }}
                     </span>
                     <button 
                       (click)="updateQuantity(i, item.quantity + 1)" 
-                      class="w-6 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-colors focus:outline-none"
+                      class="w-6 h-full flex items-center justify-center text-primary-500 hover:text-black hover:bg-gray-50 transition-colors focus:outline-none"
                     >
                       <i class="bi bi-plus text-xs"></i>
                     </button>
@@ -891,7 +836,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
         <!-- Drawer Footer -->
         <div class="p-6 border-t border-gray-100 bg-gray-50/50 text-left space-y-4">
-          <p class="text-[10px] font-semibold tracking-wide text-gray-500 text-center uppercase">
+          <p class="text-[10px] font-semibold tracking-wide text-primary-500 text-center uppercase">
             Shipping & taxes calculated at checkout
           </p>
           
@@ -926,7 +871,7 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
                 <img [src]="config.theme?.logo | optimizeImage:'thumbnail':true" alt="Shop Logo" class="h-20 w-auto object-contain drop-shadow-sm" />
               </ng-container>
               <ng-template #textLogo>
-                <span class="tracking-tight font-black text-4xl text-gray-900 uppercase">{{ config.displayName || config.shopName || 'Shop' }}</span>
+                <span class="tracking-tight font-black text-4xl text-primary-900 uppercase">{{ config.displayName || config.shopName || 'Shop' }}</span>
               </ng-template>
               <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-primary-100 text-primary-800 mt-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse"></span>
@@ -936,10 +881,10 @@ import { OptimizeImagePipe } from '../../shared/pipes/optimize-image.pipe';
 
             <!-- Message -->
             <div class="space-y-4">
-              <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+              <h2 class="text-3xl md:text-4xl font-extrabold text-primary-900 tracking-tight leading-tight">
                 Our Online Store is Under Construction
               </h2>
-              <p class="text-gray-500 text-sm md:text-base leading-relaxed max-w-lg mx-auto">
+              <p class="text-primary-500 text-sm md:text-base leading-relaxed max-w-lg mx-auto">
                 {{ config.description || 'We are currently preparing our collections and setting up our store for a premium shopping experience. We look forward to welcoming you soon!' }}
               </p>
             </div>
@@ -1218,17 +1163,23 @@ export class DefaultThemeLayoutComponent implements OnInit, OnDestroy {
   private enforcePlan(config: ShopConfig) {
     const isSubdomain = !!this.tenantService.getSubdomainSlug();
     const isPath = !!this.tenantService.getPathSlug();
+    const currentPort = this.document.location.port;
+    const portSuffix = currentPort ? `:${currentPort}` : '';
 
     if (config.subdomainEnabled && isPath) {
       const protocol = this.document.location.protocol;
       const hostname = this.document.location.hostname;
+      const pathname = this.document.location.pathname;
+      const search = this.document.location.search;
+      const subpath = pathname.replace(new RegExp(`^/shop/${config.slug}`), '') || '';
+
       let newOrigin = '';
       if (hostname.includes('localhost')) {
-        newOrigin = `${protocol}//${config.slug}.localhost:4200`;
+        newOrigin = `${protocol}//${config.slug}.localhost${portSuffix}`;
       } else {
         newOrigin = `${protocol}//${config.slug}.${hostname}`;
       }
-      window.location.href = newOrigin;
+      window.location.href = `${newOrigin}${subpath}${search}`;
     }
 
     if (!config.subdomainEnabled && isSubdomain) {
@@ -1236,7 +1187,7 @@ export class DefaultThemeLayoutComponent implements OnInit, OnDestroy {
       const hostname = this.document.location.hostname;
       let newOrigin = '';
       if (hostname.includes('localhost')) {
-        newOrigin = `${protocol}//localhost:4200/shop/${config.slug}`;
+        newOrigin = `${protocol}//localhost${portSuffix}/shop/${config.slug}`;
       } else {
         const parts = hostname.split('.');
         let baseHost = hostname;

@@ -1,4 +1,5 @@
 export interface CreditHistoryEntry {
+  id?: string;
   amount: number;
   type: 'credit' | 'debit';
   reason: string;

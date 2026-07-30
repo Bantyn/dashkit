@@ -69,7 +69,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
   imports: [CommonModule, FormsModule],
   template: `
     @if (!canViewInvoices) {
-      <div class="min-h-[calc(100vh-64px)] bg-[#f5f7fa] p-6 xl:p-8">
+      <div class="max-h-[calc(100vh-64px)] bg-primary-50 p-6 xl:p-8">
         <section class="mx-auto max-w-3xl rounded-[2rem] border border-amber-100 bg-amber-50 p-8 text-amber-900 shadow-sm">
           <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
@@ -95,7 +95,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
         </section>
       </div>
     } @else {
-      <div class="h-[calc(100vh-64px)] bg-[#f5f7fa] flex flex-col overflow-hidden">
+      <div class="h-[calc(100vh-64px)] bg-primary-50 flex flex-col overflow-hidden">
         <header class="border-b border-gray-200 bg-white px-6 py-5 shadow-sm">
           <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
             <div class="max-w-3xl">
@@ -226,7 +226,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                   [(ngModel)]="searchQuery"
                   (ngModelChange)="onFiltersChanged()"
                   placeholder="Search draft no., customer, phone, product, staff, or note"
-                  class="h-12 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] pl-11 pr-4 text-sm text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                  class="h-12 w-full rounded-2xl border border-gray-200 bg-primary-50 pl-11 pr-4 text-sm text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                 />
               </label>
 
@@ -235,7 +235,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                 <select
                   [(ngModel)]="sortKey"
                   (ngModelChange)="onFiltersChanged()"
-                  class="h-12 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                  class="h-12 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                 >
                   @for (option of sortOptions; track option.value) {
                     <option [value]="option.value">{{ option.label }}</option>
@@ -248,7 +248,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                 <select
                   [(ngModel)]="statusFilter"
                   (ngModelChange)="onFiltersChanged()"
-                  class="h-12 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                  class="h-12 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                 >
                   <option value="all">All drafts</option>
                   @for (option of statusOptions; track option.value) {
@@ -262,7 +262,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                 <select
                   [(ngModel)]="paymentStatusFilter"
                   (ngModelChange)="onFiltersChanged()"
-                  class="h-12 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                  class="h-12 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                 >
                   <option value="all">All states</option>
                   @for (option of paymentStatusOptions; track option.value) {
@@ -289,7 +289,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                   <select
                     [(ngModel)]="paymentMethodFilter"
                     (ngModelChange)="onFiltersChanged()"
-                    class="h-11 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                    class="h-11 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                   >
                     <option value="all">All methods</option>
                     @for (option of paymentMethodOptions; track option.value) {
@@ -303,7 +303,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                   <select
                     [(ngModel)]="staffFilter"
                     (ngModelChange)="onFiltersChanged()"
-                    class="h-11 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                    class="h-11 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                   >
                     <option value="all">Everyone</option>
                     @for (staff of staffFilterOptions; track staff.value) {
@@ -317,7 +317,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                   <select
                     [(ngModel)]="sourceFilter"
                     (ngModelChange)="onFiltersChanged()"
-                    class="h-11 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                    class="h-11 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                   >
                     <option value="all">All sources</option>
                     @for (option of sourceOptions; track option.value) {
@@ -331,7 +331,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                   <select
                     [(ngModel)]="taxFilter"
                     (ngModelChange)="onFiltersChanged()"
-                    class="h-11 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                    class="h-11 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                   >
                     <option value="all">All tax types</option>
                     <option value="taxed">With tax</option>
@@ -345,7 +345,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
                   <select
                     [(ngModel)]="pageSize"
                     (ngModelChange)="onPageSizeChanged()"
-                    class="h-11 w-full rounded-2xl border border-gray-200 bg-[#f8fafc] px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
+                    class="h-11 w-full rounded-2xl border border-gray-200 bg-primary-50 px-4 text-sm font-medium text-gray-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-50"
                   >
                     <option [ngValue]="10">10 rows</option>
                     <option [ngValue]="20">20 rows</option>
@@ -865,7 +865,7 @@ interface DraftInvoiceView extends Omit<Invoice, 'invoiceDate' | 'dueDate' | 'cr
             </div>
 
             <div class="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-              <section class="rounded-[1.75rem] border border-gray-100 bg-[#f8fafc] p-5">
+              <section class="rounded-[1.75rem] border border-gray-100 bg-primary-50 p-5">
                 <div class="flex items-start justify-between gap-4">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">Collection</p>

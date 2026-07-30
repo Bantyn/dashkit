@@ -25,7 +25,7 @@ export const createAdminNotification = async (
     metadata?: Record<string, any>;
   }
 ): Promise<AdminNotification> => {
-  const meta = CATEGORY_META[data.category];
+  const meta = CATEGORY_META[data.category] || CATEGORY_META.platform;
   const ref = db.collection(COLLECTION).doc();
 
   const notification: AdminNotification = {
@@ -36,8 +36,8 @@ export const createAdminNotification = async (
     priority: meta.priority,
     icon: meta.icon,
     status: "unread",
-    actionLink: data.actionLink,
-    metadata: data.metadata,
+    actionLink: data.actionLink || undefined,
+    metadata: data.metadata || {},
     createdAt: new Date(),
     readAt: null,
   };
@@ -46,6 +46,34 @@ export const createAdminNotification = async (
   invalidateCache();
   return notification;
 };
+
+// ─── Seed Initial System Admin Notifications if Empty ─────────────────────────
+async function seedInitialAdminNotifications() {
+  const defaultNotifs = [
+    {
+      title: "Platform Admin System Operational",
+      message: "Platform Admin dashboard is operational. Real-time observability, security logging, and monitoring active.",
+      category: "system_update" as AdminNotificationCategory,
+      actionLink: "/admin/dashboard",
+    },
+    {
+      title: "GST Verification Module Active",
+      message: "Pluggable GST verification system initialized with Local Checksum, Sandbox, & Self-Declaration fallback.",
+      category: "platform" as AdminNotificationCategory,
+      actionLink: "/admin/gst-verification",
+    },
+    {
+      title: "Security & Lockout Engine Ready",
+      message: "RBAC permissions, JWT authentication, and progressive login lockout rules are enforced.",
+      category: "security" as AdminNotificationCategory,
+      actionLink: "/roles",
+    },
+  ];
+
+  for (const n of defaultNotifs) {
+    await createAdminNotification(n);
+  }
+}
 
 // ─── GET /admin-notifications ──────────────────────────────────────────────────
 export const getAdminNotifications = asyncHandler(async (req: Request, res: Response) => {
@@ -63,10 +91,17 @@ export const getAdminNotifications = asyncHandler(async (req: Request, res: Resp
   if (status) query = query.where("status", "==", status);
   query = query.limit(limit);
 
-  const [snapshot, unreadSnap] = await Promise.all([
+  let [snapshot, unreadSnap] = await Promise.all([
     query.get(),
     db.collection(COLLECTION).where("status", "==", "unread").count().get(),
   ]);
+
+  // Seed default notifications if collection is completely empty
+  if (snapshot.empty && !category && !status) {
+    await seedInitialAdminNotifications();
+    snapshot = await query.get();
+    unreadSnap = await db.collection(COLLECTION).where("status", "==", "unread").count().get();
+  }
 
   const notifications = snapshot.docs.map((doc) => doc.data());
   const unreadCount = unreadSnap.data().count;

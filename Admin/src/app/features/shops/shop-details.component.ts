@@ -102,6 +102,38 @@ import { ToastService } from '../../core/services/toast.service';
 
               <!-- Actual Data -->
               <ng-container *ngIf="!loading">
+                <!-- Active Plan Highlight Banner -->
+                <div class="bg-gradient-to-r from-primary-900 via-primary-800 to-indigo-900 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+                  <div class="relative z-10">
+                    <div class="flex items-center gap-3">
+                      <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 text-white backdrop-blur border border-white/30">
+                        {{ shop?.subscriptionPlan || 'Free' }} Plan
+                      </span>
+                      <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ' + 
+                        (shop?.status === 'active' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30')">
+                        ● {{ shop?.status || 'Active' }}
+                      </span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mt-2 flex items-center gap-2">
+                      {{ shop?.shopName }}
+                      <span class="text-sm font-normal text-white/70 font-mono">({{ shop?.subdomain }})</span>
+                    </h3>
+                    <p class="text-xs text-white/70 mt-1">
+                      Recurring Plan: <strong class="text-white font-semibold">{{ upcomingInvoice?.total ? '₹' + upcomingInvoice.total + '/mo' : 'Standard' }}</strong>
+                      <span *ngIf="shop?.nextBillingDate" class="ml-2">• Next Billing: {{ formatDate(shop?.nextBillingDate) }}</span>
+                    </p>
+                  </div>
+
+                  <div class="flex items-center gap-3 relative z-10 shrink-0">
+                    <button (click)="activeTab = 'features'" class="px-4 py-2.5 bg-white text-primary-900 hover:bg-primary-50 rounded-xl font-bold text-xs shadow transition-all flex items-center gap-2">
+                      <i class="bi bi-box-seam"></i> Manage Add-ons
+                    </button>
+                    <button (click)="activeTab = 'subscription'" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-xs backdrop-blur border border-white/20 transition-all flex items-center gap-2">
+                      <i class="bi bi-award"></i> View Subscription
+                    </button>
+                  </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <!-- Summary Card 1: Revenue -->
                   <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
@@ -263,7 +295,7 @@ import { ToastService } from '../../core/services/toast.service';
                         <span class="font-bold text-gray-900">₹{{ upcomingInvoice.subtotal }}</span>
                       </div>
                       <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">GST (18%)</span>
+                        <span class="text-gray-500">GST ({{ upcomingInvoice.gstRate !== undefined ? upcomingInvoice.gstRate : (upcomingInvoice.gst > 0 ? 18 : 0) }}%)</span>
                         <span class="font-bold text-gray-900">₹{{ upcomingInvoice.gst }}</span>
                       </div>
                       <div class="flex justify-between text-base border-t border-gray-100 pt-3 mt-2">

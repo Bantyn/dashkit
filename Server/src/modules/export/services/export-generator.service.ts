@@ -1,147 +1,59 @@
 import { ExportHistoryRecord } from '../export.model';
-import * as ExcelJS from 'exceljs';
-import PDFDocument from 'pdfkit';
-import { getFirestore } from 'firebase-admin/firestore';
+import { ReportDataFetcher } from './report-data-fetcher.service';
+import { ExcelReportBuilder } from './excel-report-builder.service';
+import { PdfReportBuilder } from './pdf-report-builder.service';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
 import path from 'path';
 import fs from 'fs';
-// Note: In real app, we would import the FallbackStorageService. 
-// For now, we will simulate storing and returning a mock URL if not fully implemented.
 
 export class ExportGeneratorService {
   
   static async generate(record: ExportHistoryRecord): Promise<string> {
-    const data = await this.fetchDataForModule(record);
-    let tempFilePath = path.join(os.tmpdir(), `export_${uuidv4()}`);
+    console.log(`[ExportGenerator] Starting real database report generation for module: ${record.module}, format: ${record.format}`);
+    
+    // 1. Fetch Real Database Data & Calculate Executive KPIs
+    const reportData = await ReportDataFetcher.fetch(record);
+    
+    let tempBasePath = path.join(os.tmpdir(), `export_${uuidv4()}`);
+    let ext = '';
 
+    // 2. Build Report Document according to format
     if (record.format === 'excel' || record.format === 'csv') {
-      await this.generateExcelOrCsv(record, data, tempFilePath);
+      await ExcelReportBuilder.build(record, reportData, tempBasePath);
+      ext = record.format === 'csv' ? '.csv' : '.xlsx';
     } else if (record.format === 'pdf') {
-      await this.generatePdf(record, data, tempFilePath);
+      await PdfReportBuilder.build(record, reportData, tempBasePath);
+      ext = '.pdf';
     } else if (record.format === 'json') {
-      fs.writeFileSync(`${tempFilePath}.json`, JSON.stringify(data, null, 2));
-      tempFilePath += '.json';
+      ext = '.json';
+      fs.writeFileSync(`${tempBasePath}${ext}`, JSON.stringify(reportData, null, 2));
     } else {
-      throw new Error(`Format ${record.format} not supported yet.`);
+      throw new Error(`Export format '${record.format}' is not supported.`);
     }
 
-    // UPLOAD TO STORAGE
-    // Here we should call StorageService.uploadFile()
-    // For now, let's just simulate the upload and return a fake URL since the Fallback Logic is huge and separate.
-    console.log(`[ExportGenerator] Uploading file from ${tempFilePath} to Storage...`);
-    const mockUrl = `https://storage.clothify.com/exports/${record.id}_${record.name}`;
-    
-    // Cleanup Temp File
+    const tempFilePath = `${tempBasePath}${ext}`;
+
+    // 3. Store Generated File in Local Uploads Storage Directory
+    const exportsDir = path.join(process.cwd(), 'uploads', 'exports');
+    if (!fs.existsSync(exportsDir)) {
+      fs.mkdirSync(exportsDir, { recursive: true });
+    }
+
+    const safeName = record.name || `${record.module}_report${ext}`;
+    const targetFileName = `${record.id}_${safeName}`;
+    const finalPath = path.join(exportsDir, targetFileName);
+
     if (fs.existsSync(tempFilePath)) {
-       // fs.unlinkSync(tempFilePath);
+      fs.copyFileSync(tempFilePath, finalPath);
+      try { fs.unlinkSync(tempFilePath); } catch (e) {}
     }
-    if (fs.existsSync(`${tempFilePath}.xlsx`)) {
-       // fs.unlinkSync(`${tempFilePath}.xlsx`);
-    }
+
+    // 4. Generate Local Download API URL
+    const baseUrl = process.env.PUBLIC_API_URL || 'http://localhost:3003';
+    const downloadUrl = `${baseUrl}/api/v1/superadmin/exports/file/${record.id}`;
     
-    return mockUrl;
-  }
-
-  private static async fetchDataForModule(record: ExportHistoryRecord): Promise<any[]> {
-    // In a real app, this would route to different Services (e.g. ShopService.getShops())
-    // For demonstration, we will fetch generic mock data or real data from Firestore if available
-    const db = getFirestore();
-    let data: any[] = [];
-    
-    try {
-      if (record.module === 'shops') {
-        const snapshot = await db.collection('shops').limit(100).get();
-        data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      } else if (record.module === 'users') {
-        const snapshot = await db.collection('users').limit(100).get();
-        data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      } else {
-        // Mock data for unimplemented modules
-        data = [
-          { id: '1', name: 'Sample Record 1', status: 'Active', value: 100 },
-          { id: '2', name: 'Sample Record 2', status: 'Inactive', value: 250 },
-        ];
-      }
-    } catch (err) {
-      console.error(`Error fetching data for module ${record.module}`, err);
-      throw new Error(`Failed to fetch data for ${record.module}`);
-    }
-    
-    return data;
-  }
-
-  private static async generateExcelOrCsv(record: ExportHistoryRecord, data: any[], tempPath: string): Promise<void> {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet(record.module.toUpperCase());
-
-    if (data.length > 0) {
-      // Setup columns
-      const headers = Object.keys(data[0]);
-      sheet.columns = headers.map(h => ({ header: h.toUpperCase(), key: h, width: 20 }));
-      
-      // Add rows
-      sheet.addRows(data);
-      
-      // Style headers
-      sheet.getRow(1).font = { bold: true };
-    }
-
-    if (record.format === 'csv') {
-      await workbook.csv.writeFile(`${tempPath}.csv`);
-    } else {
-      await workbook.xlsx.writeFile(`${tempPath}.xlsx`);
-    }
-  }
-
-  private static async generatePdf(record: ExportHistoryRecord, data: any[], tempPath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const doc = new PDFDocument({ margin: 30, size: 'A4' });
-      const writeStream = fs.createWriteStream(`${tempPath}.pdf`);
-      
-      doc.pipe(writeStream);
-      
-      // Header
-      doc.fontSize(20).text(`Export Report: ${record.module.toUpperCase()}`, { align: 'center' });
-      doc.moveDown();
-      doc.fontSize(10).text(`Generated By: ${record.requestedByName || 'Admin'} | Date: ${new Date().toLocaleString()}`, { align: 'center' });
-      doc.moveDown(2);
-
-      // Data (Simple table layout)
-      if (data.length > 0) {
-        const headers = Object.keys(data[0]).slice(0, 5); // Limit to 5 cols for PDF
-        const startY = doc.y;
-        
-        // Headers
-        doc.font('Helvetica-Bold');
-        headers.forEach((h, i) => {
-          doc.text(h.toUpperCase(), 30 + (i * 100), startY, { width: 90 });
-        });
-        
-        doc.moveDown();
-        doc.font('Helvetica');
-        
-        // Rows
-        let currentY = doc.y;
-        data.forEach(row => {
-          if (currentY > 750) {
-            doc.addPage();
-            currentY = 50;
-          }
-          headers.forEach((h, i) => {
-            const val = row[h] ? String(row[h]).substring(0, 20) : '-';
-            doc.text(val, 30 + (i * 100), currentY, { width: 90 });
-          });
-          currentY += 20;
-        });
-      } else {
-        doc.text('No data available for this export.');
-      }
-
-      doc.end();
-      
-      writeStream.on('finish', resolve);
-      writeStream.on('error', reject);
-    });
+    console.log(`[ExportGenerator] Enterprise Report successfully generated & stored at: ${finalPath}`);
+    return downloadUrl;
   }
 }

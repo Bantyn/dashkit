@@ -109,7 +109,7 @@ export class WebsiteOrderTrackingComponent implements OnInit {
 
   fetchOrder() {
     this.loading = true;
-    this.http.get<any>(`${environment.apiUrl}/orders/track/${this.orderId}`).subscribe({
+    this.http.get<any>(`${environment.publicApiUrl}/orders/track/${this.orderId}`).subscribe({
       next: (res) => {
         this.order = res.data || res;
         this.loading = false;

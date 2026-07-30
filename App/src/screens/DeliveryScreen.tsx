@@ -10,6 +10,7 @@ import {
   Linking,
   ActivityIndicator,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Circle, Line } from "react-native-svg";
@@ -64,8 +65,9 @@ const MOCK_DELIVERIES: DeliveryItem[] = [
 
 export function DeliveryScreen({ user }: { user: User }) {
   const { colors } = useTheme();
-  const [deliveries, setDeliveries] = useState<DeliveryItem[]>(MOCK_DELIVERIES);
+  const [deliveries, setDeliveries] = useState<DeliveryItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryItem | null>(null);
@@ -82,33 +84,47 @@ export function DeliveryScreen({ user }: { user: User }) {
 
   useEffect(() => {
     fetchDeliveries();
-  }, []);
+  }, [user?.id]);
 
   const fetchDeliveries = async () => {
     if (!user?.id) return;
     setLoading(true);
     try {
       const res = await getStaffDeliveries(user.id);
-      if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-        const mapped: DeliveryItem[] = res.data.map((o: any, idx: number) => ({
+      const rawOrders = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+      const mapped: DeliveryItem[] = rawOrders.map((o: any, idx: number) => {
+        const addr = o.shippingAddress || {};
+        const fullAddress = [addr.address || addr.street, addr.city, addr.state, addr.pincode]
+          .filter(Boolean)
+          .join(", ") || "Main City Address";
+
+        return {
           id: o.id,
-          orderId: o.displayId || o.id.slice(-8).toUpperCase(),
-          customerName: o.customerName || o.shippingAddress?.fullName || "Customer",
-          customerPhone: o.customerPhone || o.shippingAddress?.phone || "+91 9876543210",
-          address: o.shippingAddress ? `${o.shippingAddress.address || ''}, ${o.shippingAddress.city || ''} ${o.shippingAddress.pincode || ''}` : "Main City Address",
+          orderId: o.displayId || (o.id ? o.id.slice(-8).toUpperCase() : `ORD-${idx + 1}`),
+          customerName: o.customerName || addr.fullName || addr.name || "Customer",
+          customerPhone: o.customerPhone || addr.phone || addr.phoneNumber || "+91 9876543210",
+          address: fullAddress,
           amount: `₹${(o.totalAmount || 0).toLocaleString()}`,
           paymentType: (o.paymentMethod || "cod").toUpperCase() === "COD" ? "COD" : "Prepaid",
           status: o.orderStatus || "waiting_for_delivery_acceptance",
           sequence: idx + 1,
           itemsCount: o.items?.length || o.products?.length || 1,
-        }));
-        setDeliveries(mapped);
-      }
+          notes: o.notes || o.deliveryInstructions || "",
+        };
+      });
+      setDeliveries(mapped);
     } catch (e) {
-      console.error(e);
+      console.error("Failed to fetch staff deliveries:", e);
+      setDeliveries([]);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchDeliveries();
   };
 
   const pendingAssignments = useMemo(() => {
@@ -270,7 +286,13 @@ export function DeliveryScreen({ user }: { user: User }) {
   });
 
   return (
-    <ScrollView style={dynamicStyles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={dynamicStyles.container} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.brand]} />
+      }
+    >
       {/* Header Banner */}
       <View style={dynamicStyles.hero}>
         <View>
@@ -358,6 +380,29 @@ export function DeliveryScreen({ user }: { user: User }) {
 
       {/* Delivery List */}
       <SectionHeader title="Assigned Delivery List" meta={`${filteredDeliveries.length} orders`} />
+
+      {loading && (
+        <View style={{ paddingVertical: 20, padding: 30, alignItems: "center", justifyContent: "center" }}>
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text style={{ marginTop: 10, color: colors.textMuted, fontSize: 13 }}>Loading assigned deliveries...</Text>
+        </View>
+      )}
+
+      {!loading && filteredDeliveries.length === 0 && (
+        <View style={[dynamicStyles.card, { padding: 30, alignItems: "center", justifyContent: "center" }]}>
+          <Ionicons name="bicycle-outline" size={40} color={colors.textMuted} style={{ marginBottom: 10 }} />
+          <Text style={{ fontSize: 16, fontWeight: "800", color: colors.textPrimary, marginBottom: 4 }}>No Deliveries Assigned</Text>
+          <Text style={{ fontSize: 12, color: colors.textMuted, textAlign: "center", marginBottom: 16 }}>
+            You have no assigned delivery tasks right now. Swipe down to refresh.
+          </Text>
+          <Pressable 
+            style={{ backgroundColor: colors.brand, paddingHorizontal: 16, paddingVertical: 8, borderRadius: radius.md }}
+            onPress={fetchDeliveries}
+          >
+            <Text style={{ color: "white", fontSize: 13, fontWeight: "800" }}>Refresh Tasks</Text>
+          </Pressable>
+        </View>
+      )}
 
       {filteredDeliveries.map((item) => {
         const isDelivered = item.status === "delivered";

@@ -75,7 +75,7 @@ interface ActivityLog {
       <!-- Content Area -->
       <div class="flex-1 flex overflow-hidden">
         <!-- Left Panel Content -->
-        <div class="flex-1 flex flex-col min-w-0 bg-gray-50 transition-all duration-300 overflow-hidden">
+        <div class="flex-1 flex flex-col min-w-0 bg-primary-50 transition-all duration-300 overflow-hidden">
           <!-- Search & Filter -->
           <div class="p-4 flex gap-4 bg-white border-b border-gray-100 shrink-0">
             <div class="relative flex-1">
@@ -84,7 +84,7 @@ interface ActivityLog {
                 type="text"
                 [(ngModel)]="searchQuery"
                 placeholder="Search by action or details..."
-                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg text-sm transition-all"
+                class="w-full pl-10 pr-4 py-2.5 bg-primary-50 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg text-sm transition-all"
               />
             </div>
             
@@ -101,7 +101,7 @@ interface ActivityLog {
           <div class="flex-1 overflow-auto custom-scrollbar p-4">
             <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
               <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50 sticky top-0 z-10">
+                <thead class="bg-primary-50 sticky top-0 z-10">
                   <tr class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     <th class="px-6 py-3">Timestamp</th>
                     <th class="px-6 py-3">User</th>
@@ -143,7 +143,7 @@ interface ActivityLog {
                     @for (log of filteredLogs; track log.id) {
                       <tr
                         (click)="selectLog(log)"
-                        class="cursor-pointer transition-colors hover:bg-gray-50 group border-l-2 border-transparent"
+                        class="cursor-pointer transition-colors hover:bg-primary-50 group border-l-2 border-transparent"
                         [class.bg-blue-50]="selectedLog?.id === log.id"
                         [class.border-l-primary-500]="selectedLog?.id === log.id"
                       >
@@ -204,8 +204,8 @@ interface ActivityLog {
              <!-- Operator Reference -->
              <div class="mb-8">
                 <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Operator Reference</h4>
-                <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-4">
-                   <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-black text-sm border-2 border-white shadow-sm">
+                <div class="p-4 bg-primary-50 rounded-2xl border border-gray-100 flex items-center gap-4">
+                   <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-600 font-black text-sm border-2 border-white shadow-sm">
                       {{ (selectedLog.staffName || 'S').charAt(0) }}
                    </div>
                    <div>
@@ -231,7 +231,7 @@ interface ActivityLog {
           *ngIf="!selectedLog && !loading && !error"
           class="hidden md:flex flex-col items-center justify-center w-[30%] min-w-[350px] bg-white border-l border-gray-200 text-center p-8 h-full"
         >
-          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
+          <div class="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
             <i class="bi bi-clock-history text-3xl text-gray-300"></i>
           </div>
           <h3 class="text-gray-900 font-bold mb-2">Audit History</h3>
@@ -395,7 +395,7 @@ export class StaffActivity implements OnInit {
       case 'sale': return 'bg-green-50 text-green-600';
       case 'inventory': return 'bg-blue-50 text-blue-600';
       case 'staff': return 'bg-purple-50 text-purple-600';
-      default: return 'bg-gray-50 text-gray-600';
+      default: return 'bg-primary-50 text-gray-600';
     }
   }
 

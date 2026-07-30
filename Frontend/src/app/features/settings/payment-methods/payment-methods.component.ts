@@ -4,11 +4,11 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
-  Validators,
   FormsModule,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ShopService } from '../../../core/services/shop.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { UpiDetails, BankDetails, RazorpayConfig } from '../../../core/models/shop.model';
 import { UiInputComponent } from '../../../shared/components/ui-input.component';
 
@@ -102,7 +102,7 @@ import { UiInputComponent } from '../../../shared/components/ui-input.component'
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center gap-3 mb-6">
               <div
-                class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center"
+                class="w-10 h-10 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center"
               >
                 <i class="bi bi-bank text-lg"></i>
               </div>
@@ -151,70 +151,63 @@ import { UiInputComponent } from '../../../shared/components/ui-input.component'
 
           <!-- 4. Razorpay Integration -->
           <div
-            class="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-gray-800 shadow-xl p-8 text-white"
+            class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-black"
           >
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
               <div class="flex items-center gap-4">
                 <div
-                  class="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-2xl flex items-center justify-center border border-white/5"
+                  class="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center border border-primary-100"
                 >
-                  <i class="bi bi-credit-card text-2xl text-primary-400"></i>
+                  <i class="bi bi-credit-card text-2xl text-primary-600"></i>
                 </div>
                 <div>
-                  <h2 class="text-xl font-bold">Razorpay Integration</h2>
-                  <p class="text-sm text-gray-400">
-                    Accept Credit Cards, Debit Cards, and Wallets.
+                  <h2 class="text-lg font-bold text-gray-900">Razorpay Integration</h2>
+                  <p class="text-xs text-gray-500">
+                    Accept Credit Cards, Debit Cards, Wallets, and Razorpay Official Merchant UPI.
                   </p>
                 </div>
               </div>
               <div
                 *ngIf="isRazorpayConnected"
-                class="flex items-center gap-2 bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider"
+                class="flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider"
               >
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Connected
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Connected
               </div>
             </div>
 
             <form [formGroup]="razorpayForm" (ngSubmit)="saveRazorpay()" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"
-                    >Key ID</label
-                  >
-                  <input
-                    formControlName="keyId"
-                    type="text"
-                    placeholder="rzp_live_..."
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-gray-600 transition-all"
-                  />
-                </div>
-                <div>
-                  <label
-                    class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"
-                    >Key Secret</label
-                  >
-                  <input
-                    formControlName="keySecret"
-                    type="password"
-                    placeholder="••••••••••••••••"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all font-mono"
-                  />
-                </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <app-ui-input
+                  formControlName="keyId"
+                  label="Key ID"
+                  placeholder="rzp_live_..."
+                ></app-ui-input>
+
+                <app-ui-input
+                  formControlName="keySecret"
+                  label="Key Secret"
+                  placeholder="••••••••••••••••"
+                ></app-ui-input>
+
+                <app-ui-input
+                  formControlName="merchantVpa"
+                  label="Merchant VPA / UPI ID (Optional)"
+                  placeholder="rzp.merchant@icici"
+                ></app-ui-input>
               </div>
               <div class="flex justify-between items-center pt-2">
                 <a
                   href="https://dashboard.razorpay.com/app/keys"
                   target="_blank"
-                  class="text-xs text-primary-400 hover:text-primary-300 underline font-medium"
-                  >Get API Keys</a
+                  class="text-xs text-primary-600 hover:text-primary-700 underline font-medium"
+                >Get API Keys from Razorpay Dashboard</a
                 >
                 <button
                   type="submit"
                   [disabled]="loading"
-                  class="bg-primary-600 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-500 shadow-lg shadow-primary-900/50 transition-all active:scale-95 disabled:opacity-50"
+                  class="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-black shadow-md transition-all active:scale-95 disabled:opacity-50"
                 >
-                  Connect Razorpay
+                  Save Razorpay Details
                 </button>
               </div>
             </form>
@@ -236,6 +229,7 @@ export class PaymentMethodsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private shopService: ShopService,
+    private toastService: ToastService,
     private route: ActivatedRoute,
   ) {
     this.upiForm = this.fb.group({
@@ -254,6 +248,7 @@ export class PaymentMethodsComponent implements OnInit {
     this.razorpayForm = this.fb.group({
       keyId: [''],
       keySecret: [''],
+      merchantVpa: [''],
     });
   }
 
@@ -262,22 +257,33 @@ export class PaymentMethodsComponent implements OnInit {
       const id = params.get('shopId');
       if (id) {
         this.shopId = id;
-        this.loadShopPaymentConfig();
+        this.loadShopSettings();
       }
     });
   }
 
-  loadShopPaymentConfig() {
+  loadShopSettings() {
     this.loading = true;
     this.shopService.getShop(this.shopId).subscribe({
       next: (res) => {
-        const shop = res.data;
-        if (shop) {
+        if (res.data) {
+          const shop = res.data;
           this.codEnabled = shop.paymentModes?.cod ?? true;
-          this.isRazorpayConnected = shop.razorpay?.connected ?? false;
-          if (shop.upiDetails) this.upiForm.patchValue(shop.upiDetails);
-          if (shop.bankDetails) this.bankForm.patchValue(shop.bankDetails);
-          if (shop.razorpay) this.razorpayForm.patchValue({ keyId: shop.razorpay.keyId });
+
+          if (shop.upiDetails) {
+            this.upiForm.patchValue(shop.upiDetails);
+          }
+          if (shop.bankDetails) {
+            this.bankForm.patchValue(shop.bankDetails);
+          }
+          if (shop.razorpay) {
+            this.razorpayForm.patchValue({
+              keyId: shop.razorpay.keyId || '',
+              keySecret: shop.razorpay.keySecret || '',
+              merchantVpa: shop.razorpay.merchantVpa || '',
+            });
+            this.isRazorpayConnected = !!shop.razorpay.connected;
+          }
         }
         this.loading = false;
       },
@@ -286,37 +292,72 @@ export class PaymentMethodsComponent implements OnInit {
   }
 
   toggleCod() {
-    if (!this.shopId) return;
     this.shopService
       .updateShop(this.shopId, {
         paymentModes: {
           cod: this.codEnabled,
           online: this.isRazorpayConnected,
-          bankTransfer: !!this.bankForm.get('accountNumber')?.value,
+          bankTransfer: true,
         },
       })
-      .subscribe();
+      .subscribe({
+        next: () => {
+          this.toastService.showSuccess(
+            `COD payment has been ${this.codEnabled ? 'enabled' : 'disabled'}.`,
+            'Settings Saved',
+          );
+        },
+        error: () => {
+          this.toastService.showError('Failed to update COD settings.', 'Error');
+        },
+      });
   }
 
   saveUpi() {
-    if (!this.shopId) return;
-    this.shopService.updateShop(this.shopId, { upiDetails: this.upiForm.value }).subscribe();
+    const upiDetails: UpiDetails = this.upiForm.value;
+    this.shopService.updateShop(this.shopId, { upiDetails }).subscribe({
+      next: () => {
+        this.toastService.showSuccess('UPI details saved successfully!', 'Saved');
+      },
+      error: () => {
+        this.toastService.showError('Failed to save UPI details.', 'Error');
+      },
+    });
   }
 
   saveBank() {
-    if (!this.shopId) return;
-    this.shopService.updateShop(this.shopId, { bankDetails: this.bankForm.value }).subscribe();
+    const bankDetails: BankDetails = this.bankForm.value;
+    this.shopService.updateShop(this.shopId, { bankDetails }).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Bank transfer details saved successfully!', 'Saved');
+      },
+      error: () => {
+        this.toastService.showError('Failed to save bank details.', 'Error');
+      },
+    });
   }
 
   saveRazorpay() {
-    if (!this.shopId) return;
-    const config: RazorpayConfig = {
-      keyId: this.razorpayForm.value.keyId,
-      keySecret: this.razorpayForm.value.keySecret,
-      connected: true,
+    const { keyId, keySecret, merchantVpa } = this.razorpayForm.value;
+    const razorpay: RazorpayConfig = {
+      keyId,
+      keySecret,
+      merchantVpa,
+      connected: !!(keyId && keyId.trim().length > 3),
     };
-    this.shopService.updateShop(this.shopId, { razorpay: config }).subscribe(() => {
-      this.isRazorpayConnected = true;
+
+    this.shopService.updateShop(this.shopId, { razorpay }).subscribe({
+      next: () => {
+        this.isRazorpayConnected = razorpay.connected;
+        if (razorpay.connected) {
+          this.toastService.showSuccess('Razorpay account connected successfully!', 'Connected');
+        } else {
+          this.toastService.showSuccess('Razorpay settings saved.', 'Saved');
+        }
+      },
+      error: () => {
+        this.toastService.showError('Failed to save Razorpay settings.', 'Error');
+      },
     });
   }
 }

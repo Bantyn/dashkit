@@ -17,7 +17,7 @@ import { FeatureGuardService } from '../../../core/services/feature-guard.servic
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, UiDropdownComponent, ImageUploaderComponent],
   template: `
-    <div class="flex-1 overflow-y-auto bg-gray-50 h-full">
+    <div class="flex-1 overflow-y-auto bg-primary-50 h-full">
       <main class="p-8">
         <div class="mx-auto max-w-full">
           <div class="flex items-center justify-between mb-8">
@@ -49,7 +49,7 @@ import { FeatureGuardService } from '../../../core/services/feature-guard.servic
               <div class="card p-8">
                 <form [formGroup]="form" class="space-y-6">
                   <!-- Enabled Toggle -->
-                  <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div class="flex items-center justify-between p-4 bg-primary-50 rounded-xl">
                     <div>
                       <p class="font-bold text-gray-900">Enable Public Website</p>
                       <p class="text-sm text-gray-500">

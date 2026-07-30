@@ -6,11 +6,13 @@ import {
   Modal,
   Pressable,
   Animated,
-  Dimensions
+  Dimensions,
+  Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../ThemeContext";
 import { radius } from "../theme";
+import { getResponsiveFontSize, getPlatformPadding } from "../utils/responsive";
 
 const { width, height } = Dimensions.get("window");
 
@@ -82,44 +84,54 @@ export function CustomAlert({
   const dynamicStyles = StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
+      backgroundColor: "rgba(0,0,0,0.55)",
       justifyContent: "center",
       alignItems: "center",
+      paddingHorizontal: 20,
     },
     alertBox: {
-      width: width * 0.85,
+      width: Math.min(width * 0.88, 400),
       backgroundColor: colors.surface,
       borderRadius: radius.xl,
-      padding: 24,
+      padding: getPlatformPadding(24, 20),
       alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.25,
-      shadowRadius: 15,
-      elevation: 10,
+      ...Platform.select({
+        ios: {
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.22,
+          shadowRadius: 18,
+        },
+        android: {
+          elevation: 10,
+        },
+        web: {
+          boxShadow: "0px 10px 30px rgba(0,0,0,0.2)",
+        }
+      })
     },
     iconContainer: {
-      width: 70,
-      height: 70,
-      borderRadius: 35,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
       backgroundColor: getTypeColor() + "15",
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 20,
+      marginBottom: 16,
     },
     title: {
-      fontSize: 22,
+      fontSize: getResponsiveFontSize(18),
       fontWeight: "800",
       color: colors.textPrimary,
-      marginBottom: 10,
+      marginBottom: 8,
       textAlign: "center"
     },
     message: {
-      fontSize: 16,
+      fontSize: getResponsiveFontSize(13),
       color: colors.textSecondary,
       textAlign: "center",
-      lineHeight: 22,
-      marginBottom: 24,
+      lineHeight: getResponsiveFontSize(18),
+      marginBottom: 20,
     },
     buttonContainer: {
       flexDirection: "row",
@@ -127,14 +139,14 @@ export function CustomAlert({
     },
     button: {
       flex: 1,
-      paddingVertical: 14,
+      paddingVertical: getPlatformPadding(13, 11),
       borderRadius: radius.md,
       alignItems: "center",
       justifyContent: "center",
     },
     cancelButton: {
       backgroundColor: colors.surfaceMuted,
-      marginRight: showConfirm ? 12 : 0,
+      marginRight: showConfirm ? 10 : 0,
     },
     confirmButton: {
       backgroundColor: getTypeColor(),
@@ -142,12 +154,12 @@ export function CustomAlert({
     cancelButtonText: {
       color: colors.textSecondary,
       fontWeight: "700",
-      fontSize: 16,
+      fontSize: getResponsiveFontSize(14),
     },
     confirmButtonText: {
       color: colors.white,
       fontWeight: "800",
-      fontSize: 16,
+      fontSize: getResponsiveFontSize(14),
     }
   });
 

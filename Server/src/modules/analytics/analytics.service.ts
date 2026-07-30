@@ -414,6 +414,28 @@ export class AnalyticsService {
       products: Object.keys(dailyProductsMap).map((date) => dailyProductsMap[date]),
     };
 
+    // Calculate 7-day weekly revenue bar graph data (Mon to Sun)
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const weeklyMap: { [day: string]: number } = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+
+    allInvoices.forEach((inv: any) => {
+      const createdAt = this.resolveDate(inv.createdAt);
+      if (!createdAt || createdAt < sevenDaysAgo) return;
+      const dayName = dayNames[createdAt.getDay()];
+      if (weeklyMap[dayName] !== undefined && (inv.status === "paid" || inv.paymentStatus === "paid")) {
+        weeklyMap[dayName] += inv.total || 0;
+      }
+    });
+
+    const maxWeeklyVal = Math.max(...Object.values(weeklyMap), 1);
+    const weeklyBarData = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => ({
+      day,
+      rawAmount: weeklyMap[day] || 0,
+      value: Math.max(8, Math.round(((weeklyMap[day] || 0) / maxWeeklyVal) * 100)),
+    }));
+
     const result = {
       stats: {
         totalRevenue,
@@ -434,6 +456,7 @@ export class AnalyticsService {
       },
       topProducts,
       recentInvoices,
+      weeklyBarData,
       salesChartData: Object.keys(dailySalesMap).map((date) => ({
         date,
         value: dailySalesMap[date],

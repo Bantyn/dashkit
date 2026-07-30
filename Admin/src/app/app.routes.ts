@@ -21,6 +21,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'admin/gst-verification',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin-gst/admin-gst-verification.component').then(
+        (m) => m.AdminGstVerificationComponent,
+      ),
+  },
+  {
+    path: 'shops/gst-verification',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin-gst/admin-gst-verification.component').then(
+        (m) => m.AdminGstVerificationComponent,
+      ),
+  },
+  {
     path: 'notifications',
     redirectTo: 'admin/notifications',
     pathMatch: 'full',

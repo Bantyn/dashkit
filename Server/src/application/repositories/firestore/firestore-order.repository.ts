@@ -9,19 +9,20 @@ const HISTORY_COLLECTION = "inventory_history";
 const SHOPS_COLLECTION = "shops";
 
 export class FirestoreOrderRepository implements IOrderRepository {
+  
   generateId(): string {
     return db.collection(COLLECTION).doc().id;
   }
 
   async getOrders(): Promise<Order[]> {
     const snapshot = await db.collection(COLLECTION).get();
-    return snapshot.docs.map((doc: any) => doc.data() as Order);
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }) as Order);
   }
 
   async getOrder(id: string): Promise<Order | null> {
     const docSnap = await db.collection(COLLECTION).doc(id).get();
     if (!docSnap.exists) return null;
-    return docSnap.data() as Order;
+    return { id: docSnap.id, ...docSnap.data() } as Order;
   }
 
   async createOrder(order: Order): Promise<void> {
@@ -46,7 +47,7 @@ export class FirestoreOrderRepository implements IOrderRepository {
       query = query.where("branchId", "==", branchId);
     }
     const snapshot = await query.get();
-    return snapshot.docs.map((doc: any) => doc.data() as Order);
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }) as Order);
   }
 
   async getMyOrders(customerId: string, shopId: string): Promise<Order[]> {
@@ -56,7 +57,7 @@ export class FirestoreOrderRepository implements IOrderRepository {
       .where("customerId", "==", customerId)
       .orderBy("createdAt", "desc")
       .get();
-    return snapshot.docs.map((doc: any) => doc.data() as Order);
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }) as Order);
   }
 
   async getMyOrdersByEmail(email: string, shopId: string): Promise<Order[]> {

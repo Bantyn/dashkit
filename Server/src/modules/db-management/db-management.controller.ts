@@ -297,3 +297,15 @@ export const getCleanupReport = asyncHandler(async (_req: Request, res: Response
   }
   return sendSuccess(res, report, "Cleanup report fetched.");
 });
+
+export const runCleanupWorker = asyncHandler(async (req: Request, res: Response) => {
+  const { databaseCleanupWorkerService } = await import("./cleanup-worker.service");
+  const dryRun = req.body?.dryRun !== false; // Default to dryRun: true for safety
+  const summary = await databaseCleanupWorkerService.executeCleanup({
+    action: "manual_cleanup",
+    dryRun,
+    retentionDays: req.body?.retentionDays,
+    batchSize: req.body?.batchSize,
+  });
+  return sendSuccess(res, summary, `Automated cleanup worker executed successfully (${dryRun ? "Dry-Run" : "Live"}).`);
+});

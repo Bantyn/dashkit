@@ -31,8 +31,6 @@ export type CleanupModule =
   | "activity_logs"
   | "usage_tracking"
   | "reports"
-  | "temporary_cache"
-  | "session_data"
   | "analytics";
 
 // These modules are PROTECTED — never cleaned without forceProtected=true

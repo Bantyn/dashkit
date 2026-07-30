@@ -38,7 +38,6 @@ export interface PlatformBillingSettings {
   razorpayKeySecret?: string;
   supportedMethods: string[];
   transactionFeePercent: number;
-  /** Default total billing cycles for new AutoPay subscriptions (e.g. 12 = 1 year). 0 = unlimited */
   autoPayTotalCount?: number;
   updatedAt: Date;
 }
@@ -50,28 +49,61 @@ export type PlatformGstStatus =
   | "failed"
   | "suspended";
 
+export type GstVerificationStatus = "SELF_DECLARED" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
+export type GstVerificationMode = "LOCAL_CHECKSUM" | "SELF_DECLARATION" | "MANUAL_ADMIN" | "SANDBOX_API" | "LIVE_API";
+export type GstProviderType = "LOCAL_CHECKSUM" | "SANDBOX" | "SUREPASS" | "ZOOP" | "DECENTRO" | "MASTERS_INDIA";
+
+export interface ShopGstProfile {
+  isGstRegistered: boolean;
+  gstin: string;
+  legalName: string;
+  tradeName?: string;
+  businessType?: string;
+  compositionScheme?: boolean;
+  verificationStatus: GstVerificationStatus;
+  verificationMode: GstVerificationMode;
+  verificationProvider: GstProviderType;
+  verifiedAt?: Date | null;
+  verifiedBy?: string | null;
+  certificateUrl?: string | null;
+  certificateUploadedAt?: Date | null;
+  rejectionReason?: string | null;
+  selfDeclarationAccepted: boolean;
+  selfDeclarationAcceptedAt?: Date | null;
+}
+
 export interface PlatformGstSettings {
   // Business Identity
   gstNumber: string;
   legalBusinessName: string;
   panNumber: string;
-  businessType: string; // "Private Limited" | "LLP" | "Proprietorship" | "Partnership" | "OPC" | "Other"
+  businessType: string;
 
   // Verification State
   gstStatus: PlatformGstStatus;
   gstVerified: boolean;
   gstCollectionEnabled: boolean;
 
+  // Provider & Mode Details (V2 Architecture)
+  verificationStatus?: GstVerificationStatus;
+  verificationMode?: GstVerificationMode;
+  verificationProvider?: GstProviderType;
+  selfDeclarationAccepted?: boolean;
+  selfDeclarationAcceptedAt?: Date | null;
+  certificateUrl?: string | null;
+  certificateUploadedAt?: Date | null;
+  rejectionReason?: string | null;
+
   // Verification Audit
   verifiedAt: Date | null;
-  verifiedBy: string | null; // admin UID
+  verifiedBy: string | null;
   lastVerificationAttempt: Date | null;
   verificationError: string | null;
 
   // Registered Address
   businessAddress: string;
   state: string;
-  stateCode: string; // 2-digit numeric state code derived from GSTIN
+  stateCode: string;
   city: string;
   pincode: string;
   country: string;

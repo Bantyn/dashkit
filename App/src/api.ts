@@ -36,7 +36,11 @@ const origSetApiToken = (token: string | null) => {
   }
 };
 
+let currentToken: string | null = null;
+let currentStaffId: string | null = null;
+
 export const setApiStaffId = (id: string | null) => {
+  currentStaffId = id;
   if (id) {
     api.defaults.headers.common["x-staff-id"] = id;
     fastApi.defaults.headers.common["x-staff-id"] = id;
@@ -47,6 +51,7 @@ export const setApiStaffId = (id: string | null) => {
 };
 
 export const setApiToken = (token: string | null) => {
+  currentToken = token;
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     fastApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -55,6 +60,26 @@ export const setApiToken = (token: string | null) => {
     delete fastApi.defaults.headers.common["Authorization"];
   }
 };
+
+api.interceptors.request.use((config) => {
+  if (currentToken) {
+    config.headers["Authorization"] = `Bearer ${currentToken}`;
+  }
+  if (currentStaffId) {
+    config.headers["x-staff-id"] = currentStaffId;
+  }
+  return config;
+});
+
+fastApi.interceptors.request.use((config) => {
+  if (currentToken) {
+    config.headers["Authorization"] = `Bearer ${currentToken}`;
+  }
+  if (currentStaffId) {
+    config.headers["x-staff-id"] = currentStaffId;
+  }
+  return config;
+});
 
 export const loginStaff = async (identifier: string, password: string) => {
   try {

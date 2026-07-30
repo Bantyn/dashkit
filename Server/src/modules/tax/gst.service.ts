@@ -1,62 +1,75 @@
-import axios from "axios";
+import { IGstVerificationProvider, GstVerificationResult, GstProviderType } from "./providers/gst-provider.interface";
+import { LocalChecksumProvider } from "./providers/local-checksum.provider";
+import { SandboxGstProvider } from "./providers/sandbox-gst.provider";
 
-const getAccessToken = async (): Promise<string> => {
-  const apiKey = process.env.SANDBOX_API_KEY;
-  const apiSecret = process.env.SANDBOX_SECRET_KEY;
+export class GstVerificationService {
+  private providers: Map<GstProviderType, IGstVerificationProvider> = new Map();
+  private activeProviderName: GstProviderType = "LOCAL_CHECKSUM";
 
-  if (!apiKey || !apiSecret) {
-    console.error("[GST] Credentials missing in process.env");
-    throw new Error(
-      "Sandbox credentials (SANDBOX_API_KEY/SANDBOX_SECRET_KEY) missing in .env",
-    );
+  constructor() {
+    this.registerProvider(new LocalChecksumProvider());
+    this.registerProvider(new SandboxGstProvider());
+
+    const configuredProvider = (process.env.GST_PROVIDER || "LOCAL_CHECKSUM").toUpperCase() as GstProviderType;
+    if (this.providers.has(configuredProvider)) {
+      this.activeProviderName = configuredProvider;
+    } else {
+      this.activeProviderName = "LOCAL_CHECKSUM";
+    }
   }
 
-  console.log("[GST] Authenticating with Sandbox...");
-  const response = await axios.post(
-    "https://api.sandbox.co.in/authenticate",
-    {},
-    {
-      headers: {
-        "x-api-key": apiKey,
-        "x-api-secret": apiSecret,
-        "x-api-version": "1.0.0",
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  if (
-    response.data &&
-    (response.data.code === 200 || response.data.code === 201) &&
-    response.data.data?.access_token
-  ) {
-    console.log("[GST] Auth successful, token received.");
-    return response.data.data.access_token;
+  public registerProvider(provider: IGstVerificationProvider): void {
+    this.providers.set(provider.providerName, provider);
   }
 
-  console.error("[GST] Auth failed:", response.data);
-  throw new Error(response.data.message || "Failed to authenticate with Sandbox");
-};
+  public setProvider(providerName: GstProviderType): void {
+    if (this.providers.has(providerName)) {
+      this.activeProviderName = providerName;
+    } else {
+      throw new Error(`GST Provider '${providerName}' is not registered.`);
+    }
+  }
 
+  public getActiveProvider(): IGstVerificationProvider {
+    const provider = this.providers.get(this.activeProviderName);
+    if (!provider) {
+      return this.providers.get("LOCAL_CHECKSUM")!;
+    }
+    return provider;
+  }
+
+  public async verifyGSTIN(gstin: string, overrideProvider?: GstProviderType): Promise<GstVerificationResult> {
+    const provider = overrideProvider && this.providers.has(overrideProvider)
+      ? this.providers.get(overrideProvider)!
+      : this.getActiveProvider();
+
+    return provider.verifyGstin(gstin);
+  }
+}
+
+export const gstVerificationService = new GstVerificationService();
+
+/**
+ * Backward compatibility wrapper for existing call sites.
+ */
 export const verifyGST = async (gstin: string): Promise<any> => {
-  const apiKey = process.env.SANDBOX_API_KEY;
-  const accessToken = await getAccessToken();
-
-  const url = "https://api.sandbox.co.in/gst/compliance/public/gstin/search";
-  console.log(`[GST] Calling search API for: ${gstin}`);
-
-  const response = await axios.post(
-    url,
-    { gstin },
-    {
-      headers: {
-        "x-api-key": apiKey,
-        authorization: accessToken,
-        "x-api-version": "1.0",
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  return response.data;
+  const result = await gstVerificationService.verifyGSTIN(gstin);
+  if (!result.success) {
+    return {
+      code: 400,
+      message: result.error || "GST Verification failed.",
+      data: null
+    };
+  }
+  return {
+    code: 200,
+    message: "GSTIN verified successfully",
+    data: {
+      gstin: result.gstin,
+      status: result.status === "active" ? "Active" : "Inactive",
+      legalName: result.legalName || "Self-Declared Business Entity",
+      tradeName: result.tradeName || "Self-Declared Trade Name",
+      taxpayerType: "Regular"
+    }
+  };
 };

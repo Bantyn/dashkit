@@ -14,7 +14,7 @@ import { environment } from '../../../../environments/environment';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   template: `
-    <div class="flex-1 overflow-y-auto bg-gray-50 h-full">
+    <div class="flex-1 overflow-y-auto bg-primary-50 h-full">
       <main class="p-6 md:p-8 max-w-full mx-auto space-y-6">
         <div class="flex items-center justify-between">
           <div>
@@ -62,7 +62,7 @@ import { environment } from '../../../../environments/environment';
                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                    Live
                  </span>
-                 <a [href]="currentUrl" target="_blank" class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl text-sm font-medium transition-colors border border-gray-200 inline-flex items-center gap-2">
+                 <a [href]="currentUrl" target="_blank" class="px-4 py-2 bg-primary-50 hover:bg-gray-100 text-gray-700 rounded-xl text-sm font-medium transition-colors border border-gray-200 inline-flex items-center gap-2">
                    Visit Store
                  </a>
               </div>
@@ -93,7 +93,7 @@ import { environment } from '../../../../environments/environment';
                     class="flex-1 px-4 py-2.5 border border-r-0 border-gray-200 rounded-l-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                   <span
-                    class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-r-xl text-sm text-gray-500 font-medium whitespace-nowrap"
+                    class="px-4 py-2.5 bg-primary-50 border border-gray-200 rounded-r-xl text-sm text-gray-500 font-medium whitespace-nowrap"
                     >.clothify.com</span
                   >
                 </div>
@@ -199,7 +199,7 @@ import { environment } from '../../../../environments/environment';
 
             <div class="space-y-4">
               @if (hasFeature('intg_api_access')) {
-                <div *ngIf="(shop | keyvalue) && (shop | keyvalue)?.length && $any(shop).publicApiKey" class="p-4 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between">
+                <div *ngIf="(shop | keyvalue) && (shop | keyvalue)?.length && $any(shop).publicApiKey" class="p-4 bg-primary-50 border border-gray-200 rounded-xl flex items-center justify-between">
                   <div>
                     <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide">Public API Key</label>
                     <code class="text-sm font-mono text-gray-900 mt-1 block">{{ $any(shop).publicApiKey }}</code>

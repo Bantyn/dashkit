@@ -43,6 +43,7 @@ export interface UserProfile {
   subscriptionPlan?: string;
   features?: string[];
   wishlist?: string[];
+  tags?: string[];
   addresses?: any[];
   [key: string]: any;
 }

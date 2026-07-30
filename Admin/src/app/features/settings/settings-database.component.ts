@@ -1534,7 +1534,7 @@ export class SettingsDatabaseComponent implements OnInit {
     "categories", "brands", "products", "inventory", "inventory_history", 
     "customers", "suppliers", "purchase_orders", "orders", "invoices", 
     "payments", "staff", "notifications", "activity_logs", "usage_tracking", 
-    "reports", "temporary_cache", "session_data", "analytics"
+    "reports", "analytics"
   ];
 
   protectedModulesList = [

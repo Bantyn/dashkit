@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView, RefreshControl } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, RefreshControl, Platform } from "react-native";
 
 import { CustomerCard } from "../components/CustomerCard";
 import { SectionHeader } from "../components/SectionHeader";
@@ -80,21 +80,43 @@ export function CustomersScreen({ user, refreshSignal, onRefreshComplete }: { us
 
 const styles = StyleSheet.create({
   section: {
-    gap: 14
+    gap: 12
   },
   highlight: {
-    borderRadius: radius.lg,
-    padding: 20
+    ...Platform.select({
+      ios: {
+        borderRadius: radius.sm,
+        padding: 18,
+        marginBottom: 8,
+      },
+      android: {
+        borderRadius: radius.md,
+        padding: 14,
+        marginBottom: 6,
+      },
+      web: {
+        borderRadius: radius.lg,
+        padding: 16,
+        marginBottom: 8,
+      }
+    })
   },
   highlightLabel: {
-    fontSize: 13,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 1.1,
-    marginBottom: 8
+    marginBottom: 6,
+    ...Platform.select({
+      ios: { fontSize: 13 },
+      android: { fontSize: 11 },
+      web: { fontSize: 12 }
+    })
   },
   highlightText: {
-    fontSize: 14,
-    lineHeight: 21
+    ...Platform.select({
+      ios: { fontSize: 14.5, lineHeight: 21 },
+      android: { fontSize: 13, lineHeight: 18 },
+      web: { fontSize: 14, lineHeight: 20 }
+    })
   }
 });

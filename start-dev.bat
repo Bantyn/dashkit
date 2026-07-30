@@ -55,7 +55,7 @@ timeout /t 2 /nobreak >nul
 
 REM --- Start Android Expo ---
 echo     [6/6] Android Expo Server    (Port 4203)
-start "Dashkit - Storefront" cmd /k "cd /d %~dp0Storefront && ng serve --host 0.0.0.0 --port 4202"
+start "Dashkit - Storefront" cmd /k "cd /d %~dp0Storefront && ng serve --host 0.0.0.0 --port 4203"
 timeout /t 2 /nobreak >nul
 
 

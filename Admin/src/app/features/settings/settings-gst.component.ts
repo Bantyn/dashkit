@@ -46,7 +46,7 @@ import { UiDropdownComponent } from '../../shared/components/ui-dropdown.compone
             <ng-container *ngIf="gst.gstStatus === 'not_configured'">GST will NOT be charged to shops on any subscription invoices until platform GST is verified and collection is enabled.</ng-container>
             <ng-container *ngIf="gst.gstStatus === 'pending'">Complete GST details and click "Verify GST" to enable tax collection on subscriptions.</ng-container>
             <ng-container *ngIf="gst.gstStatus === 'failed'">
-              Verification failed: {{ gst.verificationError || 'Unknown error.' }} Please check your GST details and try again.
+              Verification failed: {{ gst.verificationError || 'Invalid GSTIN or verification service unavailable.' }} Please check your GST details and try again.
             </ng-container>
           </p>
         </div>
@@ -403,7 +403,7 @@ export class SettingsGstComponent implements OnInit {
         if (res.data.gstStatus === 'verified') {
           this.toast.showSuccess('Platform GST verified! You can now enable GST collection.');
         } else {
-          this.toast.showError(`Verification failed: ${res.data.verificationError || 'Unknown error'}`);
+          this.toast.showError(`Verification failed: ${res.data.verificationError || 'Invalid GSTIN or verification service unavailable.'}`);
         }
       },
       error: (err) => {

@@ -12,7 +12,7 @@ import { ConfirmationService } from '../../shared/components/confirmation-modal.
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="h-full bg-[#f5f7fa] overflow-y-auto">
+    <div class="h-full bg-primary-50 overflow-y-auto">
       <!-- Header -->
       <div class="bg-white border-b border-gray-200 px-6 py-5 flex items-center justify-between sticky top-0 z-10">
         <div>
@@ -38,14 +38,14 @@ import { ConfirmationService } from '../../shared/components/confirmation-modal.
               type="text"
               [(ngModel)]="newCategoryName"
               placeholder="e.g. Staff Lunch, Office Supplies"
-              class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all"
+              class="flex-1 px-4 py-2.5 bg-primary-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all"
               (keydown.enter)="addCategory()"
             />
             <input
               type="text"
               [(ngModel)]="newCategoryDesc"
               placeholder="Description (optional)"
-              class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all"
+              class="flex-1 px-4 py-2.5 bg-primary-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-50 outline-none transition-all"
             />
             <button
               (click)="addCategory()"
@@ -76,7 +76,7 @@ import { ConfirmationService } from '../../shared/components/confirmation-modal.
           } @else {
             <div class="divide-y divide-gray-50">
               @for (cat of categories; track cat.id) {
-                <div class="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 group transition-colors">
+                <div class="px-6 py-4 flex items-center gap-4 hover:bg-primary-50 group transition-colors">
                   <div class="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
                     <i class="bi bi-tag-fill text-primary-500 text-sm"></i>
                   </div>

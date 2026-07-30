@@ -14,7 +14,7 @@ import { ConfirmationService } from '../../shared/components/confirmation-modal.
   standalone: true,
   imports: [CommonModule, FormsModule, UiDropdownComponent, UiLoadingComponent],
   template: `
-    <div class="h-full bg-[#f5f7fa] flex flex-col overflow-hidden">
+    <div class="h-full bg-primary-50 flex flex-col overflow-hidden">
       <!-- Header -->
       <div class="bg-white border-b border-gray-200 px-6 py-5 flex items-center justify-between shrink-0">
         <div>
@@ -68,7 +68,7 @@ import { ConfirmationService } from '../../shared/components/confirmation-modal.
           [(ngModel)]="searchQuery"
           (input)="applyFilters()"
           placeholder="Search expenses..."
-          class="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none"
+          class="flex-1 px-4 py-2 bg-primary-50 border border-gray-200 rounded-xl text-sm outline-none"
         />
         <span class="text-xs text-gray-500 font-medium whitespace-nowrap">
           {{ filtered.length }} records
@@ -78,7 +78,7 @@ import { ConfirmationService } from '../../shared/components/confirmation-modal.
       <!-- Content -->
       <div class="flex-1 overflow-hidden flex gap-0">
         <!-- Left: List -->
-        <div class="flex-1 overflow-y-auto bg-gray-50">
+        <div class="flex-1 overflow-y-auto bg-primary-50">
           @if (loading) {
             <div class="flex items-center justify-center h-40">
               <app-ui-loading size="md"></app-ui-loading>

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../../config/firebase.config";
 import { asyncHandler, sendSuccess, sendError } from "../../shared/utils/response";
+import { customerCreditService } from "../customer-credit/customer-credit.service";
 
 const COLLECTION = "return_requests";
 
@@ -173,15 +174,14 @@ export const getRefundsByShop = asyncHandler(async (req: Request, res: Response)
   });
 
   // 2. Fetch customer credit debits
-  const creditSnapshot = await db.collection("customer_credits").where("shopId", "==", shopId).get();
+  const customerCredits = await customerCreditService.getCreditsByShop(shopId);
   const creditRefunds: any[] = [];
-  creditSnapshot.docs.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
-    const data = doc.data();
+  customerCredits.forEach((data: any) => {
     const history = data.history || [];
     history.forEach((h: any, idx: number) => {
       if (h.type === 'debit') {
         creditRefunds.push({
-          id: `${doc.id}_h_${idx}`,
+          id: h.id || `${data.id}_h_${idx}`,
           date: h.date?.toDate ? h.date.toDate() : new Date(h.date || Date.now()),
           customerName: data.customerName || "Customer",
           customerPhone: data.customerPhone || "",

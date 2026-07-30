@@ -95,8 +95,8 @@ export class NotificationSenderService {
         const walletData = walletDoc.data();
 
         if (!walletDoc.exists || !walletData || walletData.whatsappCredits <= 0) {
-          console.warn(`[WhatsApp] Shop ${shopId} lacks Meta credentials and has 0 Platform WhatsApp Credits. Send failed.`);
-          return false;
+          console.warn(`[WhatsApp] Shop ${shopId} lacks Meta credentials and has 0 Platform WhatsApp Credits.`);
+          throw new Error("WhatsApp integration is not connected. Please enter your Meta API Key & Phone Number ID, or recharge Platform Credits.");
         }
 
         // Fetch platform integration settings
@@ -104,8 +104,8 @@ export class NotificationSenderService {
         const platformWa = platformIntegrations?.whatsapp;
 
         if (!platformWa || !platformWa.apiKey || !platformWa.phoneNumberId) {
-          console.warn(`[WhatsApp PLATFORM] Admin WhatsApp credentials not configured. Cannot fallback.`);
-          return false;
+          console.warn(`[WhatsApp PLATFORM] Admin WhatsApp credentials not configured.`);
+          throw new Error("WhatsApp integration is not connected and Platform fallback API keys are missing.");
         }
 
         // Format phone number (ensure country code)
@@ -297,6 +297,43 @@ export class NotificationSenderService {
       }
       return false;
     }
+  }
+
+  /**
+   * Enqueue notification to BullMQ Notification Queue for non-blocking asynchronous processing
+   */
+  async enqueueNotification(
+    shopId: string,
+    channel: "email" | "sms" | "whatsapp" | "push" | string,
+    recipient: string,
+    opts: {
+      content?: string;
+      templateId?: string;
+      templateData?: Record<string, any>;
+      metadata?: Record<string, any>;
+      deduplicationId?: string;
+    } = {}
+  ): Promise<{ success: boolean; jobId?: string }> {
+    const { queueManager } = await import("../../infrastructure/queue/queue.manager");
+    const { QueueName } = await import("../../infrastructure/queue/queue.types");
+
+    const deduplicationId = opts.deduplicationId || `notif_${shopId}_${channel}_${recipient}_${Date.now()}`;
+
+    return await queueManager.addJob(
+      QueueName.NOTIFICATION,
+      "send-notification",
+      {
+        shopId,
+        channel,
+        recipient,
+        content: opts.content,
+        templateId: opts.templateId,
+        templateData: opts.templateData,
+        metadata: opts.metadata,
+        deduplicationId
+      },
+      { jobId: deduplicationId }
+    );
   }
 }
 

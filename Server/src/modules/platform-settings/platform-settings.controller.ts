@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { asyncHandler, sendSuccess } from "../../shared/utils/response";
+import { asyncHandler, sendSuccess, sendError } from "../../shared/utils/response";
 import { platformSettingsService } from "./platform-settings.service";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 
@@ -36,10 +36,26 @@ export const saveGstSettings = asyncHandler(async (req: AuthRequest, res: Respon
   return sendSuccess(res, settings, "Platform GST settings saved");
 });
 
+import { createAdminNotification } from "../admin-notification/admin-notification.controller";
+
 export const verifyPlatformGstController = asyncHandler(async (req: AuthRequest, res: Response) => {
   const adminId = req.user?.uid || "system";
-  const result = await platformSettingsService.verifyPlatformGst(adminId);
-  return sendSuccess(res, result, `Platform GST verification ${result.gstStatus}`);
+  const providedGstNumber = req.body?.gstNumber || req.body?.gstin;
+  try {
+    const result = await platformSettingsService.verifyPlatformGst(adminId, providedGstNumber);
+    
+    // Create background admin notification
+    createAdminNotification({
+      title: `GST Status Updated: ${result.gstStatus.toUpperCase()}`,
+      message: `Platform GSTIN ${result.gstNumber} status updated to ${result.gstStatus}.`,
+      category: "platform",
+      actionLink: "/admin/gst-verification",
+    }).catch(() => {});
+
+    return sendSuccess(res, result, `Platform GST verification ${result.gstStatus}`);
+  } catch (error: any) {
+    return sendError(res, error.message || "Failed to verify GST details", 400);
+  }
 });
 
 export const toggleGstCollectionController = asyncHandler(async (req: AuthRequest, res: Response) => {

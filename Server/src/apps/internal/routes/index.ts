@@ -5,4 +5,6 @@ import gstRoutes from "./gst.routes";
 export const registerInternalRoutes = (app: Application) => {
   app.use("/api/v1/webhooks", webhookRoutes);
   app.use("/api", gstRoutes);
+  app.use("/admin/api", gstRoutes);
+  app.use("/api/v1/admin", gstRoutes);
 };

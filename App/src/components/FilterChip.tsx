@@ -1,7 +1,8 @@
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, Platform } from "react-native";
 import { radius } from "../theme";
 import { useTheme } from "../ThemeContext";
+import { getResponsiveFontSize, getPlatformPadding } from "../utils/responsive";
 
 export function FilterChip({
   label,
@@ -21,7 +22,7 @@ export function FilterChip({
     chip: {
       backgroundColor: colors.surfaceMuted,
       borderColor: colors.border,
-      borderWidth: 1,
+      borderWidth: 0.5,
     },
     chipActive: {
       backgroundColor: colors.brand,
@@ -29,6 +30,7 @@ export function FilterChip({
     },
     text: {
       color: colors.textSecondary,
+      fontSize: getResponsiveFontSize(12),
     },
     textActive: {
       color: colors.white,
@@ -37,10 +39,16 @@ export function FilterChip({
 
   return (
     <Pressable
-      style={[styles.chip, dynamicStyles.chip, isActive && dynamicStyles.chipActive]}
+      style={({ pressed }) => [
+        styles.chip, 
+        dynamicStyles.chip, 
+        isActive && dynamicStyles.chipActive,
+        pressed && Platform.OS === "ios" && { opacity: 0.8 }
+      ]}
+      android_ripple={{ color: colors.brand + "20" }}
       onPress={onPress}
     >
-      <Text style={[styles.text, dynamicStyles.text, isActive && dynamicStyles.textActive]}>
+      <Text style={[styles.text, dynamicStyles.text, isActive && dynamicStyles.textActive]} numberOfLines={1}>
         {label}
       </Text>
     </Pressable>
@@ -50,12 +58,11 @@ export function FilterChip({
 const styles = StyleSheet.create({
   chip: {
     borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: getPlatformPadding(14, 12),
+    paddingVertical: getPlatformPadding(8, 6),
     marginRight: 6,
   },
   text: {
-    fontSize: 13,
     fontWeight: "700",
   },
 });

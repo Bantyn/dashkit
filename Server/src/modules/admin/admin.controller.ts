@@ -53,52 +53,90 @@ export const getShopSecurityStatus = asyncHandler(async (req: Request, res: Resp
   const db = (await import("../../config/firebase.config")).db;
   const { auditLogService } = await import("../audit/audit-log.service");
 
-  const shopDoc = await db.collection("shops").doc(shopId).get();
-  const shopData = shopDoc.exists ? shopDoc.data() : null;
+  try {
+    const shopDoc = await db.collection("shops").doc(shopId).get();
+    const shopData = shopDoc.exists ? shopDoc.data() : null;
 
-  let ownerUser: any = null;
-  if (shopData?.ownerId) {
-    const userDoc = await db.collection("users").doc(shopData.ownerId).get();
-    if (userDoc.exists) {
-      ownerUser = userDoc.data();
+    let ownerUser: any = null;
+    if (shopData?.ownerId) {
+      try {
+        const userDoc = await db.collection("users").doc(shopData.ownerId).get();
+        if (userDoc.exists) {
+          ownerUser = userDoc.data();
+        }
+      } catch {
+        // Fallback
+      }
     }
-  }
 
-  if (!ownerUser) {
-    const userSnap = await db.collection("users").where("shopId", "==", shopId).limit(1).get();
-    if (!userSnap.empty) {
-      ownerUser = userSnap.docs[0].data();
+    if (!ownerUser) {
+      try {
+        const userSnap = await db.collection("users").where("shopId", "==", shopId).limit(1).get();
+        if (!userSnap.empty) {
+          ownerUser = userSnap.docs[0].data();
+        }
+      } catch {
+        // Fallback
+      }
     }
-  }
 
-  const now = new Date();
-  let remainingSeconds = 0;
-  if (ownerUser?.lockUntil) {
-    const lockUntilDate = new Date(ownerUser.lockUntil);
-    if (now < lockUntilDate) {
-      remainingSeconds = Math.ceil((lockUntilDate.getTime() - now.getTime()) / 1000);
+    const now = new Date();
+    let remainingSeconds = 0;
+    if (ownerUser?.lockUntil) {
+      try {
+        const lockUntilDate = new Date(ownerUser.lockUntil);
+        if (now < lockUntilDate) {
+          remainingSeconds = Math.ceil((lockUntilDate.getTime() - now.getTime()) / 1000);
+        }
+      } catch {
+        remainingSeconds = 0;
+      }
     }
+
+    let logs: any[] = [];
+    try {
+      logs = await auditLogService.getLogsForShopOrEmail(shopId, ownerUser?.email);
+    } catch (logErr: any) {
+      console.warn(`[getShopSecurityStatus] Failed to fetch audit logs for shop ${shopId}:`, logErr.message);
+    }
+
+    return sendSuccess(
+      res,
+      {
+        shopId,
+        email: ownerUser?.email || "N/A",
+        failedLoginAttempts: ownerUser?.failedLoginAttempts || 0,
+        lockoutStatus: remainingSeconds > 0 ? "LOCKED" : "NORMAL",
+        lockUntil: ownerUser?.lockUntil || null,
+        remainingLockTime: remainingSeconds,
+        accountStatus: ownerUser?.accountStatus || (shopData?.status === "suspended" ? "suspended" : "active"),
+        suspensionReason: ownerUser?.suspensionReason || shopData?.suspensionReason || null,
+        lastLogin: ownerUser?.lastLogin || ownerUser?.lastLoginAt || null,
+        lastFailedLogin: ownerUser?.lastFailedLoginAt || null,
+        securityLogs: logs,
+      },
+      "Shop security status fetched"
+    );
+  } catch (err: any) {
+    console.error(`[getShopSecurityStatus] Error fetching security status for shop ${shopId}:`, err.message);
+    return sendSuccess(
+      res,
+      {
+        shopId,
+        email: "N/A",
+        failedLoginAttempts: 0,
+        lockoutStatus: "NORMAL",
+        lockUntil: null,
+        remainingLockTime: 0,
+        accountStatus: "active",
+        suspensionReason: null,
+        lastLogin: null,
+        lastFailedLogin: null,
+        securityLogs: [],
+      },
+      "Shop security status fetched (fallback)"
+    );
   }
-
-  const logs = await auditLogService.getLogsForShopOrEmail(shopId, ownerUser?.email);
-
-  return sendSuccess(
-    res,
-    {
-      shopId,
-      email: ownerUser?.email || "N/A",
-      failedLoginAttempts: ownerUser?.failedLoginAttempts || 0,
-      lockoutStatus: remainingSeconds > 0 ? "LOCKED" : "NORMAL",
-      lockUntil: ownerUser?.lockUntil || null,
-      remainingLockTime: remainingSeconds,
-      accountStatus: ownerUser?.accountStatus || (shopData?.status === "suspended" ? "suspended" : "active"),
-      suspensionReason: ownerUser?.suspensionReason || shopData?.suspensionReason || null,
-      lastLogin: ownerUser?.lastLogin || ownerUser?.lastLoginAt || null,
-      lastFailedLogin: ownerUser?.lastFailedLoginAt || null,
-      securityLogs: logs,
-    },
-    "Shop security status fetched"
-  );
 });
 
 export const reactivateShop = asyncHandler(async (req: Request, res: Response) => {

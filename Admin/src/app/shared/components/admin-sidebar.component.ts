@@ -188,6 +188,7 @@ export class AdminSidebarComponent {
         expanded: false,
         children: [
           { label: 'All Shops',            route: 'shops' },
+          { label: 'GST Verification',     route: 'admin/gst-verification' },
           { label: 'Store Requests',       route: 'shops/requests' },
           { label: 'Custom Plan Requests', route: 'shops/custom-plan-requests' },
           { label: 'Shop Reviews',         route: 'shops/reviews' },
