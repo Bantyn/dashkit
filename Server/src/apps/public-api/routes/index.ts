@@ -12,6 +12,7 @@ import headlessRoutes from "./headless.routes";
 import { getThemeSettings } from "../../../modules/platform-settings/platform-settings.controller";
 import { verifyToken } from "../../../middlewares/auth.middleware";
 import { staffLogin } from "../../../modules/staff/staff.controller";
+import offlinePosRoutes from "../../../modules/offline-pos/offline-pos.routes";
 
 export const registerPublicApiRoutes = (app: Application) => {
   app.use("/api/v1/auth", publicAuthRoutes);
@@ -26,4 +27,5 @@ export const registerPublicApiRoutes = (app: Application) => {
   app.use("/api/v1/payment", paymentRoutes);
   app.use("/api/v1/headless", headlessRoutes);
   app.get("/api/v1/themes", getThemeSettings);
+  app.use("/api/v1/public/offline-pos", offlinePosRoutes);
 };

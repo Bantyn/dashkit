@@ -66,6 +66,7 @@ export type UserProfile = {
   shopId?: string;
   subscriptionPlan?: string;
   features?: string[];
+  limits?: Record<string, any>;
   featureStates?: Record<string, string>;
   address?: string; // Legacy
   addresses?: CustomerAddress[];

@@ -29,6 +29,7 @@ export const FEATURE_KEYS = {
   SELL_COD: "sell_cod",
   SELL_ONLINE_PAYMENTS: "sell_online_payments",
   SELL_OFFERS_DISCOUNTS: "sell_offers_discounts",
+  SELL_OFFLINE_POS_COUNTERS: "sell_offline_pos_counters",
 
   // ─── Website Module ───
   WEB_STOREFRONT: "web_storefront",
@@ -118,6 +119,7 @@ export const LIMIT_KEYS = {
   PRODUCTS_COUNT: "products_count",
   INVOICES_PER_MONTH: "invoices_per_month",
   STORAGE_LIMIT_MB: "storage_limit_mb",
+  OFFLINE_POS_COUNTERS_COUNT: "offline_pos_counters_count",
 } as const;
 
 export const DEFAULT_FEATURES: FeatureDefinition[] = [
@@ -147,6 +149,7 @@ export const DEFAULT_FEATURES: FeatureDefinition[] = [
   { key: FEATURE_KEYS.SELL_CHECKOUT,        label: "Online Checkout",       category: "selling",      description: "Customers can place orders from website.",         active: true, createdAt: new Date(), updatedAt: new Date() },
   { key: FEATURE_KEYS.SELL_COD,             label: "Cash on Delivery",      category: "selling",      description: "Allow COD payment method.",                        active: true, createdAt: new Date(), updatedAt: new Date() },
   { key: FEATURE_KEYS.SELL_ONLINE_PAYMENTS, label: "Online Payments",       category: "selling",      description: "Accept online payments.",                          active: true, createdAt: new Date(), updatedAt: new Date() },
+  { key: FEATURE_KEYS.SELL_OFFLINE_POS_COUNTERS, label: "Offline POS Counters", category: "selling", description: "Allow merchants to connect multiple offline desktop POS applications using secure API authentication.", active: true, createdAt: new Date(), updatedAt: new Date() },
   { key: FEATURE_KEYS.SELL_OFFERS_DISCOUNTS,label: "Offers & Discounts",    category: "selling",      description: "Create offers, coupons, discounts.",               active: true, createdAt: new Date(), updatedAt: new Date() },
 
   // ─── Website ───
@@ -270,6 +273,7 @@ export const DEFAULT_PLANS: SubscriptionPlan[] = [
       FEATURE_KEYS.SELL_COD,
       FEATURE_KEYS.SELL_ONLINE_PAYMENTS,
       FEATURE_KEYS.SELL_OFFERS_DISCOUNTS,
+      FEATURE_KEYS.SELL_OFFLINE_POS_COUNTERS,
       // Website — everything
       FEATURE_KEYS.WEB_STOREFRONT,
       FEATURE_KEYS.WEB_THEME,
@@ -341,6 +345,7 @@ export const DEFAULT_PLANS: SubscriptionPlan[] = [
       [LIMIT_KEYS.PRODUCTS_COUNT]: 1000,
       [LIMIT_KEYS.INVOICES_PER_MONTH]: 100,
       [LIMIT_KEYS.STORAGE_LIMIT_MB]: 500,
+      [LIMIT_KEYS.OFFLINE_POS_COUNTERS_COUNT]: 2,
     },
     includedStorageMB: 500,
     includedStorageBytes: 524288000,
@@ -438,6 +443,7 @@ export const DEFAULT_PLANS: SubscriptionPlan[] = [
       [LIMIT_KEYS.PRODUCTS_COUNT]: 5000,
       [LIMIT_KEYS.INVOICES_PER_MONTH]: 500,
       [LIMIT_KEYS.STORAGE_LIMIT_MB]: 500,
+      [LIMIT_KEYS.OFFLINE_POS_COUNTERS_COUNT]: 2,
     },
     includedStorageMB: 500,
     includedStorageBytes: 524288000,
@@ -568,6 +574,7 @@ export const DEFAULT_PLANS: SubscriptionPlan[] = [
       [LIMIT_KEYS.PRODUCTS_COUNT]: null,
       [LIMIT_KEYS.INVOICES_PER_MONTH]: null,
       [LIMIT_KEYS.STORAGE_LIMIT_MB]: 2048,
+      [LIMIT_KEYS.OFFLINE_POS_COUNTERS_COUNT]: 5,
     },
     includedStorageMB: 2048,
     includedStorageBytes: 2147483648,
@@ -607,6 +614,7 @@ export const DEFAULT_PLANS: SubscriptionPlan[] = [
       [LIMIT_KEYS.PRODUCTS_COUNT]: null,
       [LIMIT_KEYS.INVOICES_PER_MONTH]: null,
       [LIMIT_KEYS.STORAGE_LIMIT_MB]: 10240,
+      [LIMIT_KEYS.OFFLINE_POS_COUNTERS_COUNT]: null,
     },
     includedStorageMB: 10240,
     includedStorageBytes: 10737418240,

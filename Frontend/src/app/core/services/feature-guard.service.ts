@@ -78,6 +78,7 @@ export const ROUTE_FEATURE_MAPPING: Record<string, string> = {
   'analytics/branches': 'analytics_branches',
   'staff/job-cards': 'tailor_job_cards',
   'tailoring': 'tailor_job_cards',
+  'settings/pos-counters': 'sell_offline_pos_counters',
   'products/seasons': 'seasonal_collections',
   'accounting/cashbook': 'acc_cash_book',
   'accounting/bankbook': 'acc_bank_book',
@@ -159,5 +160,17 @@ export class FeatureGuardService {
     const match = paths.find(p => path === p || path.startsWith(`${p}/`));
     
     return match ? ROUTE_FEATURE_MAPPING[match] : null;
+  }
+
+  isFeatureActive(featureKey: string): boolean {
+    return this.hasFeatureSync(null, featureKey);
+  }
+
+  getLimitValue(limitKey: string): number | null {
+    const user: any = this.authService.getCurrentUser();
+    if (user && user.limits && user.limits[limitKey] !== undefined) {
+      return user.limits[limitKey];
+    }
+    return null;
   }
 }

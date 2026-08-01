@@ -55,6 +55,7 @@ import adminNotificationRoutes from "./admin-notification.routes";
 import { trackApiUsage } from "../../../middlewares/api-usage.middleware";
 import exportRoutes from "../../../modules/export/export.routes";
 import walletRoutes from "../../../modules/wallet/wallet.routes";
+import offlinePosRoutes from "../../../modules/offline-pos/offline-pos.routes";
 
 export const registerAdminApiRoutes = (app: Application) => {
   // Apply API usage tracking globally for all routes under /api/v1
@@ -114,6 +115,7 @@ export const registerAdminApiRoutes = (app: Application) => {
   app.use(`${adminBase}/subscriptions`, ...adminGuards, subscriptionRoutes);
   app.use(`${adminBase}/exports`, ...adminGuards, exportRoutes);
   app.use(`${adminBase}/wallet`, ...adminGuards, walletRoutes);
+  app.use(`${adminBase}/offline-pos`, ...adminGuards, offlinePosRoutes);
   // Admin-only (superadmin) notification system
   app.use("/api/v1/superadmin/notifications", ...adminGuards, adminNotificationRoutes);
   // Public support ticket creation (from shop frontend)

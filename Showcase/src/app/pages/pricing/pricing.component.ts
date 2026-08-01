@@ -92,6 +92,7 @@ export class PricingComponent implements OnInit {
       colorClass: 'text-green-500 bg-green-50',
       features: [
         { key: 'sell_pos_billing', name: 'POS Billing', price: 79, description: 'Fast and reliable point-of-sale system for quick checkout.' },
+        { key: 'sell_offline_pos_counters', name: 'Offline POS Counters', price: 299, description: 'Allow merchants to connect multiple offline desktop POS applications using secure API authentication.' },
         { key: 'sell_invoices', name: 'Invoices', price: 39, description: 'Generate professional, GST-compliant invoices for your customers.' },
         { key: 'sell_credit_notes', name: 'Credit Notes', price: 29, description: 'Handle customer credits effortlessly for future purchases.' },
         { key: 'sell_drafts', name: 'Draft Orders', price: 29, description: 'Save incomplete orders and resume them later without losing data.' },

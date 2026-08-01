@@ -319,6 +319,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'settings/pos-counters',
+            loadComponent: () =>
+              import('./features/settings/pos-counters/pos-counters.component').then(
+                (m) => m.PosCountersComponent,
+              ),
+          },
+          {
             path: 'website',
             loadComponent: () =>
               import('./features/settings/website-settings/website-overview.component').then(

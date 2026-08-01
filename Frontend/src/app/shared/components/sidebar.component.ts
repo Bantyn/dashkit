@@ -855,6 +855,7 @@ export class SidebarComponent {
         feature: 'inv_product_listing',
         children: [
           { label: 'Shop Profile', route: 'settings', feature: 'inv_product_listing' },
+          { label: 'POS Counters', route: 'settings/pos-counters', feature: 'sell_offline_pos_counters' },
           { label: 'Tax Settings', route: 'settings/tax', feature: 'fin_tax_report' },
           { label: 'Invoice Template', route: 'settings/invoice-template', feature: 'intg_invoice_template' },
           { label: 'Payment Methods', route: 'settings/payment-methods', feature: 'fin_payments' },
