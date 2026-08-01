@@ -6,7 +6,6 @@ import { getLocalISODate } from '../../core/utils/date.utils';
 import { StaffService } from '../../core/services/staff.service';
 import { UiInputComponent } from '../../shared/components/ui-input.component';
 import { UiDropdownComponent } from '../../shared/components/ui-dropdown.component';
-import { UiDatePickerComponent } from '../../shared/components/ui-date-picker.component';
 
 export interface PermissionCategory {
   key: string;
@@ -35,7 +34,7 @@ const ROLE_RECOMMENDED_PERMISSIONS: Record<string, string[]> = {
 @Component({
   selector: 'app-staff-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, UiInputComponent, UiDropdownComponent, UiDatePickerComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, UiInputComponent, UiDropdownComponent],
   template: `
     <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
       <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col">

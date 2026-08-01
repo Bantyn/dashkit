@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OfflinePosService, OfflinePosCounter, CounterCredentialsResult } from '../../../core/services/offline-pos.service';
@@ -54,7 +54,7 @@ import { UiLoadingComponent } from '../../../shared/components/ui-loading.compon
 
         <!-- Locked / Upgrade Banner if Feature Gated -->
         @if (!hasFeature && !loading) {
-          <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-6 rounded-2xl shadow-md flex items-center justify-between">
+          <div class="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 rounded-2xl flex items-center justify-between">
             <div class="flex items-center gap-4">
               <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-2xl shrink-0">
                 <i class="bi bi-lock-fill"></i>
@@ -68,7 +68,7 @@ import { UiLoadingComponent } from '../../../shared/components/ui-loading.compon
             </div>
             <a
               href="/subscription/plans"
-              class="px-5 py-2.5 bg-white text-orange-700 font-semibold rounded-xl text-xs hover:bg-orange-50 transition-colors shrink-0 shadow-sm"
+              class="px-5 py-2.5 bg-white text-primary-700 font-semibold rounded-xl text-xs hover:bg-orange-50 transition-colors shrink-0 shadow-sm"
             >
               Upgrade Subscription
             </a>
@@ -212,7 +212,7 @@ import { UiLoadingComponent } from '../../../shared/components/ui-loading.compon
                         </td>
 
                         <td class="py-3.5 px-4 text-gray-500 text-xs">
-                          {{ counter.lastConnectedAt ? (counter.lastConnectedAt | date:'medium') : 'Never' }}
+                          {{ formatLastConnected(counter.lastConnectedAt) }}
                         </td>
 
                         <td class="py-3.5 px-4 text-right">
@@ -417,7 +417,7 @@ import { UiLoadingComponent } from '../../../shared/components/ui-loading.compon
     }
   `
 })
-export class PosCountersComponent implements OnInit {
+export class PosCountersComponent implements OnInit, OnDestroy {
   private offlinePosService = inject(OfflinePosService);
   private shopContext = inject(ShopContextService);
   private featureGuard = inject(FeatureGuardService);
@@ -430,7 +430,9 @@ export class PosCountersComponent implements OnInit {
   loading = true;
   hasFeature = true;
   counterLimit: number | null = null;
-  
+  lastRefreshedAt: Date | null = null;
+  private pollInterval: any = null;
+
   showAddModal = false;
   creating = false;
   newCounter = { name: '', description: '', branchId: '', location: '' };
@@ -458,12 +460,27 @@ export class PosCountersComponent implements OnInit {
     this.checkEntitlements();
     this.loadBranches();
     this.loadCounters();
+    // Auto-refresh every 30 seconds to show live device status & lastConnectedAt
+    this.pollInterval = setInterval(() => this.loadCountersSilent(), 30000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+    }
   }
 
   checkEntitlements(): void {
-    this.hasFeature = this.featureGuard.isFeatureActive('sell_offline_pos_counters');
+    const shop = this.shopContext.getShopSync();
+    const user = this.authService.getCurrentUser();
+
+    const hasUserFeat = user && Array.isArray(user.features) && (user.features.includes('sell_offline_pos_counters') || user.features.includes('*'));
+    const hasShopFeat = shop && Array.isArray((shop as any).customFeatures) && (shop as any).customFeatures.includes('sell_offline_pos_counters');
+
+    this.hasFeature = !!hasUserFeat || !!hasShopFeat || this.featureGuard.isFeatureActive('sell_offline_pos_counters');
+
     const limit = this.featureGuard.getLimitValue('offline_pos_counters_count');
-    this.counterLimit = limit !== undefined ? limit : null;
+    this.counterLimit = limit !== undefined && limit !== null ? limit : (this.hasFeature ? 5 : null);
   }
 
   loadBranches(): void {
@@ -486,13 +503,56 @@ export class PosCountersComponent implements OnInit {
     this.loading = true;
     this.offlinePosService.getCounters(shopId).subscribe({
       next: (res) => {
-        this.counters = res.data || [];
+        this.counters = this.normalizeCounters(res.data || []);
+        this.lastRefreshedAt = new Date();
         this.loading = false;
       },
       error: (err) => {
         this.toast.showError(err.error?.message || 'Failed to load POS counters');
         this.loading = false;
       }
+    });
+  }
+
+  /** Silent refresh — no loading spinner, used for polling */
+  loadCountersSilent(): void {
+    const shopId = this.getShopId();
+    if (!shopId) return;
+    this.offlinePosService.getCounters(shopId).subscribe({
+      next: (res) => {
+        this.counters = this.normalizeCounters(res.data || []);
+        this.lastRefreshedAt = new Date();
+      },
+      error: () => {}
+    });
+  }
+
+  /** Normalize Firestore Timestamps to JS Date objects */
+  private normalizeCounters(counters: OfflinePosCounter[]): OfflinePosCounter[] {
+    return counters.map(c => ({
+      ...c,
+      lastConnectedAt: this.toDate(c.lastConnectedAt)
+    }));
+  }
+
+  private toDate(val: any): Date | null {
+    if (!val) return null;
+    if (val instanceof Date) return val;
+    // Firestore Timestamp: { _seconds, _nanoseconds } or { seconds, nanoseconds }
+    if (typeof val === 'object' && (val._seconds !== undefined || val.seconds !== undefined)) {
+      const secs = val._seconds ?? val.seconds;
+      return new Date(secs * 1000);
+    }
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  formatLastConnected(val: any): string {
+    const d = this.toDate(val);
+    if (!d) return 'Never';
+    return d.toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true
     });
   }
 

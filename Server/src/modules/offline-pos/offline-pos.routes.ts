@@ -8,7 +8,8 @@ import {
   regenerateCredentials,
   getLogs,
   authenticateDesktop,
-  heartbeat
+  heartbeat,
+  syncInvoice
 } from "./offline-pos.controller";
 import { checkPermission } from "../../middlewares/role.middleware";
 import { checkFeature, checkLimit } from "../../middlewares/subscription.middleware";
@@ -70,5 +71,6 @@ router.get(
 // Public / Desktop Device Auth Routes
 router.post("/auth", authenticateDesktop);
 router.post("/heartbeat", heartbeat);
+router.post("/sync-invoice", syncInvoice);
 
 export default router;

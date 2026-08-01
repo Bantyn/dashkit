@@ -123,20 +123,45 @@ import { UiCounterComponent } from '../../shared/components/ui-counter.component
                 @for (addon of (activeAddons$ | async); track addon.id) {
                   <div class="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-all">
                     <div class="flex items-center gap-4">
-                      <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-600">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                           [class.bg-emerald-50]="addon.status === 'active'"
+                           [class.text-emerald-600]="addon.status === 'active'"
+                           [class.bg-amber-50]="addon.status !== 'active'"
+                           [class.text-amber-600]="addon.status !== 'active'">
                         <i class="bi bi-plugin"></i>
                       </div>
                       <div>
-                        <div class="font-normal text-gray-900">{{ addon.name }}</div>
-                        <div class="text-xs text-gray-500 mt-0.5">Key: {{ addon.itemKey }} &bull; Status: <span class="text-orange-500 font-medium">{{ addon.status | uppercase }}</span></div>
+                        <div class="font-bold text-gray-900">{{ addon.name }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-2">
+                          <span>Key: {{ addon.itemKey }}</span>
+                          &bull;
+                          <span
+                            class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase"
+                            [class.bg-emerald-100]="addon.status === 'active'"
+                            [class.text-emerald-800]="addon.status === 'active'"
+                            [class.bg-amber-100]="addon.status !== 'active'"
+                            [class.text-amber-800]="addon.status !== 'active'"
+                          >
+                            {{ addon.status === 'active' ? 'Active' : 'Pending Payment' }}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
                       <div class="text-right">
-                        <div class="font-normal text-gray-900">₹{{ addon.price }}/mo</div>
-                        <div class="text-xs text-gray-400">Awaiting payment</div>
+                        <div class="font-bold text-gray-900">₹{{ addon.price }}/mo</div>
+                        <div class="text-[11px] font-medium"
+                             [class.text-emerald-600]="addon.status === 'active'"
+                             [class.text-amber-600]="addon.status !== 'active'">
+                          {{ addon.status === 'active' ? 'Active Subscription' : 'Awaiting Payment' }}
+                        </div>
                       </div>
-                      <button (click)="cancelAddon(addon.id)" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Remove Add-on">
+                      @if (addon.status !== 'active' && addon.paymentLinkUrl) {
+                        <a [href]="addon.paymentLinkUrl" target="_blank" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold text-xs shadow-xs transition-colors">
+                          Pay Now
+                        </a>
+                      }
+                      <button (click)="cancelAddon(addon.id)" class="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Remove Add-on">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>

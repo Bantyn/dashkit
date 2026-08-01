@@ -446,6 +446,83 @@ export class PaymentService {
     return { success: true, subscriptionItemId, itemKey: item.itemKey };
   }
 
+  /**
+   * Manually activate an add-on item (mark as paid & active, grant feature/limit to shop).
+   */
+  async activateAddon(shopId: string, subscriptionItemId: string, adminId?: string) {
+    const db = (await import("../../config/firebase.config")).db;
+    const FieldValue = (await import("firebase-admin/firestore")).FieldValue;
+    const now = new Date();
+
+    const itemRef = db.collection(SUBSCRIPTION_ITEMS_COLLECTION).doc(subscriptionItemId);
+    const itemDoc = await itemRef.get();
+    if (!itemDoc.exists) throw new Error("Subscription item not found");
+
+    const item = itemDoc.data() as SubscriptionItem;
+    if (item.shopId !== shopId) throw new Error("Item does not belong to this shop");
+
+    // 1. Activate the feature/limit on the shop
+    const shopRef = db.collection("shops").doc(shopId);
+    if (item.type === "feature_addon") {
+      await shopRef.update({
+        customFeatures: FieldValue.arrayUnion(item.itemKey),
+        updatedAt: now,
+      });
+    } else if (item.type === "limit_addon") {
+      const shopDoc = await shopRef.get();
+      const shopData = shopDoc.data() as any;
+      const current = shopData?.additionalLimits?.[item.itemKey] || 0;
+      
+      const updateData: any = {
+        [`additionalLimits.${item.itemKey}`]: current + (item.quantity || 1),
+        updatedAt: now,
+      };
+      await shopRef.update(updateData);
+    }
+
+    // 2. Mark subscription item as active & paid
+    await itemRef.update({
+      status: "active",
+      paymentStatus: "paid",
+      activatedAt: now,
+      purchasedAt: now,
+      updatedAt: now,
+    });
+
+    // 3. Create billing transaction record
+    const txnRef = db.collection("billing_transactions").doc();
+    await txnRef.set({
+      id: txnRef.id,
+      transactionId: `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
+      shopId,
+      type: "extra_feature",
+      featureCode: item.itemKey,
+      billingPeriod: "monthly",
+      amount: item.price * (item.quantity || 1),
+      paymentGateway: "manual_activation",
+      paymentMethod: "admin_override",
+      status: "success",
+      createdAt: now,
+      completedAt: now,
+      notes: `Add-on activated: ${item.name}`,
+    });
+
+    // 4. Audit log
+    await db.collection(ADDON_AUDIT_COLLECTION).add({
+      shopId,
+      subscriptionItemId,
+      action: "activated_manually",
+      itemKey: item.itemKey,
+      performedBy: adminId || "system",
+      timestamp: now,
+    });
+
+    // 5. Invalidate subscription access cache
+    subscriptionService["invalidateAccessCache"](undefined, shopId);
+
+    return { success: true, subscriptionItemId, itemKey: item.itemKey };
+  }
+
   async handleRazorpayWebhook(body: any, signature: string, webhookSecret: string) {
     const crypto = await import("crypto");
     

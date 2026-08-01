@@ -17,6 +17,22 @@ export const resolveShopMiddleware = async (
   next: NextFunction,
 ) => {
   try {
+    const directShopId = (req.query.shopId as string) || (req.headers["x-shop-id"] as string) || (req.headers["shop-id"] as string);
+    if (directShopId) {
+      const cached = tenantCacheService.getShopBySlug(directShopId);
+      if (cached) {
+        req.shop = cached;
+        return next();
+      }
+      const shopDoc = await db.collection("shops").doc(directShopId).get();
+      if (shopDoc.exists) {
+        const shopData = { id: shopDoc.id, ...shopDoc.data() } as Shop;
+        tenantCacheService.setShopBySlug(directShopId, shopData);
+        req.shop = shopData;
+        return next();
+      }
+    }
+
     const normalizeSubdomain = (value?: string | null) =>
       String(value || "")
         .trim()

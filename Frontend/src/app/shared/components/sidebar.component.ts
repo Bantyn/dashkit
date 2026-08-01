@@ -7,6 +7,7 @@ import { FeatureGuardService } from '../../core/services/feature-guard.service';
 import { PermissionService } from '../../core/services/permission.service';
 import { BranchContextService } from '../../core/services/branch-context.service';
 import { BranchService, Branch } from '../../core/services/branch.service';
+import { ShopContextService } from '../../core/services/shop-context.service';
 
 import { UiLogoComponent } from './ui/ui-logo.component';
 
@@ -177,6 +178,7 @@ export class SidebarComponent {
     private permissionService: PermissionService,
     private branchContext: BranchContextService,
     private branchService: BranchService,
+    private shopContext: ShopContextService,
   ) {
     this.initShopMenu();
   }
@@ -198,6 +200,10 @@ export class SidebarComponent {
         this.fetchActiveBranchDetails();
         this.checkCurrentRouteFeature();
       }
+    });
+
+    this.shopContext.shopConfig$.subscribe(() => {
+      this.refreshFilteredMenu();
     });
 
     this.branchContext.activeBranchInfo$.subscribe(() => {
@@ -281,9 +287,21 @@ export class SidebarComponent {
     if (this.userRole === 'admin') return true;
     
     const user = this.authService.getCurrentUser();
-    if (!user || !user.shopId) return false;
+    if (!user) return false;
+
+    // 1. Check user features array (including wildcard '*')
+    if (Array.isArray(user.features)) {
+      if (user.features.includes(featureKey) || user.features.includes('*')) {
+        return true;
+      }
+    }
     
-    const shop = this.authService.getShopSync(user.shopId);
+    // 2. Check current shop context customFeatures
+    const shop = this.shopContext.getShopSync();
+    if (shop && Array.isArray((shop as any).customFeatures) && (shop as any).customFeatures.includes(featureKey)) {
+      return true;
+    }
+
     return this.featureService.hasFeatureSync(shop, featureKey);
   }
 

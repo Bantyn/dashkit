@@ -111,3 +111,24 @@ export const heartbeat = asyncHandler(async (req: Request, res: Response) => {
   if (!ok) return sendError(res, "Device heartbeat failed", 400);
   return sendSuccess(res, { status: "online", timestamp: new Date() }, "Heartbeat received");
 });
+
+export const syncInvoice = asyncHandler(async (req: Request, res: Response) => {
+  const payload = req.body || {};
+  const shopId = payload.shopId || (req.headers["x-shop-id"] as string) || req.query.shopId;
+  
+  if (!shopId) {
+    return sendError(res, "Missing shopId in invoice payload or headers", 400);
+  }
+
+  const { invoiceService } = await import("../invoice/invoice.service");
+  
+  const invoiceData = payload.invoice || payload;
+  const createdInvoice = await invoiceService.createInvoice({
+    ...invoiceData,
+    shopId: String(shopId),
+    source: "offline_pos_counter",
+    counterId: payload.counterId || invoiceData.counterId,
+  });
+
+  return sendSuccess(res, createdInvoice, "Offline POS Invoice synced successfully", 201);
+});

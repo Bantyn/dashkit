@@ -966,7 +966,22 @@ export class SubscriptionService {
       .where("isDeleted", "==", false)
       .get();
 
-    return snap.docs.map((d: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: d.id, ...d.data() }));
+    const rawItems = snap.docs
+      .map((d: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: d.id, ...d.data() } as any))
+      .filter((item: any) => item.status !== "cancelled");
+
+    // Deduplicate by itemKey (keep active or first item)
+    const itemMap = new Map<string, any>();
+    for (const item of rawItems) {
+      const existing = itemMap.get(item.itemKey);
+      if (!existing) {
+        itemMap.set(item.itemKey, item);
+      } else if (item.status === "active" && existing.status !== "active") {
+        itemMap.set(item.itemKey, item);
+      }
+    }
+
+    return Array.from(itemMap.values());
   }
 
   /**

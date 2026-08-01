@@ -25,6 +25,7 @@ const FEATURE_ADDON_CATALOG: Record<string, { name: string; defaultPrice: number
   web_storefront:  { name: "Storefront Website",    defaultPrice: 149 },
   web_theme:       { name: "Theme Customization",   defaultPrice: 49 },
   web_seo:         { name: "SEO Tools",             defaultPrice: 49 },
+  sell_offline_pos_counters: { name: "Offline POS Counters", defaultPrice: 299 },
 };
 
 const LIMIT_ADDON_CATALOG: Record<string, { name: string; pricePerUnit: number }> = {
@@ -32,6 +33,7 @@ const LIMIT_ADDON_CATALOG: Record<string, { name: string; pricePerUnit: number }
   branch_count:       { name: "Extra Branch",        pricePerUnit: 500 },
   invoices_per_month: { name: "Extra 500 Invoices/Month", pricePerUnit: 199 },
   products_count:     { name: "Extra 1000 Products", pricePerUnit: 99 },
+  offline_pos_counters_count: { name: "Extra POS Counter Device", pricePerUnit: 299 },
 };
 
 /**
@@ -122,6 +124,23 @@ export const cancelShopAddon = asyncHandler(async (req: Request, res: Response) 
     return sendSuccess(res, result, "Add-on cancelled successfully");
   } catch (err: any) {
     return sendError(res, err.message || "Failed to cancel add-on", 500);
+  }
+});
+
+/**
+ * POST /api/v1/admin/shops/:shopId/addons/:itemId/activate
+ * Manually activate an add-on item and mark payment completed.
+ */
+export const activateShopAddon = asyncHandler(async (req: Request, res: Response) => {
+  const shopId = String(req.params.shopId);
+  const itemId = String(req.params.itemId);
+  const adminId = (req as any).user?.uid;
+
+  try {
+    const result = await paymentService.activateAddon(shopId, itemId, adminId);
+    return sendSuccess(res, result, "Add-on activated successfully");
+  } catch (err: any) {
+    return sendError(res, err.message || "Failed to activate add-on", 500);
   }
 });
 

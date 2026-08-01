@@ -98,6 +98,7 @@ export const ROUTE_FEATURE_MAPPING: Record<string, string> = {
 };
 
 import { AuthService } from './auth.service';
+import { ShopContextService } from './shop-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -105,6 +106,7 @@ import { AuthService } from './auth.service';
 export class FeatureGuardService {
   private shopService = inject(ShopService);
   private authService = inject(AuthService);
+  private shopContext = inject(ShopContextService, { optional: true });
 
   /**
    * Check if a specific feature is enabled for the current shop.
@@ -118,9 +120,12 @@ export class FeatureGuardService {
         const user = this.authService.getCurrentUser();
         if (!user) return false;
         
-        // Custom feature override via shop data if needed
-        // But primarily rely on the user profile's features
-        if (Array.isArray(user.features) && user.features.includes(featureKey)) {
+        if (Array.isArray(user.features) && (user.features.includes(featureKey) || user.features.includes('*'))) {
+          return true;
+        }
+
+        const shop = this.shopContext?.getShopSync();
+        if (shop && Array.isArray((shop as any).customFeatures) && (shop as any).customFeatures.includes(featureKey)) {
           return true;
         }
 
@@ -137,14 +142,22 @@ export class FeatureGuardService {
   hasFeatureSync(context: any, featureKey: string): boolean {
     if (!featureKey) return true;
 
-    // Use dynamic features attached to the user session
+    // 1. Check dynamic features attached to the user session
     const user = this.authService.getCurrentUser();
-    if (user && Array.isArray(user.features) && user.features.includes(featureKey)) {
+    if (user && Array.isArray(user.features)) {
+      if (user.features.includes(featureKey) || user.features.includes('*')) {
+        return true;
+      }
+    }
+
+    // 2. Check context passed directly
+    if (context && Array.isArray(context.customFeatures) && context.customFeatures.includes(featureKey)) {
       return true;
     }
 
-    // Allow custom features fallback if passed explicitly on a shop context object
-    if (context && Array.isArray(context.customFeatures) && context.customFeatures.includes(featureKey)) {
+    // 3. Check ShopContextService fallback
+    const currentShop = this.shopContext?.getShopSync();
+    if (currentShop && Array.isArray((currentShop as any).customFeatures) && (currentShop as any).customFeatures.includes(featureKey)) {
       return true;
     }
 

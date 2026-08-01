@@ -36,15 +36,30 @@ export class OfflinePosService {
   async getCounters(shopId: string): Promise<OfflinePosCounter[]> {
     const snap = await db.collection(COUNTERS_COLLECTION).where("shopId", "==", shopId).get();
     const now = new Date().getTime();
-    
+
     return snap.docs.map((doc: any) => {
       const data = doc.data() as OfflinePosCounter;
-      const lastSeen = data.lastConnectedAt ? new Date(data.lastConnectedAt).getTime() : 0;
-      const isOnline = now - lastSeen < 2 * 60 * 1000 && data.status === "active"; // online if seen in last 2 mins
+
+      // Firestore Admin SDK returns Timestamp objects — use .toMillis() if available
+      const lastSeen = data.lastConnectedAt
+        ? typeof (data.lastConnectedAt as any).toMillis === "function"
+          ? (data.lastConnectedAt as any).toMillis()
+          : new Date(data.lastConnectedAt as any).getTime()
+        : 0;
+
+      const isOnline = !isNaN(lastSeen) && now - lastSeen < 2 * 60 * 1000 && data.status === "active";
+
+      // Also convert lastConnectedAt to ISO string for consistent frontend serialization
+      const lastConnectedAtISO = data.lastConnectedAt
+        ? typeof (data.lastConnectedAt as any).toDate === "function"
+          ? (data.lastConnectedAt as any).toDate().toISOString()
+          : new Date(data.lastConnectedAt as any).toISOString()
+        : null;
 
       return {
         ...data,
         id: doc.id,
+        lastConnectedAt: lastConnectedAtISO,
         deviceStatus: isOnline ? "online" : "offline",
       } as any;
     });

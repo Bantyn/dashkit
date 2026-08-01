@@ -19,8 +19,8 @@ export interface OfflinePosCounter {
   os?: string;
   desktopName?: string;
   ipAddress?: string;
-  lastConnectedAt?: string | null;
-  createdAt: string;
+  lastConnectedAt?: string | Date | null;
+  createdAt: string | Date;
   updatedAt: string;
   deviceStatus?: 'online' | 'offline';
 }
