@@ -109,7 +109,7 @@ interface PageConfig {
                         <div class="w-3 h-3 rounded-full bg-green-400"></div>
                       </div>
                       <div class="mx-auto bg-white px-6 py-1 rounded-full text-[10px] text-gray-400 font-mono flex items-center gap-2 shadow-sm border border-gray-200">
-                        <i class="bi bi-lock-fill text-gray-300"></i> yourshop.clothify.com
+                        <i class="bi bi-lock-fill text-gray-300"></i> yourshop.dashkit.com
                       </div>
                     </div>
 

@@ -89,7 +89,7 @@ import { FeatureGuardService } from '../../../core/services/feature-guard.servic
                       />
                       <span
                         class="px-4 py-2 bg-gray-100 border border-gray-200 rounded-r-lg text-gray-500"
-                        >.clothify.com</span
+                        >.dashkit.com</span
                       >
                     </div>
                     <p *ngIf="subdomainError" class="text-red-500 text-sm mt-1">

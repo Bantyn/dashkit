@@ -28,10 +28,26 @@ function getPublicApiUrl(): string {
   return 'http://localhost:3003/api/v1';
 }
 
+function getStorefrontUrl(): string {
+  try {
+    const customUrl = (window as any)?.process?.env?.STOREFRONT_URL || (globalThis as any)?.process?.env?.STOREFRONT_URL || (window as any)?.__env?.STOREFRONT_URL;
+    if (customUrl) return customUrl;
+  } catch {}
+
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.endsWith('.localhost')) {
+      return 'https://dashkit-storefront.vercel.app';
+    }
+  }
+  return 'http://localhost:4203';
+}
+
 export const environment = {
   production: true,
   get apiUrl() { return getApiUrl(); },
   get publicApiUrl() { return getPublicApiUrl(); },
+  get storefrontUrl() { return getStorefrontUrl(); },
 
   firebase: {
     apiKey: 'AIzaSyD45PhCDp-Dz2TfQEksmWGGfgf2A4FwkXM',

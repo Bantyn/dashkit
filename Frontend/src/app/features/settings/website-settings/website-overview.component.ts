@@ -5,6 +5,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Shop } from '../../../core/models/shop.model';
 import { ShopService } from '../../../core/services/shop.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-website-overview',
@@ -64,11 +65,11 @@ import { ToastService } from '../../../core/services/toast.service';
               <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
                 <p class="text-sm text-gray-500">Your website is live at:</p>
                 <a
-                  [href]="'https://' + shop!.slug + '.clothify.com'"
+                  [href]="storeUrl"
                   target="_blank"
                   class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
                 >
-                  {{ shop!.slug }}.clothify.com
+                  {{ displayUrl }}
                   <i class="bi bi-box-arrow-up-right text-xs"></i>
                 </a>
               </div>
@@ -142,6 +143,16 @@ export class WebsiteOverviewComponent implements OnInit {
       route: '../website/settings',
     },
   ];
+
+  get storeUrl(): string {
+    if (!this.shop?.slug) return '';
+    if (this.shop.customDomain) return `https://${this.shop.customDomain}`;
+    return `${environment.storefrontUrl}/shop/${this.shop.slug}`;
+  }
+
+  get displayUrl(): string {
+    return this.storeUrl.replace(/^https?:\/\//, '');
+  }
 
   constructor(
     private fb: FormBuilder,

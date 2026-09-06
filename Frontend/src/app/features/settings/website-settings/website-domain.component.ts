@@ -94,7 +94,7 @@ import { environment } from '../../../../environments/environment';
                   />
                   <span
                     class="px-4 py-2.5 bg-primary-50 border border-gray-200 rounded-r-xl text-sm text-gray-500 font-medium whitespace-nowrap"
-                    >.clothify.com</span
+                    >.dashkit.com</span
                   >
                 </div>
                 <div class="mt-1.5 h-4">
@@ -287,13 +287,13 @@ export class WebsiteDomainComponent implements OnInit {
   }
 
   get currentUrl(): string {
-    if (!this.shop) return 'https://clothify.com';
+    if (!this.shop) return environment.storefrontUrl;
     
     if (this.shop.customDomain) {
       return `https://${this.shop.customDomain}`;
     }
     
-    return `https://${this.shop.slug}.clothify.com`;
+    return `${environment.storefrontUrl}/shop/${this.shop.slug}`;
   }
 
   ngOnInit() {
