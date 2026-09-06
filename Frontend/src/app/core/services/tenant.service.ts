@@ -59,7 +59,7 @@ export class TenantService {
         subdomain = domainParts[0];
       }
     } else if (hostname.includes('vercel.app') || hostname.includes('clothify.com') || hostname.includes('clothify.in') || hostname.includes('dashkit.com')) {
-      // Platform domains (e.g. shop.dashkiiit.vercel.app or zara.dashkit.com)
+      // Platform domains (e.g. shop.dashkit.vercel.app or zara.dashkit.com)
       if (domainParts.length >= 3) {
         subdomain = domainParts[0];
       }

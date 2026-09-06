@@ -84,7 +84,7 @@ export class TenantService {
       hostname.includes("dashkit.in") ||
       hostname.includes("dashkit.com")
     ) {
-      // Platform domains (e.g. shop.dashkiiit.vercel.app or zara.dashkit.com)
+      // Platform domains (e.g. shop.dashkit.vercel.app or zara.dashkit.com)
       if (domainParts.length >= 3) {
         subdomain = domainParts[0];
       }
