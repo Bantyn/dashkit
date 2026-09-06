@@ -38,7 +38,7 @@ const getDashboardUrl = (): string => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.endsWith('.localhost')) {
-      return 'https://dashkiiit.vercel.app';
+      return 'https://dashboard.dashkit.vercel.app';
     }
   }
   return 'http://localhost:4200';
